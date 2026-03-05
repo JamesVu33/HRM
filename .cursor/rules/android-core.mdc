@@ -1,0 +1,34 @@
+---
+description: keep the project structure/config stable
+globs: "**/*"
+alwaysApply: true
+---
+# Android Project Safeguards
+
+### 1. Configuration Restrictions
+- **DO NOT** modify any of the following files without explicit user permission:
+  - `build.gradle`, `build.gradle.kts`
+  - `AndroidManifest.xml`
+  - `gradle.properties`, `settings.gradle.kts`
+  - `proguard-rules.pro`
+- If a feature requires a new dependency or a permission change, you must **list the changes** and ask: "Should I apply these configuration changes?"
+
+### 2. Architecture Alignment
+- Always analyze the existing package structure (e.g., `com.example.app.data`, `ui`, `domain`).
+- When creating a new feature, mirror the structure of existing features found in `@/src/main/java`.
+- Follow the **MVVM** pattern unless the project context suggests otherwise.
+
+### 3. Documentation
+- If you introduce a complex logic, add KDoc comments for public functions.
+
+# Kotlin & Logic Standards
+### 4. Coding Style
+- Use **Kotlin Coroutines** and **Flow** for asynchronous operations.
+- Prefer `val` over `var` whenever possible.
+- Use `StateFlow` or `SharedFlow` in ViewModels to emit states to the UI.
+
+### in SOL, always use Hilt for DI
+### 5. Dependency Injection
+<!-- - Check for existing DI frameworks (Hilt, Koin, or Dagger).-->
+- Using Hilt for DI
+- Always inject dependencies through constructors.

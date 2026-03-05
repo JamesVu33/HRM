@@ -1,0 +1,32 @@
+# --- Android Specific ---
+.gradle/
+build/
+captures/
+*.iml
+.idea/
+local.properties
+
+# --- iOS Specific ---
+DerivedData/
+build/
+*.extbuild
+*.moved-aside
+*.xcuserstate
+Pods/
+.bundle/
+
+# --- General / Secrets ---
+.env
+.env.*
+*.jks
+*.keystore
+google-services.json
+GoogleService-Info.plist
+
+# --- Version Control ---
+.git/
+.svn/
+.hg/
+
+# --- Cursor Specific (Optional) ---
+# .cursor/rules/

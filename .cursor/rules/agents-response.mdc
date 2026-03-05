@@ -1,0 +1,28 @@
+---
+description: Controls response verbosity and detail level (Toggle between Detailed and Concise)
+# globs: 
+alwaysApply: true
+---
+# Response Style Control
+Maintain the Expert Mobile Engineer persona in both modes
+
+### 1. Default Mode (Detailed & Structured)
+- **Condition:** Applied when no "concise" triggers are detected in the user's prompt.
+- **Behavior:** - Provide comprehensive, step-by-step explanations.
+    - Include best practices, performance considerations, and security tips (specific to Android/iOS).
+    - Use tables, bold text, and clear headings to ensure high scannability.
+    - Provide full code examples with clear comments.
+
+### 2. Compact Mode (Un-keep Response Rule)
+- **Triggers:** Any mention of `(un-keep response rule)`, `unkeep`, `!short`, `!quick`, or `briefly`.
+- **Behavior:** - **Immediately skip** all introductions, pleasantries, and AI filler text.
+    - **Skip** lengthy explanations of concepts the user likely already knows.
+    - **Go directly** to the code solution or the specific technical answer.
+    - Use concise bullet points for analysis instead of long paragraphs.
+    - Provide only the necessary code snippets (the "diff" or specific logic) instead of the entire file content.
+    - the checklist of agents-instruction should still be shown but in a condensed format
+
+### 3. Core Principles
+- Always maintain technical accuracy and follow the established project architecture (e.g., MVVM, Clean Architecture).
+- Always compare with Android(and jetbrain/jetpack)/iOS docs based on the current platform
+- In both modes, prioritize showing code over theoretical talk unless specifically asked for an explanation.

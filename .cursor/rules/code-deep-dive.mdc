@@ -1,0 +1,69 @@
+---
+description: Triggered when the user wants to understand code, logic, or features deeply
+globs: "**/*"
+alwaysApply: false
+---
+# Deep Dive Analysis Standards
+
+When the user asks to "explain", "understand", "deep dive", or uses the keyword `!deep`, apply the following analytical framework:
+
+### 1. Multi-Layer Analysis
+- **Contextual Layer:** Use `@Codebase` to explain why this code exists and what business value it provides.
+- **Structural Layer:** Identify the design patterns (e.g., Singleton, Observer, Factory) and architectural components (ViewModel, UseCase).
+- **Execution Layer:** Trace the lifecycle. What triggers this? What does it trigger next?
+- **Logic Layer:** Breakdown complex lines (especially Regex, Math, or Flow logic) using simple analogies.
+
+### 2. Visualization (Mermaid)
+- If the logic involves more than 2 components or asynchronous steps, **ALWAYS** generate a Mermaid sequence diagram or flowchart to visualize the execution.
+
+### 3. Edge Case & Risk Assessment
+- Identify potential "Hidden Dangers":
+    - Threading issues (Race conditions, Main thread blocking).
+    - Memory risks (Retain cycles, large allocations).
+    - Nullability or Unwrapped optionals.
+
+### 4. Interactive Learning
+- Conclude the explanation with 2-3 "What if?" scenarios to help the user test their understanding (e.g., "What if the network fails at line X?").
+
+### 5. Response Toggle
+- If `!short` is used with `!deep`, provide only the Mermaid diagram and a 3-bullet point "Technical Essence" summary.
+
+<!-- or using prompt -->
+### to understand the code better, you can use the following prompt
+<!-- 
+Prompt: "Please perform a Deep Dive Analysis on this @SelectedCode.
+
+I want to understand:
+
+Purpose: What is the primary responsibility of this code in the context of the whole feature?
+
+Execution Flow: Trace the lifecycle. Where is this called from, and what happens next? (Reference @Codebase if needed).
+
+Logic Breakdown: Explain the complex parts of the logic line-by-line using simple analogies.
+
+Dependencies: What external services, repositories, or injected classes does this rely on?
+
+Edge Cases: What could break this code? Are there any hidden side effects or threading risks (Main vs Background thread)?
+
+Design Pattern: Is there a specific architectural pattern being used here (e.g., Observer, Factory, Delegate)?"
+-->
+
+### get the big picture of the code
+ <!-- 
+ How does this function impact the overall @Feature?
+  -->
+
+### show the data flow of the code
+<!-- 
+Create a Mermaid sequence diagram to show the data flow of this function from the UI to the Database. 
+-->
+
+### show the architecture of the code
+<!-- 
+Create a Mermaid class diagram to show the architecture of this function. 
+-->
+
+### what if the code is not working as expected?
+<!-- 
+What happens if this API call returns a 401 error here? Show me exactly how the code handles it.
+ -->

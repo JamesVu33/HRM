@@ -1,0 +1,51 @@
+---
+description: Unit Test (JUnit) and Mocking (MockK) rules
+globs: "**/test/**/*.kt, **/androidTest/**/*.kt"
+alwaysApply: false
+---
+
+######### EXAMPLE #########
+## create test for existing file:
+<!-- "Generate a JUnit test for @MyViewModel.kt. Use MockK for all dependencies. Make sure to cover the error state when the API fails." -->
+## create specific Mock/Test file:
+<!-- "Create a Unit Test for @PaymentService.kt. Please mock @DatabaseRepository.kt and @AnalyticsProvider.kt using MockK. I want to test the processPayment function." -->
+## create boilerplate testing structure:
+<!-- "Create a test class for @UserRepository.kt with all dependencies mocked and a setup() method. Don't write the test cases yet, just the structure." -->
+## feature/function testing
+<!-- 
+Write tests for a function that validates email addresses. 
+Expected behavior:
+- "user@example.com" returns true
+- "invalid-email" returns false  
+- Empty string returns false
+
+Use the testing patterns in `__tests__/`. Don't implement the function yet—I want the tests to fail first.
+ -->
+
+# Android Testing & Mocking Standards
+
+### 1. Framework Preferences
+- **Unit Testing:** Use **JUnit 5** (preferable) or JUnit 4.
+- **Mocking:** Use **MockK** for all Kotlin mocking (avoid Mockito in Kotlin projects).
+- **Assertion:** Use `kotlin.test` assertions or **Truth** library.
+
+### 2. Testing Pattern (AAA)
+- Follow the **Arrange-Act-Assert** pattern clearly with comments.
+- **Naming Convention:** Use descriptive names for test functions, e.g., `should_ReturnSuccess_When_RepositoryReturnsData()`.
+
+### 3. Mocking Guidelines
+- Use `@MockK` and `@InjectMockKs` or `mockk<Class>()` for dependency mocking.
+- Always handle Coroutines in tests:
+    - Use `runTest` from `kotlinx-coroutines-test`.
+    - Use a `TestDispatcher` (e.g., `UnconfinedTestDispatcher`) when testing ViewModels.
+- **Mocking Specific Files:** When asked to mock a specific file/class, use `every { ... } returns ...` for behavior and `verify { ... }` for interaction checks.
+
+### 4. Code Coverage & Scenarios
+- Always include tests for:
+    - **Happy Path:** Standard successful execution.
+    - **Edge Cases:** Empty lists, null values, or unexpected inputs.
+    - **Error Handling:** Ensure exceptions/errors are caught and handled by the UI state.
+
+### 5. Integration with Existing Code
+- Before creating a test, analyze the constructor of the class being tested to identify all dependencies that need to be mocked.
+- If the project has a `BaseTest` class, inherit from it.

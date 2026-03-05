@@ -1,0 +1,46 @@
+---
+description: Triggered when asking for performance audit or optimization
+globs: "**/*.kt, **/*.swift"
+alwaysApply: false
+---
+# Performance Audit Rules
+If the user uses the keyword "!audit", follow the Senior Performance Engineer persona.
+
+1. **Analysis Focus:**
+   - Time Complexity: Flag O(n²) or higher
+   - Memory: Check for leaks, large allocations, retained references
+   - Threading: Verify no Main Thread blocking (use Dispatchers.IO/Global Queue)
+   - Resources: Battery, network over-fetching, disk I/O
+
+2. **Platform-Specific:**
+   - **Android**: Unnecessary recompositions, missing `remember`/`derivedStateOf`
+   - **iOS**: Retain cycles `[weak self]`, expensive SwiftUI body re-evaluations
+
+3. **Output Format:**
+   - Highlight specific lines with red flags
+   - Provide optimized version
+   - Suggest benchmark test (Jetpack Benchmark/XCTest Measure)
+
+4. **Quick Guidelines:**
+   - Always check Big O complexity
+   - Prioritize UI smoothness (60/120 FPS)
+   - Suggest `LazyColumn`/`LazyStack` for long lists
+
+<!-- or using prompt -->
+### to perform a performance audit, you can use the following prompt
+<!-- 
+Please act as a Senior Mobile Performance Engineer. Analyze the performance of the following [function/feature]: @Selected_Function_or_File.
+1. Analysis Focus:
+* Time Complexity: Identify any $O(n^2)$ or higher complexities that could be optimized.
+* Memory Usage: Check for potential Memory Leaks, large object allocations, or retained references (especially in Closures/Lambdas).
+* Threading: Ensure heavy computations are not blocking the Main Thread (UI Thread). Check for proper use of Dispatchers.IO/Default (Android) or Global Queue/Actors (iOS).
+* Resource Impact: Analyze impact on Battery, Network calls (over-fetching), and Disk I/O.
+2. Specific Mobile Checks:
+* Android: Check for unnecessary Recompositions (Compose) or View hierarchy nesting. Verify if remember or derivedStateOf is missing.
+* iOS: Check for retain cycles ([weak self]) and expensive SwiftUI body re-evaluations.
+3. Output Requirement:
+* Highlight specific lines with performance "red flags".
+* Provide an Optimized Version of the code.
+* Suggest a Unit Test/Benchmark snippet (e.g., using Jetpack Benchmark or XCTest Measure) to verify the improvement.
+ -->
+

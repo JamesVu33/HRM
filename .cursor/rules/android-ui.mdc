@@ -1,0 +1,22 @@
+---
+description: Jetpack Compose rules
+globs: "**/ui/**/*.kt"
+alwaysApply: false
+---
+# Jetpack Compose UI Standards
+
+### 1. Composable Patterns
+- Follow **State Hoisting** patterns: pass state down and events up.
+- Keep Composables "dumb" (UI only). Move all business logic to the ViewModel.
+- Always include a `@Preview` function for each screen/component which has not required input parameters.
+- Should not leave the function code too long, should split into smaller function
+
+
+### custom follow SOL
+<!-- ### 2. Resources & Theme
+- Use `MaterialTheme.colorScheme` and `MaterialTheme.typography` instead of hardcoded values.
+- Use `stringResource(R.string.id)` for all user-facing text. -->
+
+### 3. Performance
+- Use `remember` and `derivedStateOf` to optimize recompositions.
+- Use `LazyColumn` / `LazyRow` for lists.
