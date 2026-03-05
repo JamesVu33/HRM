@@ -36,6 +36,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+//comment something
 @Composable
 fun HRMApp() {
     val navController = rememberNavController()
