@@ -61,11 +61,14 @@ fun HRMApp() {
                     currentRoute = currentRoute,
                     onItemClick = { route ->
                         when (route) {
+                            Screen.Dashboard.route -> {
+                                navController.navigate(route) {
+                                    popUpTo(Screen.Dashboard.route) { inclusive = true }
+                                }
+                            }
                             Screen.EmployeeList.route -> {
                                 navController.navigate(route) {
-                                    popUpTo(Screen.EmployeeList.route) {
-                                        inclusive = true
-                                    }
+                                    popUpTo(Screen.EmployeeList.route) { inclusive = true }
                                 }
                             }
                         }

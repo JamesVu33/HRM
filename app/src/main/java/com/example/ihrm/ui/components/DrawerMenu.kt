@@ -1,6 +1,7 @@
 package com.example.ihrm.ui.components
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Icon
@@ -30,11 +31,15 @@ fun DrawerMenu(
 ) {
     val menuItems = listOf(
         DrawerMenuItem(
+            title = "Dashboard",
+            icon = Icons.Default.Home,
+            route = "dashboard"
+        ),
+        DrawerMenuItem(
             title = "Employees",
             icon = Icons.Default.Person,
             route = "employee_list"
         )
-        // TODO: Add more menu items as needed (Departments, Settings, etc.)
     )
 
     ModalDrawerSheet(modifier = modifier) {

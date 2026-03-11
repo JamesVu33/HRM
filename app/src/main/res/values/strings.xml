@@ -1,3 +1,54 @@
 <resources>
     <string name="app_name">IHRM</string>
+
+    <!-- loginTest -->
+    <string name="login_test_brand">Shinhan DS</string>
+    <string name="login_test_title">Welcome</string>
+    <string name="login_test_subtitle">Enter your credentials to access your account</string>
+    <string name="login_test_email_label">Email</string>
+    <string name="login_test_email_placeholder">Enter your email</string>
+    <string name="login_test_password_label">Password</string>
+    <string name="login_test_password_placeholder">Enter your password</string>
+    <string name="login_test_login_button">Login</string>
+    <string name="login_test_forgot_password">Forgot your password?</string>
+    <string name="login_test_signup_link">Don\u2019t have an account? Sign Up</string>
+    <string name="login_test_footer">More friendly, secure, creative\nConnect more, Create the most</string>
+    <string name="login_test_error_email_required">Email is required</string>
+    <string name="login_test_error_email_invalid">Please enter a valid email address</string>
+    <string name="login_test_error_password_required">Password is required</string>
+    <string name="login_test_error_password_rules">Password must be 8-16 characters and include uppercase, lowercase, number, and special character.</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_good_morning">Good Morning</string>
+    <string name="dashboard_search_placeholder">Search by name, role, or email…</string>
+    <string name="dashboard_total_employees">Total Employees</string>
+    <string name="dashboard_active_today">Active Today</string>
+    <string name="dashboard_manage_team_title">Manage Your Team</string>
+    <string name="dashboard_manage_team_subtitle">Keep track of your employees and stay organized</string>
+    <string name="dashboard_view_stats">View Stats</string>
+    <string name="dashboard_team_members">Team Members</string>
+    <string name="dashboard_view_details">View Details</string>
+    <string name="dashboard_delete">Delete</string>
+    <string name="dashboard_id_format">ID: %1$s</string>
+    <string name="dashboard_fab_add">Add employee</string>
+
+    <!-- Employee Detail -->
+    <string name="employee_detail_title">Member Information</string>
+    <string name="employee_detail_subtitle_format">%1$s | ID: %2$s</string>
+    <string name="employee_detail_tab_basic_info">Basic Info</string>
+    <string name="employee_detail_tab_employee_info">Employee Info</string>
+    <string name="employee_detail_tab_emergency_contact">Emergency Contact</string>
+    <string name="employee_detail_personal_info">Personal Information</string>
+    <string name="employee_detail_change_info">Change Info</string>
+    <string name="employee_detail_save">Save</string>
+    <string name="employee_detail_full_name">Full Name</string>
+    <string name="employee_detail_english_name">English Name</string>
+    <string name="employee_detail_gender">Gender</string>
+    <string name="employee_detail_email_address">Email Address</string>
+    <string name="employee_detail_contact_number">Contact Number</string>
+    <string name="employee_detail_personal_id">Personal ID</string>
+    <string name="employee_detail_id_issue_date">ID Issue Date</string>
+    <string name="employee_detail_permanent_address">Permanent Address</string>
+    <string name="employee_detail_not_found">Employee not found</string>
+    <string name="employee_detail_error_format">Error: %1$s</string>
 </resources>

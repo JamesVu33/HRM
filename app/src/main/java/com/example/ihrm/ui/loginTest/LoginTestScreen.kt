@@ -1,0 +1,388 @@
+package com.example.ihrm.ui.loginTest
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.ihrm.R
+import com.example.ihrm.ui.components.ButtonSize
+import com.example.ihrm.ui.components.ButtonVariant
+import com.example.ihrm.ui.components.CustomButton
+import com.example.ihrm.ui.theme.Error
+import com.example.ihrm.ui.theme.IHRMTheme
+import com.example.ihrm.ui.theme.Neutral200
+import com.example.ihrm.ui.theme.Neutral400
+import com.example.ihrm.ui.theme.Neutral500
+import com.example.ihrm.ui.theme.Neutral600
+import com.example.ihrm.ui.theme.Neutral700
+import com.example.ihrm.ui.theme.Primary300
+import com.example.ihrm.ui.theme.Primary400
+import com.example.ihrm.ui.theme.Primary50
+import com.example.ihrm.ui.theme.Primary500
+
+@Composable
+fun LoginTestScreen(
+    onLoginSuccess: () -> Unit,
+    onNavigateToSignUp: () -> Unit,
+    viewModel: LoginTestViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(Primary50, Primary300, Primary50)
+                    )
+                )
+                .padding(paddingValues)
+        ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                item {
+
+                    Spacer(modifier = Modifier.height(72.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(Color.White)
+                                .border(
+                                    1.dp,
+                                    Color.White.copy(alpha = 0.2f),
+                                    RoundedCornerShape(16.dp)
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.shinhan_logo),
+                                modifier = Modifier.size(32.dp),
+                                contentDescription = null
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(12.dp))
+
+                        Text(
+                            text = stringResource(R.string.login_test_brand),
+                            color = Primary500,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 24.sp
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(24.dp))
+                            .background(Color.White)
+                            .padding(horizontal = 32.dp, vertical = 32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = stringResource(R.string.login_test_title),
+                            fontSize = 30.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Neutral700,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = stringResource(R.string.login_test_subtitle),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Neutral500,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth(),
+                            lineHeight = 20.sp
+                        )
+
+                        Spacer(modifier = Modifier.height(28.dp))
+
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = buildAnnotatedString {
+                                append(stringResource(R.string.login_test_email_label))
+
+                                withStyle(
+                                    style = SpanStyle(
+                                        color = Color.Red
+                                    )
+                                ) {
+                                    append(" *")
+                                }
+                            },
+                            color = Neutral600,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+
+                        OutlinedTextField(
+                            value = uiState.email,
+                            onValueChange = viewModel::updateEmail,
+                            placeholder = {
+                                Text(
+                                    stringResource(R.string.login_test_email_placeholder),
+                                    color = Neutral400
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !uiState.isLoading,
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.icon_email),
+                                    contentDescription = null,
+                                    tint = if (uiState.emailError != null) Error else Neutral400
+                                )
+                            },
+                            isError = uiState.emailError != null,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = if (uiState.emailError != null) Error else Neutral200,
+                                unfocusedBorderColor = if (uiState.emailError != null) Error else Neutral200,
+                                errorBorderColor = Error
+                            ),
+                            shape = RoundedCornerShape(14.dp)
+                        )
+
+                        val emailError = uiState.emailError
+                        if (emailError != null) {
+                            Text(
+                                text = stringResource(emailError.toMessageResId(isEmail = true)),
+                                color = Error,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 6.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = buildAnnotatedString {
+                                append(stringResource(R.string.login_test_password_label))
+
+                                withStyle(
+                                    style = SpanStyle(
+                                        color = Color.Red
+                                    )
+                                ) {
+                                    append(" *")
+                                }
+                            },
+                            color = Neutral600,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+
+                        OutlinedTextField(
+                            value = uiState.password,
+                            onValueChange = viewModel::updatePassword,
+                            placeholder = {
+                                Text(
+                                    stringResource(R.string.login_test_password_placeholder),
+                                    color = Neutral400
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !uiState.isLoading,
+                            singleLine = true,
+                            visualTransformation = if (uiState.isPasswordVisible) {
+                                VisualTransformation.None
+                            } else {
+                                PasswordVisualTransformation()
+                            },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.icon_email),
+                                    contentDescription = null,
+                                    tint = if (uiState.passwordError != null) Error else Neutral400
+                                )
+                            },
+                            trailingIcon = {
+                                IconButton(onClick = viewModel::togglePasswordVisibility) {
+                                    Icon(
+                                        imageVector = if (uiState.isPasswordVisible) ImageVector.vectorResource(id = R.drawable.icon_eye_off) else ImageVector.vectorResource(id = R.drawable.icon_remember),
+                                        contentDescription = null,
+                                        tint = Neutral400
+                                    )
+                                }
+                            },
+                            isError = uiState.passwordError != null,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = if (uiState.passwordError != null) Error else Neutral200,
+                                unfocusedBorderColor = if (uiState.passwordError != null) Error else Neutral200,
+                                errorBorderColor = Error
+                            ),
+                            shape = RoundedCornerShape(14.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(40.dp))
+
+                        val passwordError = uiState.passwordError
+                        if (passwordError != null) {
+                            Text(
+                                text = stringResource(passwordError.toMessageResId(isEmail = false)),
+                                color = Error,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 6.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        if (uiState.isLoading) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(48.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(24.dp),
+                                    color = Primary400
+                                )
+                            }
+                        } else {
+                            CustomButton(
+                                text = stringResource(R.string.login_test_login_button),
+                                onClick = { viewModel.login(onLoginSuccess) },
+                                modifier = Modifier.fillMaxWidth(),
+                                size = ButtonSize.Large,
+                                variant = ButtonVariant.Primary,
+                                enabled = uiState.email.isNotEmpty() && uiState.password.isNotEmpty()
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        TextButton(
+                            onClick = { /* TODO */ },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = stringResource(R.string.login_test_forgot_password),
+                                color = Primary400,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Text(
+                        text = stringResource(R.string.login_test_footer),
+                        color = Primary400,
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 24.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+private fun LoginTestFieldError.toMessageResId(isEmail: Boolean): Int {
+    return when (this) {
+        LoginTestFieldError.Required -> {
+            if (isEmail) R.string.login_test_error_email_required else R.string.login_test_error_password_required
+        }
+
+        LoginTestFieldError.InvalidFormat -> R.string.login_test_error_email_invalid
+        LoginTestFieldError.InvalidRules -> R.string.login_test_error_password_rules
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LoginTestScreenPreview() {
+    IHRMTheme(dynamicColor = false) {
+        LoginTestScreen(
+            onLoginSuccess = {},
+            onNavigateToSignUp = {},
+            viewModel = LoginTestViewModel()
+        )
+    }
+}
+

@@ -25,5 +25,21 @@ val Neutral100 = Color(0x1A000000)
 val Neutral50 = Color(0xFFf9fafb)
 
 val Error = Color(0xFFfb2c36)
+val ErrorLight = Color(0x2Bfb2c36) // rgba(251,44,54,0.17)
 val Success = Color(0xFF10b981)
+val SuccessGreen = Color(0xFF00a63e) // Figma "Active Today" accent
 val Warning = Color(0xFFf59e0b)
+
+// Dashboard / badge colors from Figma
+val Primary200 = Color(0xFFB3D4FF) // blue75
+val PrimaryTint = Color(0xFFeff6ff) // View Details button bg
+val BadgePurple = Color(0xFF8200db)
+val BadgePurpleBg = Color(0xFFf3e8ff)
+val BadgePurpleBorder = Color(0xFFe9d4ff)
+val BadgeOrange = Color(0xFFca3500)
+val BadgeOrangeBg = Color(0xFFffedd4)
+val BadgeOrangeBorder = Color(0xFFffd6a7)
+val AvatarBlueBg = Color(0xFFdbeafe)
+val AvatarGreenBg = Color(0xFFdcfce7)
+val SurfaceBorder = Color(0xFFf3f4f6)
+val TextSecondary = Color(0xFF4a5565)

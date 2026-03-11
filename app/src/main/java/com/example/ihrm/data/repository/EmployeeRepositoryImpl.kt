@@ -38,6 +38,10 @@ class EmployeeRepositoryImpl @Inject constructor(
                 hireDate = employee.hireDate,
                 salary = employee.salary,
                 address = employee.address,
+                englishName = employee.englishName,
+                gender = employee.gender,
+                personalId = employee.personalId,
+                idIssueDate = employee.idIssueDate,
                 createdAt = employee.createdAt,
                 updatedAt = employee.updatedAt
             )
@@ -70,6 +74,10 @@ class EmployeeRepositoryImpl @Inject constructor(
                 hireDate = employee.hireDate,
                 salary = employee.salary,
                 address = employee.address,
+                englishName = employee.englishName,
+                gender = employee.gender,
+                personalId = employee.personalId,
+                idIssueDate = employee.idIssueDate,
                 createdAt = employee.createdAt,
                 updatedAt = employee.updatedAt
             )

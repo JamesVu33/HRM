@@ -11,9 +11,12 @@ import com.example.ihrm.ui.auth.SignUpScreen
 import com.example.ihrm.ui.auth.SplashScreen
 import com.example.ihrm.ui.employee.addedit.AddEditEmployeeScreen
 import com.example.ihrm.ui.employee.detail.EmployeeDetailScreen
+import com.example.ihrm.ui.dashboard.DashboardScreen
 import com.example.ihrm.ui.employee.list.EmployeeListScreen
+import com.example.ihrm.ui.loginTest.LoginTestScreen
 import com.example.ihrm.util.AuthManager
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun NavGraph(
@@ -29,12 +32,12 @@ fun NavGraph(
         composable(Screen.Splash.route) {
             SplashScreen(
                 onNavigateToLogin = {
-                    navController.navigate(Screen.Login.route) {
+                    navController.navigate(Screen.LoginTest.route) {
                         popUpTo(Screen.Splash.route) { inclusive = true }
                     }
                 },
                 onNavigateToHome = {
-                    navController.navigate(Screen.EmployeeList.route) {
+                    navController.navigate(Screen.Dashboard.route) {
                         popUpTo(Screen.Splash.route) { inclusive = true }
                     }
                 },
@@ -56,6 +59,20 @@ fun NavGraph(
             )
         }
 
+        composable(Screen.LoginTest.route) {
+            LoginTestScreen(
+                onLoginSuccess = {
+                    AuthManager.setLoggedIn(true)
+                    navController.navigate(Screen.Dashboard.route) {
+                        popUpTo(Screen.LoginTest.route) { inclusive = true }
+                    }
+                },
+                onNavigateToSignUp = {
+                    navController.navigate(Screen.SignUp.route)
+                }
+            )
+        }
+
         composable(Screen.SignUp.route) {
             SignUpScreen(
                 onSignUpSuccess = {
@@ -65,6 +82,22 @@ fun NavGraph(
                 },
                 onNavigateToLogin = {
                     navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.Dashboard.route) {
+            DashboardScreen(
+                onMenuClick = { scope.launch { drawerState?.open() } },
+                onProfileClick = { },
+                onViewDetails = { employeeId ->
+                    navController.navigate(Screen.EmployeeDetail.createRoute(employeeId))
+                },
+                onAddEmployee = {
+                    navController.navigate(Screen.AddEmployee.route)
+                },
+                onViewStats = {
+                    navController.navigate(Screen.EmployeeList.route)
                 }
             )
         }
@@ -92,7 +125,8 @@ fun NavGraph(
                 },
                 onDeleteClick = {
                     navController.popBackStack()
-                }
+                },
+                onBackClick = { navController.popBackStack() }
             )
         }
 

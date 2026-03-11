@@ -15,6 +15,10 @@ fun EmployeeDto.toEmployeeEntity(): EmployeeEntity {
         hireDate = hireDate,
         salary = salary,
         address = address,
+        englishName = englishName,
+        gender = gender,
+        personalId = personalId,
+        idIssueDate = idIssueDate,
         createdAt = createdAt ?: System.currentTimeMillis(),
         updatedAt = updatedAt ?: System.currentTimeMillis()
     )
@@ -31,6 +35,10 @@ fun EmployeeDto.toEmployee(): Employee {
         hireDate = hireDate,
         salary = salary,
         address = address,
+        englishName = englishName,
+        gender = gender,
+        personalId = personalId,
+        idIssueDate = idIssueDate,
         createdAt = createdAt ?: System.currentTimeMillis(),
         updatedAt = updatedAt ?: System.currentTimeMillis()
     )
@@ -47,6 +55,10 @@ fun EmployeeEntity.toEmployee(): Employee {
         hireDate = hireDate,
         salary = salary,
         address = address,
+        englishName = englishName,
+        gender = gender,
+        personalId = personalId,
+        idIssueDate = idIssueDate,
         createdAt = createdAt,
         updatedAt = updatedAt
     )
@@ -63,6 +75,10 @@ fun Employee.toEmployeeEntity(): EmployeeEntity {
         hireDate = hireDate,
         salary = salary,
         address = address,
+        englishName = englishName,
+        gender = gender,
+        personalId = personalId,
+        idIssueDate = idIssueDate,
         createdAt = createdAt,
         updatedAt = updatedAt
     )

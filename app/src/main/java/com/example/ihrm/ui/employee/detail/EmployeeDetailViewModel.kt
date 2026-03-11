@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.usecase.DeleteEmployeeUseCase
 import com.example.ihrm.domain.usecase.GetEmployeeByIdUseCase
+import com.example.ihrm.domain.usecase.UpdateEmployeeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +22,8 @@ data class EmployeeDetailUiState(
 @HiltViewModel
 class EmployeeDetailViewModel @Inject constructor(
     private val getEmployeeByIdUseCase: GetEmployeeByIdUseCase,
-    private val deleteEmployeeUseCase: DeleteEmployeeUseCase
+    private val deleteEmployeeUseCase: DeleteEmployeeUseCase,
+    private val updateEmployeeUseCase: UpdateEmployeeUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(EmployeeDetailUiState())
@@ -55,6 +57,19 @@ class EmployeeDetailViewModel @Inject constructor(
                 onFailure = { exception ->
                     _uiState.value = _uiState.value.copy(
                         error = exception.message ?: "Failed to delete employee"
+                    )
+                }
+            )
+        }
+    }
+
+    fun updateEmployee(employee: Employee, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            updateEmployeeUseCase(employee).fold(
+                onSuccess = { onSuccess() },
+                onFailure = { e ->
+                    _uiState.value = _uiState.value.copy(
+                        error = e.message ?: "Failed to update"
                     )
                 }
             )
