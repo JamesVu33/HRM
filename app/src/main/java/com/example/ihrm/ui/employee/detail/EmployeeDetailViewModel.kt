@@ -16,7 +16,8 @@ import javax.inject.Inject
 data class EmployeeDetailUiState(
     val employee: Employee? = null,
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val updateSuccess: Boolean = false
 )
 
 @HiltViewModel
@@ -31,12 +32,14 @@ class EmployeeDetailViewModel @Inject constructor(
 
     fun loadEmployee(employeeId: String) {
         viewModelScope.launch {
+            val preserveSuccess = _uiState.value.updateSuccess
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             try {
                 getEmployeeByIdUseCase(employeeId).collect { employee ->
                     _uiState.value = _uiState.value.copy(
                         employee = employee,
-                        isLoading = false
+                        isLoading = false,
+                        updateSuccess = preserveSuccess
                     )
                 }
             } catch (e: Exception) {
@@ -66,7 +69,10 @@ class EmployeeDetailViewModel @Inject constructor(
     fun updateEmployee(employee: Employee, onSuccess: () -> Unit) {
         viewModelScope.launch {
             updateEmployeeUseCase(employee).fold(
-                onSuccess = { onSuccess() },
+                onSuccess = {
+                    _uiState.value = _uiState.value.copy(updateSuccess = true)
+                    onSuccess()
+                },
                 onFailure = { e ->
                     _uiState.value = _uiState.value.copy(
                         error = e.message ?: "Failed to update"
@@ -78,5 +84,9 @@ class EmployeeDetailViewModel @Inject constructor(
 
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
+    }
+
+    fun clearUpdateSuccess() {
+        _uiState.value = _uiState.value.copy(updateSuccess = false)
     }
 }

@@ -163,7 +163,8 @@ fun CustomButton(
         .shadow(
             elevation = elevation,
             shape = RoundedCornerShape(cornerRadius),
-            spotColor = Color.Black.copy(alpha = 0.1f)
+            ambientColor = Color(18, 20, 24).copy(alpha = 0.05f),
+            spotColor = Color(18, 20, 24).copy(alpha = 0.2f)
         )
 
     when (variant) {

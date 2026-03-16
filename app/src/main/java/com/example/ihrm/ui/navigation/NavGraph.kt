@@ -133,9 +133,8 @@ fun NavGraph(
         composable(Screen.AddEmployee.route) {
             AddEditEmployeeScreen(
                 employeeId = null,
-                onSaveSuccess = {
-                    navController.popBackStack()
-                }
+                onSaveSuccess = { navController.popBackStack() },
+                onBack = { navController.popBackStack() }
             )
         }
 
@@ -146,9 +145,8 @@ fun NavGraph(
             val employeeId = backStackEntry.arguments?.getString("employeeId") ?: return@composable
             AddEditEmployeeScreen(
                 employeeId = employeeId,
-                onSaveSuccess = {
-                    navController.popBackStack()
-                }
+                onSaveSuccess = { navController.popBackStack() },
+                onBack = { navController.popBackStack() }
             )
         }
     }

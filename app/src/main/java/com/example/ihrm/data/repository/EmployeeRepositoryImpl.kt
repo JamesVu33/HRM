@@ -62,6 +62,7 @@ class EmployeeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateEmployee(employee: Employee): Result<Unit> {
+        val entity = employee.toEmployeeEntity()
         return try {
             // Try to update via API first
             val dto = com.example.ihrm.data.remote.dto.EmployeeDto(
@@ -82,14 +83,13 @@ class EmployeeRepositoryImpl @Inject constructor(
                 updatedAt = employee.updatedAt
             )
             apiService.updateEmployee(employee.id, dto)
-            
-            // Update local database
-            employeeDao.updateEmployee(employee.toEmployeeEntity())
+            // Update local database (REPLACE ensures row is overwritten)
+            employeeDao.insertEmployee(entity)
             Result.success(Unit)
         } catch (e: Exception) {
             // If API fails, still update locally
             try {
-                employeeDao.updateEmployee(employee.toEmployeeEntity())
+                employeeDao.insertEmployee(entity)
                 Result.success(Unit)
             } catch (dbException: Exception) {
                 Result.failure(dbException)

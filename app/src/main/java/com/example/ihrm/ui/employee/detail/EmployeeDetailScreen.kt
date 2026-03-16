@@ -1,7 +1,9 @@
 package com.example.ihrm.ui.employee.detail
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,25 +25,38 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -54,12 +70,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ihrm.R
 import com.example.ihrm.domain.model.Employee
@@ -85,12 +104,27 @@ fun EmployeeDetailScreen(
     viewModel: EmployeeDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(employeeId) {
         viewModel.loadEmployee(employeeId)
     }
 
-    Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
+    val successMessage = stringResource(R.string.employee_info_update_success)
+    LaunchedEffect(uiState.updateSuccess) {
+        if (uiState.updateSuccess) {
+            snackbarHostState.showSnackbar(
+                message = successMessage,
+                withDismissAction = true
+            )
+            viewModel.clearUpdateSuccess()
+        }
+    }
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+    ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -105,6 +139,7 @@ fun EmployeeDetailScreen(
                         CircularProgressIndicator(color = Primary400)
                     }
                 }
+
                 uiState.error != null -> {
                     Box(
                         modifier = Modifier
@@ -113,10 +148,14 @@ fun EmployeeDetailScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = stringResource(R.string.employee_detail_error_format, uiState.error!!)
+                            text = stringResource(
+                                R.string.employee_detail_error_format,
+                                uiState.error!!
+                            )
                         )
                     }
                 }
+
                 uiState.employee == null -> {
                     Box(
                         modifier = Modifier
@@ -127,6 +166,7 @@ fun EmployeeDetailScreen(
                         Text(text = stringResource(R.string.employee_detail_not_found))
                     }
                 }
+
                 else -> {
                     EmployeeDetailContent(
                         employee = uiState.employee!!,
@@ -174,11 +214,10 @@ private fun EmployeeDetailContent(
                 )
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
-                Row(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = onBackClick) {
                         Icon(
@@ -187,14 +226,13 @@ private fun EmployeeDetailContent(
                             tint = Color.White
                         )
                     }
-                    Spacer(modifier = Modifier.weight(1f))
                     Text(
+                        modifier = Modifier.align(Alignment.Center),
                         text = stringResource(R.string.employee_detail_title),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.White
                     )
-                    Spacer(modifier = Modifier.weight(1f))
                 }
                 Row(
                     modifier = Modifier
@@ -210,7 +248,8 @@ private fun EmployeeDetailContent(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = employee.name.take(2).uppercase().filter { it.isLetter() }.ifEmpty { "?" },
+                            text = employee.name.take(2).uppercase().filter { it.isLetter() }
+                                .ifEmpty { "?" },
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
@@ -247,7 +286,7 @@ private fun EmployeeDetailContent(
                         TextButton(
                             onClick = { selectedTabIndex = index },
                             shape = RoundedCornerShape(20.dp),
-                            colors = androidx.compose.material3.ButtonDefaults.textButtonColors(
+                            colors = ButtonDefaults.textButtonColors(
                                 containerColor = if (isSelected) Color.White else Primary500,
                                 contentColor = if (isSelected) Primary400 else Color.White
                             )
@@ -274,6 +313,7 @@ private fun EmployeeDetailContent(
                     ) {
                         when (selectedTabIndex) {
                             0 -> BasicInfoSection(employee = employee, onSave = onSave)
+                            1 -> EmployeeInfoSection(employee = employee, onSave = onSave)
                             else -> PlaceholderSection(tabName = tabs[selectedTabIndex])
                         }
                     }
@@ -334,7 +374,8 @@ private fun BasicInfoSection(
                             phone = phone,
                             personalId = personalId.ifBlank { null },
                             idIssueDate = idIssueDate.ifBlank { null },
-                            address = address.ifBlank { null }
+                            address = address.ifBlank { null },
+                            updatedAt = System.currentTimeMillis()
                         )
                     )
                     isEditing = false
@@ -355,7 +396,9 @@ private fun BasicInfoSection(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = if (isEditing) stringResource(R.string.employee_detail_save) else stringResource(R.string.employee_detail_change_info),
+                text = if (isEditing) stringResource(R.string.employee_detail_save) else stringResource(
+                    R.string.employee_detail_change_info
+                ),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium
             )
@@ -364,7 +407,9 @@ private fun BasicInfoSection(
     Spacer(modifier = Modifier.height(16.dp))
 
     Card(
-        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -653,20 +698,572 @@ private fun DetailField(
     }
 }
 
+private val SectionPaddingHorizontal = 20.dp
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun PlaceholderSection(tabName: String) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(200.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = "$tabName (Coming soon)",
-            fontSize = 14.sp,
-            color = Neutral500
+private fun EmployeeInfoDatePickerDialog(
+    onDateSelected: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val datePickerState = rememberDatePickerState(
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean =
+                utcTimeMillis <= System.currentTimeMillis()
+
+            override fun isSelectableYear(year: Int): Boolean =
+                year <= java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)
+        }
+    )
+    Dialog(onDismissRequest = onDismiss) {
+        EmployeeInfoDatePickerContent(
+            datePickerState = datePickerState,
+            onConfirm = {
+                datePickerState.selectedDateMillis?.let { ms ->
+                    val sdf =
+                        java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+                    onDateSelected(sdf.format(java.util.Date(ms)))
+                }
+            },
+            onDismiss = onDismiss
         )
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EmployeeInfoDatePickerContent(
+    datePickerState: androidx.compose.material3.DatePickerState,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    Card(
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+        Column(modifier = Modifier.padding(24.dp)) {
+            DatePicker(
+                state = datePickerState,
+                colors = DatePickerDefaults.colors(
+                    selectedDayContainerColor = Primary400,
+                    selectedDayContentColor = Color.White,
+                    todayContentColor = Primary400
+                )
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(android.R.string.cancel), color = Neutral500)
+                }
+                TextButton(onClick = onConfirm) {
+                    Text(stringResource(android.R.string.ok), color = Primary400)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun EmployeeInfoSection(
+    employee: Employee,
+    onSave: (Employee) -> Unit
+) {
+    val role1Str = stringResource(R.string.employee_info_role1)
+    val role2Str = stringResource(R.string.employee_info_role2)
+    val jobDeveloperStr = stringResource(R.string.employee_info_job_developer)
+    val levelJ1Str = stringResource(R.string.employee_info_level_j1)
+    val statusWorkingStr = stringResource(R.string.employee_info_status_working)
+    val contractFullStr = stringResource(R.string.employee_info_contract_full)
+    val jobTitleOptionsStr = listOf(
+        stringResource(R.string.employee_info_job_accounting),
+        stringResource(R.string.employee_info_job_ga),
+        stringResource(R.string.employee_info_job_hr),
+        stringResource(R.string.employee_info_job_contract),
+        stringResource(R.string.employee_info_job_developer)
+    )
+    val levelOptionsStr = listOf(
+        stringResource(R.string.employee_info_level_j1),
+        stringResource(R.string.employee_info_level_j2),
+        stringResource(R.string.employee_info_level_s1),
+        stringResource(R.string.employee_info_level_s2),
+        stringResource(R.string.employee_info_level_m1),
+        stringResource(R.string.employee_info_level_m2),
+        stringResource(R.string.employee_info_level_m3),
+        stringResource(R.string.employee_info_level_d1),
+        stringResource(R.string.employee_info_level_d2)
+    )
+    val contractOptionsStr = listOf(
+        stringResource(R.string.employee_info_contract_full),
+        stringResource(R.string.employee_info_contract_part),
+        stringResource(R.string.employee_info_contract_contract),
+        stringResource(R.string.employee_info_contract_internship)
+    )
+    val statusOtherStr = stringResource(R.string.employee_info_status_other)
+
+    var role by remember(role1Str) { mutableStateOf(role1Str) }
+    var jobTitle by remember(jobDeveloperStr) { mutableStateOf(jobDeveloperStr) }
+    var level by remember(levelJ1Str) { mutableStateOf(levelJ1Str) }
+    var department by remember { mutableStateOf("GDC") }
+    var status by remember(statusWorkingStr) { mutableStateOf(statusWorkingStr) }
+    var contractType by remember(contractFullStr) { mutableStateOf(contractFullStr) }
+    var departmentAddress by remember(employee.address) { mutableStateOf(employee.address ?: "") }
+    var dateOfBirth by remember { mutableStateOf("") }
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    val roleOptions = listOf(role1Str, role2Str)
+    val jobTitleOptions = jobTitleOptionsStr
+    val levelOptions = levelOptionsStr
+    val departmentOptions = listOf("GDC", "HR", "IT", "Finance")
+    val statusOptions = listOf(statusWorkingStr, statusOtherStr)
+    val contractOptions = contractOptionsStr
+
+    if (showDatePicker) {
+        EmployeeInfoDatePickerDialog(
+            onDateSelected = { dateStr -> dateOfBirth = dateStr; showDatePicker = false },
+            onDismiss = { showDatePicker = false }
+        )
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = SectionPaddingHorizontal)
+    ) {
+        Text(
+            text = stringResource(R.string.employee_info_employment_title),
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Neutral700
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                EmployeeInfoDropdown(
+                    label = stringResource(R.string.employee_info_role),
+                    value = role,
+                    options = roleOptions,
+                    onValueChange = { role = it },
+                    icon = Icons.Default.Person
+                )
+                EmployeeInfoDropdown(
+                    label = stringResource(R.string.employee_info_job_title),
+                    value = jobTitle,
+                    options = jobTitleOptions,
+                    onValueChange = { jobTitle = it },
+                    icon = Icons.Default.Person,
+                    hint = stringResource(R.string.employee_info_job_title_hint)
+                )
+                EmployeeInfoDropdown(
+                    label = stringResource(R.string.employee_info_level),
+                    value = level,
+                    options = levelOptions,
+                    onValueChange = { level = it },
+                    icon = Icons.Default.Person
+                )
+                EmployeeInfoDropdown(
+                    label = stringResource(R.string.employee_info_department),
+                    value = department,
+                    options = departmentOptions,
+                    onValueChange = { department = it },
+                    icon = Icons.Default.LocationOn
+                )
+                EmployeeInfoDropdown(
+                    label = stringResource(R.string.employee_info_status),
+                    value = status,
+                    options = statusOptions,
+                    onValueChange = { status = it },
+                    icon = Icons.Default.Person
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = Neutral500
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.employee_info_contract_type).uppercase(),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Neutral500
+                    )
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+                // Contract type pills: row1 = Full-time, Part-time, Contract; row2 = Internship (per Figma)
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        listOf(
+                            contractOptionsStr[0],
+                            contractOptionsStr[1],
+                            contractOptionsStr[2]
+                        ).forEach { option ->
+                            val selected = contractType == option
+                            Button(
+                                onClick = { contractType = option },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(20.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (selected) Primary400 else SurfaceBorder,
+                                    contentColor = if (selected) Color.White else Neutral500
+                                ),
+                                elevation = ButtonDefaults.buttonElevation(0.dp),
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 10.dp)
+                            ) {
+                                Text(
+                                    text = option,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                        }
+                    }
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        val internshipOption = contractOptionsStr[3]
+                        val selected = contractType == internshipOption
+                        Button(
+                            onClick = { contractType = internshipOption },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(20.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (selected) Primary400 else SurfaceBorder,
+                                contentColor = if (selected) Color.White else Neutral500
+                            ),
+                            elevation = ButtonDefaults.buttonElevation(0.dp),
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 10.dp)
+                        ) {
+                            Text(
+                                text = internshipOption,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.LocationOn,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = Neutral500
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.employee_info_department_address).uppercase(),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Neutral500
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = departmentAddress,
+                    onValueChange = { departmentAddress = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = {
+                        Text(
+                            stringResource(R.string.employee_info_department_address_placeholder),
+                            color = Neutral500
+                        )
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = FormInputBg,
+                        unfocusedContainerColor = FormInputBg,
+                        focusedBorderColor = Neutral200,
+                        unfocusedBorderColor = Neutral200,
+                        focusedTextColor = Neutral700,
+                        unfocusedTextColor = Neutral700
+                    ),
+                    shape = RoundedCornerShape(14.dp)
+                )
+//
+//                Spacer(modifier = Modifier.height(16.dp))
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    verticalAlignment = Alignment.CenterVertically
+//                ) {
+//                    Icon(
+//                        imageVector = Icons.Default.Edit,
+//                        contentDescription = null,
+//                        modifier = Modifier.size(16.dp),
+//                        tint = Neutral500
+//                    )
+//                    Spacer(modifier = Modifier.width(8.dp))
+//                    Text(
+//                        text = stringResource(R.string.employee_info_date_of_birth).uppercase(),
+//                        fontSize = 12.sp,
+//                        fontWeight = FontWeight.SemiBold,
+//                        color = Neutral500
+//                    )
+//                }
+//                Spacer(modifier = Modifier.height(8.dp))
+//                Box(modifier = Modifier.fillMaxWidth()) {
+//                    OutlinedTextField(
+//                        value = dateOfBirth,
+//                        onValueChange = {},
+//                        readOnly = true,
+//                        modifier = Modifier.fillMaxWidth(),
+//                        placeholder = { Text("DD/MM/YYYY", color = Neutral500) },
+//                        colors = OutlinedTextFieldDefaults.colors(
+//                            focusedContainerColor = FormInputBg,
+//                            unfocusedContainerColor = FormInputBg,
+//                            focusedBorderColor = Neutral200,
+//                            unfocusedBorderColor = Neutral200
+//                        ),
+//                        shape = RoundedCornerShape(14.dp),
+//                        trailingIcon = {
+//                            Icon(
+//                                imageVector = Icons.Default.KeyboardArrowDown,
+//                                contentDescription = null,
+//                                tint = Neutral500
+//                            )
+//                        }
+//                    )
+//                    // Overlay để bắt click mở lịch (TextField readOnly vẫn ăn click trước)
+//                    Box(
+//                        modifier = Modifier
+//                            .matchParentSize()
+//                            .clickable(
+//                                indication = null,
+//                                interactionSource = remember { MutableInteractionSource() }
+//                            ) { showDatePicker = true }
+//                    )
+//                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+        // Two buttons per Figma: Cancel + Update
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+//            Button(
+//                onClick = { /* Cancel: dismiss or reset */ },
+//                modifier = Modifier.weight(1f),
+//                shape = RoundedCornerShape(14.dp),
+//                colors = ButtonDefaults.buttonColors(containerColor = SurfaceBorder, contentColor = Neutral700),
+//                elevation = ButtonDefaults.buttonElevation(0.dp)
+//            ) {
+//                Text(
+//                    text = stringResource(R.string.employee_info_cancel),
+//                    fontSize = 14.sp,
+//                    fontWeight = FontWeight.SemiBold
+//                )
+//            }
+            Button(
+                onClick = {
+                    onSave(
+                        employee.copy(
+                            department = department,
+                            position = jobTitle,
+                            address = departmentAddress.ifBlank { employee.address },
+                            updatedAt = System.currentTimeMillis()
+                        )
+                    )
+                },
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Primary500,
+                    contentColor = Color.White
+                ),
+                elevation = ButtonDefaults.buttonElevation(4.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.employee_info_update),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EmployeeInfoDropdown(
+    label: String,
+    value: String,
+    options: List<String>,
+    onValueChange: (String) -> Unit,
+    icon: ImageVector,
+    hint: String? = null
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val displayValue = value.ifBlank { hint ?: "" }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+                tint = Neutral500
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = label.uppercase(),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Neutral500
+            )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = it },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            OutlinedTextField(
+                value = displayValue,
+                onValueChange = {},
+                readOnly = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = FormInputBg,
+                    unfocusedContainerColor = FormInputBg,
+                    focusedBorderColor = Neutral200,
+                    unfocusedBorderColor = Neutral200,
+                    disabledTextColor = Neutral700,
+                    disabledBorderColor = Neutral200
+                ),
+                shape = RoundedCornerShape(14.dp),
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                }
+            )
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.background(Color.White, RoundedCornerShape(14.dp))
+            ) {
+                options.forEach { option ->
+                    val isSelected = value == option
+                    DropdownMenuItem(
+                        text = {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = option,
+                                    color = if (isSelected) Primary400 else Neutral700,
+                                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal
+                                )
+                                if (isSelected) {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = null,
+                                        tint = Primary400,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                            }
+                        },
+                        onClick = {
+                            onValueChange(option)
+                            expanded = false
+                        },
+                        modifier = Modifier.background(
+                            if (isSelected) Primary50 else Color.Transparent
+                        )
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        HorizontalDivider(color = SurfaceBorder, thickness = 1.dp)
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun PlaceholderSection(tabName: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = stringResource(R.string.employee_detail_personal_info),
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Neutral700
+        )
+    }
+    Spacer(modifier = Modifier.height(16.dp))
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painter = painterResource(R.drawable.icon_comming_soon),
+                contentDescription = "",
+                modifier = Modifier.size(64.dp),
+                contentScale = ContentScale.FillBounds
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Emergency Contact",
+                fontSize = 20.sp,
+                color = Neutral500,
+                fontWeight = FontWeight.Black
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Coming soon",
+                fontSize = 16.sp,
+                color = Neutral500,
+                fontWeight = FontWeight.Thin
+            )
+        }
+    }
+
 }
 
 @Preview(showBackground = true)
