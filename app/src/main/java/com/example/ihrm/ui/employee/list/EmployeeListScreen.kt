@@ -46,13 +46,13 @@ fun EmployeeListScreen(
                     Text(text = "Error: ${uiState.error}")
                 }
 
-                uiState.employees.isEmpty() -> {
+                uiState.employeeUiModels.isEmpty() -> {
                     Text(text = "No employees found")
                 }
 
                 else -> {
-                    // TODO: Implement employee list UI based on Figma design
-                    Text(text = "Employee List Screen\n${uiState.employees.size} employees")
+                    // UI model đã gộp Employee + Level (levelCode dùng cho badge, v.v.)
+                    Text(text = "Employee List Screen\n${uiState.employeeUiModels.size} employees")
                 }
             }
         }

@@ -56,6 +56,7 @@ import com.example.ihrm.ui.theme.TextSecondary
 @Composable
 fun EmployeeCard(
     employee: Employee,
+    levelCode: String,
     onViewDetails: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
@@ -65,7 +66,6 @@ fun EmployeeCard(
         1 -> BadgeOrangeBg
         else -> AvatarBlueBg
     }
-    val badgeLabel = employee.department?.take(2)?.uppercase() ?: "S1"
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -109,7 +109,7 @@ fun EmployeeCard(
                     )
                 }
                 Column(horizontalAlignment = Alignment.End) {
-                    EmployeeCardBadge(text = badgeLabel)
+                    EmployeeCardBadge(text = levelCode)
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = stringResource(R.string.dashboard_id_format, employee.id),
@@ -219,7 +219,7 @@ private fun EmployeeCardBadge(text: String) {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "S1",
+            text = text,
             style = TextStyle(
                 fontSize = 12.sp,
                 lineHeight = 16.sp,
@@ -240,12 +240,13 @@ private fun EmployeeCardPreview() {
                 name = "Nguyen Van A",
                 email = "example@gmail.com",
                 phone = "0123456789",
-                department = "S1",
+                department = null,
                 position = "Developer",
                 hireDate = null,
                 salary = null,
                 address = null
             ),
+            levelCode = "S1",
             onViewDetails = {},
             onDelete = {},
             modifier = Modifier.padding(16.dp)

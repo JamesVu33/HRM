@@ -38,6 +38,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -118,123 +119,171 @@ fun DashboardScreen(
         )
     }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        containerColor = AppBackground,
-        contentWindowInsets = WindowInsets(top = 0),
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddEmployee,
-                modifier = Modifier
-                    .navigationBarsPadding()
-                    .size(56.dp)
-                    .shadow(8.dp, CircleShape),
-                shape = CircleShape,
-                containerColor = Color.Transparent,
-                contentColor = Color.White,
-                elevation = FloatingActionButtonDefaults.elevation(8.dp, 8.dp),
-                content = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(
-                                brush = Brush.linearGradient(
-                                    colors = listOf(FABGradientStart, FABGradientEnd)
-                                ),
-                                shape = CircleShape
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = stringResource(R.string.dashboard_fab_add)
-                        )
-                    }
-                }
-            )
-        }
-    ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        if (uiState.isLoading) {
             Box(
                 modifier = Modifier
-                    .matchParentSize()
-                    .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                Primary500,
-                                Primary400,
-                                Primary200,
-                                Primary50,
-                                Primary50,
-                                Primary50
+                    .fillMaxWidth()
+                    .height(4.dp)
+                    .background(Neutral200),
+                contentAlignment = Alignment.Center
+            ) {
+                androidx.compose.material3.LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Primary400,
+                    trackColor = Neutral200
+                )
+            }
+        }
+
+        if (uiState.errorUnauthorized || uiState.error != null) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(com.example.ihrm.ui.theme.Error.copy(alpha = 0.15f))
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (uiState.errorUnauthorized) {
+                        stringResource(R.string.dashboard_error_unauthorized)
+                    } else {
+                        uiState.error!!
+                    },
+                    modifier = Modifier.weight(1f),
+                    fontSize = 13.sp,
+                    color = com.example.ihrm.ui.theme.Error
+                )
+                TextButton(onClick = { viewModel.clearError() }) {
+                    Text(
+                        stringResource(R.string.dashboard_error_dismiss),
+                        color = Primary400,
+                        fontSize = 13.sp
+                    )
+                }
+            }
+        }
+
+        Scaffold(
+            modifier = Modifier.weight(1f),
+            containerColor = AppBackground,
+            contentWindowInsets = WindowInsets(top = 0),
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = onAddEmployee,
+                    modifier = Modifier
+                        .navigationBarsPadding()
+                        .size(56.dp)
+                        .shadow(8.dp, CircleShape),
+                    shape = CircleShape,
+                    containerColor = Color.Transparent,
+                    contentColor = Color.White,
+                    elevation = FloatingActionButtonDefaults.elevation(8.dp, 8.dp),
+                    content = {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    brush = Brush.linearGradient(
+                                        colors = listOf(FABGradientStart, FABGradientEnd)
+                                    ),
+                                    shape = CircleShape
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = stringResource(R.string.dashboard_fab_add)
+                            )
+                        }
+                    }
+                )
+            }
+        ) { paddingValues ->
+            Box(modifier = Modifier.fillMaxSize()) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .background(
+                            brush = Brush.linearGradient(
+                                colors = listOf(
+                                    Primary500,
+                                    Primary400,
+                                    Primary200,
+                                    Primary50,
+                                    Primary50,
+                                    Primary50
+                                )
                             )
                         )
-                    )
-            )
+                )
 
-            // Content layer
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .statusBarsPadding()
-                    .padding(paddingValues)
-            ) {
-                LazyColumn(
+                // Content layer
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .statusBarsPadding()
+                        .padding(paddingValues)
                 ) {
-                    item {
-                        DashboardHeader(
-                            greeting = uiState.greeting,
-                            dateText = uiState.dateText,
-                            onMenuClick = onMenuClick,
-                            onProfileClick = onProfileClick
-                        )
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        item {
+                            DashboardHeader(
+                                greeting = uiState.greeting,
+                                dateText = uiState.dateText,
+                                onMenuClick = onMenuClick,
+                                onProfileClick = onProfileClick
+                            )
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            DashboardSearchBar(
+                                query = uiState.searchQuery,
+                                onQueryChange = viewModel::updateSearchQuery,
+                                placeholder = stringResource(R.string.dashboard_search_placeholder)
+                            )
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            ManageTeamCard(onViewStats = onViewStats)
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            StatsRow(
+                                totalEmployees = uiState.totalEmployees,
+                                activeToday = uiState.activeToday
+                            )
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = stringResource(R.string.dashboard_team_members),
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Neutral700
+                            )
+                        }
+                        item { Spacer(modifier = Modifier.height(12.dp)) }
+                        items(
+                            items = uiState.filteredEmployees,
+                            key = { it.id }
+                        ) { employee ->
+                            EmployeeCard(
+                                employee = employee,
+                                levelCode = uiState.levelCodeByEmployeeId[employee.id]
+                                    ?: stringResource(R.string.dashboard_badge_no_level),
+                                onViewDetails = { onViewDetails(employee.id) },
+                                onDelete = { employeeToDelete = employee }
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                        }
+                        item { Spacer(modifier = Modifier.height(80.dp)) }
                     }
-                    item {
-                        Spacer(modifier = Modifier.height(12.dp))
-                        DashboardSearchBar(
-                            query = uiState.searchQuery,
-                            onQueryChange = viewModel::updateSearchQuery,
-                            placeholder = stringResource(R.string.dashboard_search_placeholder)
-                        )
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        ManageTeamCard(onViewStats = onViewStats)
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        StatsRow(
-                            totalEmployees = uiState.totalEmployees,
-                            activeToday = uiState.activeToday
-                        )
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = stringResource(R.string.dashboard_team_members),
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Neutral700
-                        )
-                    }
-                    item { Spacer(modifier = Modifier.height(12.dp)) }
-                    items(
-                        items = uiState.filteredEmployees,
-                        key = { it.id }
-                    ) { employee ->
-                        EmployeeCard(
-                            employee = employee,
-                            onViewDetails = { onViewDetails(employee.id) },
-                            onDelete = { employeeToDelete = employee }
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                    }
-                    item { Spacer(modifier = Modifier.height(80.dp)) }
                 }
             }
         }

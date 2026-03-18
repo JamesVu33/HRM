@@ -1,6 +1,8 @@
 package com.example.ihrm.di
 
+import com.example.ihrm.data.repository.AuthRepositoryImpl
 import com.example.ihrm.data.repository.EmployeeRepositoryImpl
+import com.example.ihrm.domain.repository.AuthRepository
 import com.example.ihrm.domain.repository.EmployeeRepository
 import dagger.Binds
 import dagger.Module
@@ -17,4 +19,10 @@ abstract class RepositoryModule {
     abstract fun bindEmployeeRepository(
         employeeRepositoryImpl: EmployeeRepositoryImpl
     ): EmployeeRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAuthRepository(
+        authRepositoryImpl: AuthRepositoryImpl
+    ): AuthRepository
 }

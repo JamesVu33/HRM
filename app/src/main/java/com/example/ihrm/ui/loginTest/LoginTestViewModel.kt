@@ -1,50 +1,67 @@
 package com.example.ihrm.ui.loginTest
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ihrm.R
+import com.example.ihrm.domain.repository.AuthRepository
+import com.example.ihrm.util.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.net.ConnectException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import javax.inject.Inject
 
 data class LoginTestUiState(
-    val email: String = "",
+    val employeeId: String = "",
     val password: String = "",
     val isLoading: Boolean = false,
-    val emailError: LoginTestFieldError? = null,
+    val employeeIdError: LoginTestFieldError? = null,
     val passwordError: LoginTestFieldError? = null,
     val isLoginSuccess: Boolean = false,
-    val isPasswordVisible: Boolean = false
+    val isPasswordVisible: Boolean = false,
+    val loginError: String? = null
 )
+
+/** API requires employeeId exactly 8 characters. */
+const val EMPLOYEE_ID_EXACT_LENGTH = 8
 
 sealed interface LoginTestFieldError {
     data object Required : LoginTestFieldError
-    data object InvalidFormat : LoginTestFieldError
+    data object TooShort : LoginTestFieldError
+    data object InvalidLength : LoginTestFieldError  // not exactly 8 chars
     data object InvalidRules : LoginTestFieldError
 }
 
 @HiltViewModel
-class LoginTestViewModel @Inject constructor() : ViewModel() {
+class LoginTestViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val authRepository: AuthRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginTestUiState())
     val uiState: StateFlow<LoginTestUiState> = _uiState.asStateFlow()
 
-    fun updateEmail(email: String) {
-        val emailError = validateEmail(email)
+    fun updateEmployeeId(employeeId: String) {
+        val error = validateEmployeeId(employeeId)
         _uiState.value = _uiState.value.copy(
-            email = email,
-            emailError = emailError
+            employeeId = employeeId,
+            employeeIdError = error,
+            loginError = null
         )
     }
 
     fun updatePassword(password: String) {
-        val passwordError = validatePassword(password)
+        val error = validatePassword(password)
         _uiState.value = _uiState.value.copy(
             password = password,
-            passwordError = passwordError
+            passwordError = error,
+            loginError = null
         )
     }
 
@@ -56,15 +73,12 @@ class LoginTestViewModel @Inject constructor() : ViewModel() {
 
     fun login(onSuccess: () -> Unit) {
         viewModelScope.launch {
-            val email = _uiState.value.email.trim()
-            val password = _uiState.value.password.trim()
+            val employeeId = _uiState.value.employeeId.trim()
+            val password = _uiState.value.password
 
-            val emailError = validateEmail(email)
-            val passwordError = validatePassword(password)
-
-            if (email.isEmpty()) {
+            if (employeeId.isEmpty()) {
                 _uiState.value = _uiState.value.copy(
-                    emailError = LoginTestFieldError.Required
+                    employeeIdError = LoginTestFieldError.Required
                 )
                 return@launch
             }
@@ -76,9 +90,11 @@ class LoginTestViewModel @Inject constructor() : ViewModel() {
                 return@launch
             }
 
-            if (emailError != null || passwordError != null) {
+            val employeeIdError = validateEmployeeId(employeeId)
+            val passwordError = validatePassword(password)
+            if (employeeIdError != null || passwordError != null) {
                 _uiState.value = _uiState.value.copy(
-                    emailError = emailError,
+                    employeeIdError = employeeIdError,
                     passwordError = passwordError
                 )
                 return@launch
@@ -86,25 +102,50 @@ class LoginTestViewModel @Inject constructor() : ViewModel() {
 
             _uiState.value = _uiState.value.copy(
                 isLoading = true,
-                emailError = null,
-                passwordError = null
+                employeeIdError = null,
+                passwordError = null,
+                loginError = null
             )
 
-            delay(1000)
+            val result = authRepository.login(employeeId, password)
 
-            // TODO: Replace with real auth implementation.
-            _uiState.value = _uiState.value.copy(
-                isLoading = false,
-                isLoginSuccess = true
+            _uiState.value = _uiState.value.copy(isLoading = false)
+
+            result.fold(
+                onSuccess = { data ->
+                    AuthManager.saveTokens(data)
+                    _uiState.value = _uiState.value.copy(isLoginSuccess = true)
+                    onSuccess()
+                },
+                onFailure = { e ->
+                    val msg = e.message?.lowercase() ?: ""
+                    val isNetworkOrUnreachable = e is UnknownHostException
+                            || e is SocketTimeoutException
+                            || e is ConnectException
+                            || msg.contains("unable to resolve host", ignoreCase = true)
+                            || msg.contains("no address associated with the hostname", ignoreCase = true)
+                            || msg.contains("connection refused", ignoreCase = true)
+                            || msg.contains("failed to connect", ignoreCase = true)
+                            || msg.contains("timeout", ignoreCase = true)
+                            || msg.contains("timed out", ignoreCase = true)
+                    val message = if (isNetworkOrUnreachable) {
+                        context.getString(R.string.login_test_error_network)
+                    } else {
+                        e.message ?: context.getString(R.string.login_test_error_api)
+                    }
+                    _uiState.value = _uiState.value.copy(loginError = message)
+                }
             )
-            onSuccess()
         }
     }
 
-    private fun validateEmail(email: String): LoginTestFieldError? {
-        if (email.isEmpty()) return null
-        val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$".toRegex()
-        return if (!emailRegex.matches(email)) LoginTestFieldError.InvalidFormat else null
+    private fun validateEmployeeId(employeeId: String): LoginTestFieldError? {
+        if (employeeId.isBlank()) return null
+        val len = employeeId.trim().length
+        return when {
+            len != EMPLOYEE_ID_EXACT_LENGTH -> LoginTestFieldError.InvalidLength
+            else -> null
+        }
     }
 
     private fun validatePassword(password: String): LoginTestFieldError? {
@@ -117,9 +158,8 @@ class LoginTestViewModel @Inject constructor() : ViewModel() {
 
         return when {
             !isValidLength || !hasUpperCase || !hasLowerCase || !hasDigit || !hasSpecialChar -> {
-                LoginTestFieldError.InvalidRules
+                null
             }
-
             else -> null
         }
     }
@@ -128,4 +168,3 @@ class LoginTestViewModel @Inject constructor() : ViewModel() {
         _uiState.value = LoginTestUiState()
     }
 }
-

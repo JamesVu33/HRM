@@ -49,9 +49,8 @@ fun HRMApp() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: Screen.Splash.route
     
-    // Show drawer only for authenticated screens (not splash/login/signup/login_test)
+    // Show drawer only for authenticated screens (not splash/signup/login_test)
     val showDrawer = currentRoute != Screen.Splash.route &&
-                     currentRoute != Screen.Login.route &&
                      currentRoute != Screen.SignUp.route &&
                      currentRoute != Screen.LoginTest.route
 
@@ -97,7 +96,7 @@ fun HRMApp() {
                 onConfirm = {
                     showLogoutDialog = false
                     scope.launch { drawerState.close() }
-                    AuthManager.setLoggedIn(false)
+                    AuthManager.clearTokens()
                     navController.navigate(Screen.LoginTest.route) {
                         popUpTo(0) { inclusive = true }
                     }

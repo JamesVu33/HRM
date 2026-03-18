@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -40,9 +42,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import com.example.ihrm.util.AuthManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -132,7 +136,10 @@ fun DrawerMenu(
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             DrawerHeader(scope = scope, drawerState = drawerState)
-            DrawerUserCard()
+            DrawerUserCard(
+                fullName = AuthManager.getUserFullName(),
+                email = AuthManager.getUserEmail()
+            )
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -219,15 +226,20 @@ private fun DrawerHeader(scope: CoroutineScope, drawerState: DrawerState) {
 }
 
 @Composable
-private fun DrawerUserCard() {
+private fun DrawerUserCard(
+    fullName: String?,
+    email: String?
+) {
+    val displayName = fullName?.takeIf { it.isNotBlank() } ?: stringResource(R.string.drawer_user_name)
+    val displayEmail = email?.takeIf { it.isNotBlank() } ?: stringResource(R.string.drawer_user_email)
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-            .height(56.dp)
+            .heightIn(min = 56.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(Neutral50)
-            .padding(horizontal = 8.dp, vertical = 8.dp),
+            .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -237,20 +249,40 @@ private fun DrawerUserCard() {
                 .background(Neutral600.copy(alpha = 0.2f)),
             contentAlignment = Alignment.Center
         ) {
-            Icon(Icons.Default.Person, contentDescription = null, tint = Neutral600, modifier = Modifier.size(24.dp))
+            Icon(
+                Icons.Default.Person,
+                contentDescription = null,
+                tint = Neutral600,
+                modifier = Modifier.size(24.dp)
+            )
         }
-        Spacer(modifier = Modifier.size(12.dp))
+
+        Spacer(modifier = Modifier.width(12.dp))
+
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = stringResource(R.string.drawer_user_name),
+                text = displayName,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
-                color = androidx.compose.ui.graphics.Color(0xFF0a0a0a)
+                color = Color(0xFF0a0a0a)
             )
-            Text(text = stringResource(R.string.drawer_user_email), fontSize = 12.sp, color = Neutral600)
+            Text(
+                text = displayEmail,
+                fontSize = 12.sp,
+                color = Neutral600
+            )
         }
-        IconButton(onClick = {}, modifier = Modifier.size(32.dp)) {
-            Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.drawer_edit_profile), tint = Neutral600, modifier = Modifier.size(16.dp))
+
+        IconButton(
+            onClick = {},
+            modifier = Modifier.size(32.dp)
+        ) {
+            Icon(
+                Icons.Default.Edit,
+                contentDescription = stringResource(R.string.drawer_edit_profile),
+                tint = Neutral600,
+                modifier = Modifier.size(16.dp)
+            )
         }
     }
 }

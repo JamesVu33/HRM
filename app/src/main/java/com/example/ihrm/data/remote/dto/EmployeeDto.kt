@@ -29,6 +29,10 @@ data class EmployeeDto(
     val personalId: String? = null,
     @SerializedName("idIssueDate")
     val idIssueDate: String? = null,
+    @SerializedName("levelId")
+    val levelId: Int? = null,
+    @SerializedName("level")
+    val level: LevelShortDto? = null,
     @SerializedName("createdAt")
     val createdAt: Long?,
     @SerializedName("updatedAt")

@@ -24,6 +24,12 @@ private val MIGRATION_1_2 = object : Migration(1, 2) {
     }
 }
 
+private val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE employees ADD COLUMN levelId INTEGER")
+    }
+}
+
 @Module
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
@@ -36,7 +42,7 @@ object DatabaseModule {
             EmployeeDatabase::class.java,
             "employee_database"
         )
-            .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
             .addCallback(SeedDataCallback())
             .build()
     }
@@ -86,8 +92,8 @@ private class SeedDataCallback : RoomDatabase.Callback() {
             val phone = "012345678$index"
             db.execSQL(
                 """
-                INSERT OR REPLACE INTO employees (id, name, email, phone, department, position, hireDate, salary, address, englishName, gender, personalId, idIssueDate, createdAt, updatedAt)
-                VALUES ('${e.id}', '${e.name}', '${e.email}', '$phone', '${e.dept}', '${e.position}', NULL, NULL, NULL, NULL, NULL, NULL, NULL, $now, $now)
+                INSERT OR REPLACE INTO employees (id, name, email, phone, levelId, department, position, hireDate, salary, address, englishName, gender, personalId, idIssueDate, createdAt, updatedAt)
+                VALUES ('${e.id}', '${e.name}', '${e.email}', '$phone', NULL, '${e.dept}', '${e.position}', NULL, NULL, NULL, NULL, NULL, NULL, NULL, $now, $now)
                 """.trimIndent()
             )
         }

@@ -2,7 +2,6 @@ package com.example.ihrm.ui.navigation
 
 sealed class Screen(val route: String) {
     data object Splash : Screen("splash")
-    data object Login : Screen("login")
     data object LoginTest : Screen("login_test")
     data object SignUp : Screen("signup")
     data object Dashboard : Screen("dashboard")

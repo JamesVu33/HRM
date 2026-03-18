@@ -6,7 +6,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.ihrm.ui.auth.LoginScreen
 import com.example.ihrm.ui.auth.SignUpScreen
 import com.example.ihrm.ui.auth.SplashScreen
 import com.example.ihrm.ui.employee.addedit.AddEditEmployeeScreen
@@ -45,20 +44,6 @@ fun NavGraph(
             )
         }
 
-        composable(Screen.Login.route) {
-            LoginScreen(
-                onLoginSuccess = {
-                    AuthManager.setLoggedIn(true)
-                    navController.navigate(Screen.EmployeeList.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
-                    }
-                },
-                onNavigateToSignUp = {
-                    navController.navigate(Screen.SignUp.route)
-                }
-            )
-        }
-
         composable(Screen.LoginTest.route) {
             LoginTestScreen(
                 onLoginSuccess = {
@@ -76,7 +61,7 @@ fun NavGraph(
         composable(Screen.SignUp.route) {
             SignUpScreen(
                 onSignUpSuccess = {
-                    navController.navigate(Screen.Login.route) {
+                    navController.navigate(Screen.LoginTest.route) {
                         popUpTo(Screen.SignUp.route) { inclusive = true }
                     }
                 },

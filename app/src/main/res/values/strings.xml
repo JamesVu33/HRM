@@ -6,10 +6,30 @@
     <string name="splash_subtitle">Human Resources Management</string>
     <string name="splash_footer">Digital Solutions</string>
 
+    <!-- Login (main auth screen) -->
+    <string name="login_title">Welcome</string>
+    <string name="login_subtitle">Enter your credentials to access your account</string>
+    <string name="login_employee_id_label">Employee ID *</string>
+    <string name="login_employee_id_placeholder">Enter your employee ID</string>
+    <string name="login_employee_id_required">Employee ID is required</string>
+    <string name="login_employee_id_too_short">Employee ID is too short</string>
+    <string name="login_password_label">Password *</string>
+    <string name="login_password_placeholder">Enter your password</string>
+    <string name="login_password_required">Password is required</string>
+    <string name="login_password_rules">Password must be 8-16 characters and include uppercase, lowercase, number, and special character.</string>
+    <string name="login_button">Login</string>
+    <string name="login_error_generic">Login failed</string>
+    <string name="login_forgot_password">Forgot your password?</string>
+    <string name="login_sign_up">Don\'t have an account? Sign Up</string>
+    <string name="login_footer_line1">More friendly, secure, creative</string>
+    <string name="login_footer_line2">Connect more, Create the most</string>
+
     <!-- loginTest -->
     <string name="login_test_brand">Shinhan DS</string>
     <string name="login_test_title">Welcome</string>
     <string name="login_test_subtitle">Enter your credentials to access your account</string>
+    <string name="login_test_employee_id_label">Employee ID</string>
+    <string name="login_test_employee_id_placeholder">Enter your employee ID</string>
     <string name="login_test_email_label">Email</string>
     <string name="login_test_email_placeholder">Enter your email</string>
     <string name="login_test_password_label">Password</string>
@@ -18,10 +38,16 @@
     <string name="login_test_forgot_password">Forgot your password?</string>
     <string name="login_test_signup_link">Don\u2019t have an account? Sign Up</string>
     <string name="login_test_footer">More friendly, secure, creative\nConnect more, Create the most</string>
+    <string name="login_test_error_employee_id_required">Employee ID is required</string>
+    <string name="login_test_error_employee_id_too_short">Employee ID is too short</string>
+    <string name="login_test_error_employee_id_invalid_length">Employee ID must be exactly 8 characters</string>
     <string name="login_test_error_email_required">Email is required</string>
     <string name="login_test_error_email_invalid">Please enter a valid email address</string>
     <string name="login_test_error_password_required">Password is required</string>
     <string name="login_test_error_password_rules">Password must be 8-16 characters and include uppercase, lowercase, number, and special character.</string>
+    <string name="login_test_error_api">Login failed</string>
+    <string name="login_test_error_network">Cannot reach server. Check your internet connection or try again in a moment (server may be starting).</string>
+    <string name="login_test_error_invalid_credentials">Invalid employee ID or password.</string>
 
     <!-- Dashboard -->
     <string name="dashboard_good_morning">Good Morning</string>
@@ -40,6 +66,9 @@
     <string name="dashboard_delete_dialog_confirm">Delete</string>
     <string name="dashboard_id_format">ID: %1$s</string>
     <string name="dashboard_fab_add">Add employee</string>
+    <string name="dashboard_error_dismiss">Dismiss</string>
+    <string name="dashboard_error_unauthorized">Phiên đăng nhập hết hạn, vui lòng đăng nhập lại.</string>
+    <string name="dashboard_badge_no_level">—</string>
 
     <!-- Drawer -->
     <string name="drawer_brand">Shinhan DS</string>

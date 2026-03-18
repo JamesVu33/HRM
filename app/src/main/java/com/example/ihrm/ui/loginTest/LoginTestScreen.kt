@@ -55,7 +55,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -64,7 +63,6 @@ import com.example.ihrm.ui.components.ButtonSize
 import com.example.ihrm.ui.components.ButtonVariant
 import com.example.ihrm.ui.components.CustomButton
 import com.example.ihrm.ui.theme.Error
-import com.example.ihrm.ui.theme.IHRMTheme
 import com.example.ihrm.ui.theme.Neutral200
 import com.example.ihrm.ui.theme.Neutral400
 import com.example.ihrm.ui.theme.Neutral500
@@ -174,7 +172,7 @@ fun LoginTestScreen(
                         Text(
                             modifier = Modifier.fillMaxWidth(),
                             text = buildAnnotatedString {
-                                append(stringResource(R.string.login_test_email_label))
+                                append(stringResource(R.string.login_test_employee_id_label))
 
                                 withStyle(
                                     style = SpanStyle(
@@ -190,38 +188,49 @@ fun LoginTestScreen(
                         )
 
                         OutlinedTextField(
-                            value = uiState.email,
-                            onValueChange = viewModel::updateEmail,
+                            value = uiState.employeeId,
+                            onValueChange = viewModel::updateEmployeeId,
                             placeholder = {
                                 Text(
-                                    stringResource(R.string.login_test_email_placeholder),
+                                    stringResource(R.string.login_test_employee_id_placeholder),
                                     color = Neutral400
                                 )
                             },
                             modifier = Modifier.fillMaxWidth(),
                             enabled = !uiState.isLoading,
                             singleLine = true,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                             leadingIcon = {
                                 Icon(
                                     imageVector = ImageVector.vectorResource(id = R.drawable.icon_email),
                                     contentDescription = null,
-                                    tint = if (uiState.emailError != null) Error else Neutral400
+                                    tint = if (uiState.employeeIdError != null) Error else Neutral400
                                 )
                             },
-                            isError = uiState.emailError != null,
+                            isError = uiState.employeeIdError != null,
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = if (uiState.emailError != null) Error else Neutral200,
-                                unfocusedBorderColor = if (uiState.emailError != null) Error else Neutral200,
+                                focusedBorderColor = if (uiState.employeeIdError != null) Error else Neutral200,
+                                unfocusedBorderColor = if (uiState.employeeIdError != null) Error else Neutral200,
                                 errorBorderColor = Error
                             ),
                             shape = RoundedCornerShape(14.dp)
                         )
 
-                        val emailError = uiState.emailError
-                        if (emailError != null) {
+                        val employeeIdError = uiState.employeeIdError
+                        if (employeeIdError != null) {
                             Text(
-                                text = stringResource(emailError.toMessageResId(isEmail = true)),
+                                text = stringResource(employeeIdError.toEmployeeIdMessageResId()),
+                                color = Error,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 6.dp)
+                            )
+                        }
+
+                        if (uiState.loginError != null) {
+                            Text(
+                                text = uiState.loginError!!,
                                 color = Error,
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier
@@ -298,7 +307,7 @@ fun LoginTestScreen(
                         val passwordError = uiState.passwordError
                         if (passwordError != null) {
                             Text(
-                                text = stringResource(passwordError.toMessageResId(isEmail = false)),
+                                text = stringResource(passwordError.toPasswordMessageResId()),
                                 color = Error,
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier
@@ -328,7 +337,7 @@ fun LoginTestScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 size = ButtonSize.Large,
                                 variant = ButtonVariant.Primary,
-                                enabled = uiState.email.isNotEmpty() && uiState.password.isNotEmpty()
+                                enabled = uiState.employeeId.isNotEmpty() && uiState.password.isNotEmpty()
                             )
                         }
 
@@ -363,26 +372,22 @@ fun LoginTestScreen(
     }
 }
 
-private fun LoginTestFieldError.toMessageResId(isEmail: Boolean): Int {
+private fun LoginTestFieldError.toEmployeeIdMessageResId(): Int {
     return when (this) {
-        LoginTestFieldError.Required -> {
-            if (isEmail) R.string.login_test_error_email_required else R.string.login_test_error_password_required
-        }
-
-        LoginTestFieldError.InvalidFormat -> R.string.login_test_error_email_invalid
+        LoginTestFieldError.Required -> R.string.login_test_error_employee_id_required
+        LoginTestFieldError.TooShort -> R.string.login_test_error_employee_id_too_short
+        LoginTestFieldError.InvalidLength -> R.string.login_test_error_employee_id_invalid_length
         LoginTestFieldError.InvalidRules -> R.string.login_test_error_password_rules
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun LoginTestScreenPreview() {
-    IHRMTheme(dynamicColor = false) {
-        LoginTestScreen(
-            onLoginSuccess = {},
-            onNavigateToSignUp = {},
-            viewModel = LoginTestViewModel()
-        )
+private fun LoginTestFieldError.toPasswordMessageResId(): Int {
+    return when (this) {
+        LoginTestFieldError.Required -> R.string.login_test_error_password_required
+        LoginTestFieldError.TooShort -> R.string.login_test_error_employee_id_too_short
+        LoginTestFieldError.InvalidLength -> R.string.login_test_error_employee_id_invalid_length
+        LoginTestFieldError.InvalidRules -> R.string.login_test_error_password_rules
     }
 }
+
 
