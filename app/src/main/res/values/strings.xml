@@ -136,6 +136,7 @@
     <string name="employee_info_update">Update</string>
     <string name="employee_info_update_success">Information updated successfully</string>
     <string name="employee_info_create_member">Create Member</string>
+    <string name="employee_list_title">Employees</string>
     <!-- Role options -->
     <string name="employee_info_role1">Role1</string>
     <string name="employee_info_role2">Role2</string>
