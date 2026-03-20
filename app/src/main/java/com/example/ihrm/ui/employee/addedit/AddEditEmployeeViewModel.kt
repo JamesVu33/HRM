@@ -66,6 +66,10 @@ class AddEditEmployeeViewModel @Inject constructor(
         hireDate: String?,
         salary: Double?,
         address: String?,
+        englishName: String? = null,
+        gender: String? = null,
+        personalId: String? = null,
+        idIssueDate: String? = null,
         onSuccess: () -> Unit
     ) {
         viewModelScope.launch {
@@ -83,6 +87,10 @@ class AddEditEmployeeViewModel @Inject constructor(
                     hireDate = hireDate,
                     salary = salary,
                     address = address,
+                    englishName = englishName,
+                    gender = gender,
+                    personalId = personalId,
+                    idIssueDate = idIssueDate,
                     updatedAt = currentTime
                 )
             } else {
@@ -97,6 +105,10 @@ class AddEditEmployeeViewModel @Inject constructor(
                     hireDate = hireDate,
                     salary = salary,
                     address = address,
+                    englishName = englishName,
+                    gender = gender,
+                    personalId = personalId,
+                    idIssueDate = idIssueDate,
                     createdAt = currentTime,
                     updatedAt = currentTime
                 )

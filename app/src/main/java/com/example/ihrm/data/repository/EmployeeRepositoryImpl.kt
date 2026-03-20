@@ -2,9 +2,15 @@ package com.example.ihrm.data.repository
 
 import com.example.ihrm.data.local.dao.EmployeeDao
 import com.example.ihrm.data.remote.api.EmployeeApiService
+import com.example.ihrm.data.remote.base.safeApiCall
+import com.example.ihrm.data.remote.base.safeApiCallList
+import com.example.ihrm.data.remote.dto.MeEmployeeResponse
+import com.example.ihrm.data.remote.dto.UserMetaResponseDto
 import com.example.ihrm.data.remote.mapper.toEmployee
 import com.example.ihrm.data.remote.mapper.toEmployeeEntity
+import com.example.ihrm.data.remote.mapper.toLevel
 import com.example.ihrm.domain.model.Employee
+import com.example.ihrm.domain.model.Level
 import com.example.ihrm.domain.repository.EmployeeRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -38,6 +44,10 @@ class EmployeeRepositoryImpl @Inject constructor(
                 hireDate = employee.hireDate,
                 salary = employee.salary,
                 address = employee.address,
+                englishName = employee.englishName,
+                gender = employee.gender,
+                personalId = employee.personalId,
+                idIssueDate = employee.idIssueDate,
                 createdAt = employee.createdAt,
                 updatedAt = employee.updatedAt
             )
@@ -58,6 +68,7 @@ class EmployeeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateEmployee(employee: Employee): Result<Unit> {
+        val entity = employee.toEmployeeEntity()
         return try {
             // Try to update via API first
             val dto = com.example.ihrm.data.remote.dto.EmployeeDto(
@@ -70,18 +81,21 @@ class EmployeeRepositoryImpl @Inject constructor(
                 hireDate = employee.hireDate,
                 salary = employee.salary,
                 address = employee.address,
+                englishName = employee.englishName,
+                gender = employee.gender,
+                personalId = employee.personalId,
+                idIssueDate = employee.idIssueDate,
                 createdAt = employee.createdAt,
                 updatedAt = employee.updatedAt
             )
             apiService.updateEmployee(employee.id, dto)
-            
-            // Update local database
-            employeeDao.updateEmployee(employee.toEmployeeEntity())
+            // Update local database (REPLACE ensures row is overwritten)
+            employeeDao.insertEmployee(entity)
             Result.success(Unit)
         } catch (e: Exception) {
             // If API fails, still update locally
             try {
-                employeeDao.updateEmployee(employee.toEmployeeEntity())
+                employeeDao.insertEmployee(entity)
                 Result.success(Unit)
             } catch (dbException: Exception) {
                 Result.failure(dbException)
@@ -108,18 +122,34 @@ class EmployeeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun syncEmployees(): Result<Unit> {
-        return try {
-            // Fetch from API
-            val employees = apiService.getAllEmployees()
-            
-            // Clear local database and insert fresh data
-            employeeDao.deleteAllEmployees()
-            employeeDao.insertEmployees(employees.map { it.toEmployeeEntity() })
-            
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
+    override suspend fun syncEmployees(meta: UserMetaResponseDto?): Result<Unit> =
+        safeApiCallList { apiService.getAllEmployees() }.fold(
+            onSuccess = { list ->
+                employeeDao.deleteAllEmployees()
+                employeeDao.insertEmployees(list.map { it.toEmployeeEntity(meta) })
+                Result.success(Unit)
+            },
+            onFailure = { Result.failure(it) }
+        )
+
+    override suspend fun getLevelsMap(): Result<Map<Int, String>> =
+        safeApiCallList { apiService.getAllLevels() }.map { list -> list.associate { it.id to it.code } }
+
+    override suspend fun getLevelById(id: Int): Result<Level?> =
+        safeApiCall { apiService.getLevelById(id) }.map { dto -> dto?.toLevel() }
+
+    override suspend fun getLevelByEmployeeId(employeeId: String): Result<Level?> =
+        safeApiCall { apiService.getEmployeeById(employeeId) }.map { dto -> dto?.level?.toLevel() }
+
+    override suspend fun getMeEmployeeInfo(): Result<MeEmployeeResponse> =
+        safeApiCall { apiService.getMeEmployeeInfo() }.fold(
+            onSuccess = { data -> if (data != null) Result.success(data) else Result.failure(Exception("No employee info")) },
+            onFailure = { Result.failure(it) }
+        )
+
+    override suspend fun getEmployeesMeta(): Result<UserMetaResponseDto> =
+        safeApiCall { apiService.getEmployeesMeta() }.fold(
+            onSuccess = { data -> if (data != null) Result.success(data) else Result.failure(Exception("No meta")) },
+            onFailure = { Result.failure(it) }
+        )
 }

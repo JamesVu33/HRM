@@ -1,0 +1,14 @@
+package com.example.ihrm.domain.usecase
+
+import com.example.ihrm.domain.model.Level
+import com.example.ihrm.domain.repository.EmployeeRepository
+import javax.inject.Inject
+
+/**
+ * Lấy level theo employee id: gọi GET /employees/{id}, trả về level từ response.
+ */
+class GetLevelByEmployeeIdUseCase @Inject constructor(
+    private val repository: EmployeeRepository
+) {
+    suspend operator fun invoke(employeeId: String) = repository.getLevelByEmployeeId(employeeId)
+}

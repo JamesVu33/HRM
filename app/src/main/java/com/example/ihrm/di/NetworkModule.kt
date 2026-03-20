@@ -1,8 +1,12 @@
 package com.example.ihrm.di
 
+import com.example.ihrm.data.remote.api.AuthApiService
 import com.example.ihrm.data.remote.api.EmployeeApiService
+import com.example.ihrm.util.AuthManager
 import com.example.ihrm.util.Constants
 import com.google.gson.Gson
+import okhttp3.Interceptor
+import okhttp3.Response
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
@@ -30,15 +34,27 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(): OkHttpClient {
+        val authInterceptor = Interceptor { chain ->
+            val token = AuthManager.getAccessToken()
+            val request = if (!token.isNullOrBlank()) {
+                chain.request().newBuilder()
+                    .addHeader("Authorization", "Bearer $token")
+                    .build()
+            } else {
+                chain.request()
+            }
+            chain.proceed(request)
+        }
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
         return OkHttpClient.Builder()
+            .addInterceptor(authInterceptor)
             .addInterceptor(loggingInterceptor)
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
             .build()
     }
 
@@ -56,5 +72,11 @@ object NetworkModule {
     @Singleton
     fun provideEmployeeApiService(retrofit: Retrofit): EmployeeApiService {
         return retrofit.create(EmployeeApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuthApiService(retrofit: Retrofit): AuthApiService {
+        return retrofit.create(AuthApiService::class.java)
     }
 }

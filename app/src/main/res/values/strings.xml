@@ -1,3 +1,235 @@
 <resources>
     <string name="app_name">IHRM</string>
+
+    <!-- Splash -->
+    <string name="splash_title">Shinhan DS</string>
+    <string name="splash_subtitle">Human Resources Management</string>
+    <string name="splash_footer">Digital Solutions</string>
+
+    <!-- Login (main auth screen) -->
+    <string name="login_title">Welcome</string>
+    <string name="login_subtitle">Enter your credentials to access your account</string>
+    <string name="login_employee_id_label">Employee ID *</string>
+    <string name="login_employee_id_placeholder">Enter your employee ID</string>
+    <string name="login_employee_id_required">Employee ID is required</string>
+    <string name="login_employee_id_too_short">Employee ID is too short</string>
+    <string name="login_password_label">Password *</string>
+    <string name="login_password_placeholder">Enter your password</string>
+    <string name="login_password_required">Password is required</string>
+    <string name="login_password_rules">Password must be 8-16 characters and include uppercase, lowercase, number, and special character.</string>
+    <string name="login_button">Login</string>
+    <string name="login_error_generic">Login failed</string>
+    <string name="login_forgot_password">Forgot your password?</string>
+    <string name="login_sign_up">Don\'t have an account? Sign Up</string>
+    <string name="login_footer_line1">More friendly, secure, creative</string>
+    <string name="login_footer_line2">Connect more, Create the most</string>
+
+    <!-- loginTest -->
+    <string name="login_test_brand">Shinhan DS</string>
+    <string name="login_test_title">Welcome</string>
+    <string name="login_test_subtitle">Enter your credentials to access your account</string>
+    <string name="login_test_employee_id_label">Employee ID</string>
+    <string name="login_test_employee_id_placeholder">Enter your employee ID</string>
+    <string name="login_test_email_label">Email</string>
+    <string name="login_test_email_placeholder">Enter your email</string>
+    <string name="login_test_password_label">Password</string>
+    <string name="login_test_password_placeholder">Enter your password</string>
+    <string name="login_test_login_button">Login</string>
+    <string name="login_test_forgot_password">Forgot your password?</string>
+    <string name="login_test_signup_link">Don\u2019t have an account? Sign Up</string>
+    <string name="login_test_footer">More friendly, secure, creative\nConnect more, Create the most</string>
+    <string name="login_test_error_employee_id_required">Employee ID is required</string>
+    <string name="login_test_error_employee_id_too_short">Employee ID is too short</string>
+    <string name="login_test_error_employee_id_invalid_length">Employee ID must be exactly 8 characters</string>
+    <string name="login_test_error_email_required">Email is required</string>
+    <string name="login_test_error_email_invalid">Please enter a valid email address</string>
+    <string name="login_test_error_password_required">Password is required</string>
+    <string name="login_test_error_password_rules">Password must be 8-16 characters and include uppercase, lowercase, number, and special character.</string>
+    <string name="login_test_error_api">Login failed</string>
+    <string name="login_test_error_network">Cannot reach server. Check your internet connection or try again in a moment (server may be starting).</string>
+    <string name="login_test_error_invalid_credentials">Invalid employee ID or password.</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_good_morning">Good Morning</string>
+    <string name="dashboard_search_placeholder">Search by name, role, or email…</string>
+    <string name="dashboard_total_employees">Total Employees</string>
+    <string name="dashboard_active_today">Active Today</string>
+    <string name="dashboard_manage_team_title">Manage Your Team</string>
+    <string name="dashboard_manage_team_subtitle">Keep track of your employees and stay organized</string>
+    <string name="dashboard_view_stats">View Stats</string>
+    <string name="dashboard_team_members">Team Members</string>
+    <string name="dashboard_view_details">View Details</string>
+    <string name="dashboard_delete">Delete</string>
+    <string name="dashboard_delete_dialog_title">Delete Member?</string>
+    <string name="dashboard_delete_dialog_message">Are you sure you want to remove %1$s from the team? This action cannot be undone.</string>
+    <string name="dashboard_delete_dialog_cancel">Cancel</string>
+    <string name="dashboard_delete_dialog_confirm">Delete</string>
+    <string name="dashboard_id_format">ID: %1$s</string>
+    <string name="dashboard_fab_add">Add employee</string>
+    <string name="dashboard_error_dismiss">Dismiss</string>
+    <string name="dashboard_error_unauthorized">Phiên đăng nhập hết hạn, vui lòng đăng nhập lại.</string>
+    <string name="dashboard_badge_no_level">—</string>
+
+    <!-- Drawer -->
+    <string name="drawer_brand">Shinhan DS</string>
+    <string name="drawer_section_dashboard">Dashboard</string>
+    <string name="drawer_section_hr_info">HR Information</string>
+    <string name="drawer_item_dashboard">Dashboard</string>
+    <string name="drawer_item_employees">Employees</string>
+    <string name="drawer_item_attendance">Attendance Management</string>
+    <string name="drawer_section_security">Security Management</string>
+    <string name="drawer_item_security_check">Security Check</string>
+    <string name="drawer_item_templates">Templates</string>
+    <string name="drawer_section_organization">Organization</string>
+    <string name="drawer_item_structure">Structure</string>
+    <string name="drawer_section_admin">Admin Management</string>
+    <string name="drawer_item_permission">Permission</string>
+    <string name="drawer_item_role">Role</string>
+    <string name="drawer_item_team">Team</string>
+    <string name="drawer_item_translation_keys">Translation Keys</string>
+    <string name="drawer_user_name">Nguyen Van A</string>
+    <string name="drawer_user_email">mai@shinhan-DS.com</string>
+    <string name="drawer_logout">Logout</string>
+    <string name="drawer_close">Close menu</string>
+    <string name="drawer_edit_profile">Edit profile</string>
+    <string name="logout_dialog_title">Logout Confirmation</string>
+    <string name="logout_dialog_message">Are you sure you want to logout from your account?</string>
+    <string name="logout_yes_button">Yes, Logout</string>
+    <string name="logout_cancel_button">Cancel</string>
+    <string name="coming_soon_title">Coming Soon</string>
+    <string name="coming_soon_message">The \"%1$s\" feature is currently under development and will be available soon.</string>
+    <string name="coming_soon_got_it">Got it</string>
+    <string name="coming_soon_close">Close</string>
+
+    <!-- Employee Detail -->
+    <string name="employee_detail_title">Member Information</string>
+    <string name="employee_detail_subtitle_format">%1$s | ID: %2$s</string>
+    <string name="employee_detail_tab_basic_info">Basic Info</string>
+    <string name="employee_detail_tab_employee_info">Employee Info</string>
+    <string name="employee_detail_tab_emergency_contact">Emergency Contact</string>
+    <string name="employee_detail_personal_info">Personal Information</string>
+    <string name="employee_detail_change_info">Change Info</string>
+    <string name="employee_detail_save">Save</string>
+    <string name="employee_detail_full_name">Full Name</string>
+    <string name="employee_detail_english_name">English Name</string>
+    <string name="employee_detail_gender">Gender</string>
+    <string name="employee_detail_email_address">Email Address</string>
+    <string name="employee_detail_contact_number">Contact Number</string>
+    <string name="employee_detail_personal_id">Personal ID</string>
+    <string name="employee_detail_id_issue_date">ID Issue Date</string>
+    <string name="employee_detail_permanent_address">Permanent Address</string>
+    <string name="employee_detail_not_found">Employee not found</string>
+    <string name="employee_detail_error_format">Error: %1$s</string>
+
+    <!-- Employee Info tab -->
+    <string name="employee_info_employment_title">Employment Information</string>
+    <string name="employee_info_role">Role</string>
+    <string name="employee_info_job_title">Job Title</string>
+    <string name="employee_info_job_title_hint">Developer</string>
+    <string name="employee_info_level">Level</string>
+    <string name="employee_info_department">Department</string>
+    <string name="employee_info_status">Status</string>
+    <string name="employee_info_contract_type">Contract Type</string>
+    <string name="employee_info_department_address">Department Address</string>
+    <string name="employee_info_date_of_birth">Date of Birth</string>
+    <string name="employee_info_cancel">Cancel</string>
+    <string name="employee_info_update">Update</string>
+    <string name="employee_info_update_success">Information updated successfully</string>
+    <string name="employee_info_create_member">Create Member</string>
+    <!-- Role options -->
+    <string name="employee_info_role1">Role1</string>
+    <string name="employee_info_role2">Role2</string>
+    <!-- Job title options -->
+    <string name="employee_info_job_accounting">Accounting Officer</string>
+    <string name="employee_info_job_ga">GA Officer</string>
+    <string name="employee_info_job_hr">HR Officer</string>
+    <string name="employee_info_job_contract">Contract Officer</string>
+    <string name="employee_info_job_developer">Developer</string>
+    <!-- Level options -->
+    <string name="employee_info_level_j1">Junior (J1)</string>
+    <string name="employee_info_level_j2">Senior (J2)</string>
+    <string name="employee_info_level_s1">Supervisor (S1)</string>
+    <string name="employee_info_level_s2">Senior Supervisor (S2)</string>
+    <string name="employee_info_level_m1">Deputy Manager (M1)</string>
+    <string name="employee_info_level_m2">Manager (M2)</string>
+    <string name="employee_info_level_m3">Senior Manager (M3)</string>
+    <string name="employee_info_level_d1">Deputy Director (D1)</string>
+    <string name="employee_info_level_d2">Director (D2)</string>
+    <!-- Contract type (Figma: Full-time, Part-time, Contract, Internship) -->
+    <string name="employee_info_contract_full">Full-time</string>
+    <string name="employee_info_contract_part">Part-time</string>
+    <string name="employee_info_contract_contract">Contract</string>
+    <string name="employee_info_contract_internship">Internship</string>
+    <!-- Status -->
+    <string name="employee_info_status_working">Working</string>
+    <string name="employee_info_status_other">Other</string>
+    <string name="employee_info_department_address_placeholder">123 Business Park, Suite 500</string>
+
+    <!-- Add Employee -->
+    <string name="add_employee_title">Add New Member</string>
+    <string name="add_employee_upload_photo">Upload Photo</string>
+    <string name="add_employee_take_photo">Take Photo</string>
+    <string name="add_employee_choose_from_library">Choose from Library</string>
+    <string name="add_employee_photo_cancel">Cancel</string>
+    <string name="add_employee_basic_info">Basic Information</string>
+    <string name="add_employee_basic_info_subtitle">Basic information of employee</string>
+    <string name="add_employee_full_name">FULL NAME *</string>
+    <string name="add_employee_full_name_hint">Full name</string>
+    <string name="add_employee_english_name">ENGLISH NAME</string>
+    <string name="add_employee_english_name_hint">English name</string>
+    <string name="add_employee_email">EMAIL *</string>
+    <string name="add_employee_email_hint">example@gmail.com</string>
+    <string name="add_employee_phone">PHONE NUMBER *</string>
+    <string name="add_employee_phone_hint">0123456789</string>
+    <string name="add_employee_gender_male">Male</string>
+    <string name="add_employee_gender_female">Female</string>
+    <string name="add_employee_gender_other">Other</string>
+    <string name="add_employee_date_of_birth">DATE OF BIRTH</string>
+    <string name="add_employee_date_format">dd/MM/yyyy</string>
+    <string name="add_employee_gender">GENDER</string>
+    <string name="add_employee_identity_id">IDENTITY ID</string>
+    <string name="add_employee_identity_id_hint">123456789012</string>
+    <string name="add_employee_id_issue_day">IDENTITY ID ISSUE DAY</string>
+    <string name="add_employee_id_issue_place">IDENTITY ID ISSUE PLACE</string>
+    <string name="add_employee_id_issue_place_hint">Personal ID issue place</string>
+    <string name="add_employee_nationality">NATIONALITY</string>
+    <string name="add_employee_marital_status">MARITAL STATUS</string>
+    <string name="add_employee_address">ADDRESS</string>
+    <string name="add_employee_address_hint">123 Thu Thiem, Ho Chi Minh City</string>
+    <string name="add_employee_employment_info">Employee Information</string>
+    <string name="add_employee_job_title">Job title</string>
+    <string name="add_employee_role">Role</string>
+    <string name="add_employee_department">Department</string>
+    <string name="add_employee_status">Status</string>
+    <string name="add_employee_contract_type">Contract type</string>
+    <string name="add_employee_level">Level</string>
+    <string name="add_employee_cancel">Cancel</string>
+    <string name="add_employee_create_member">Create member</string>
+    <!-- Nationality -->
+    <string name="nationality_vietnamese">Vietnamese</string>
+    <string name="nationality_american">American</string>
+    <string name="nationality_british">British</string>
+    <string name="nationality_chinese">Chinese</string>
+    <string name="nationality_japanese">Japanese</string>
+    <string name="nationality_korean">Korean</string>
+    <!-- Marital -->
+    <string name="marital_single">Single</string>
+    <string name="marital_married">Married</string>
+    <string name="marital_divorced">Divorced</string>
+    <string name="marital_widowed">Widowed</string>
+    <!-- Job title (Add form) -->
+    <string name="job_title_account">Account Officer</string>
+    <string name="job_title_ga">GA Officer</string>
+    <string name="job_title_contract">Contract Officer</string>
+    <string name="job_title_developer">Developer</string>
+    <!-- Department (Add form) -->
+    <string name="department_gdc">GDC</string>
+    <string name="department_project_biz">Project Biz Team</string>
+    <string name="department_banking">Banking Dev</string>
+    <string name="department_mobile">Mobile Team</string>
+    <string name="department_qa">QA Team</string>
+    <!-- Status (Add form) -->
+    <string name="status_on_leave">On Leave</string>
+    <string name="status_probation">Probation</string>
+    <string name="status_notice_period">Notice Period</string>
 </resources>

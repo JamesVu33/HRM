@@ -21,6 +21,18 @@ data class EmployeeDto(
     val salary: Double?,
     @SerializedName("address")
     val address: String?,
+    @SerializedName("englishName")
+    val englishName: String? = null,
+    @SerializedName("gender")
+    val gender: String? = null,
+    @SerializedName("personalId")
+    val personalId: String? = null,
+    @SerializedName("idIssueDate")
+    val idIssueDate: String? = null,
+    @SerializedName("levelId")
+    val levelId: Int? = null,
+    @SerializedName("level")
+    val level: LevelShortDto? = null,
     @SerializedName("createdAt")
     val createdAt: Long?,
     @SerializedName("updatedAt")
