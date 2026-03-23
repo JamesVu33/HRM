@@ -69,6 +69,24 @@ object DashboardMockData {
                     "mock-emp-1" to "S2",
                     "mock-emp-2" to "L3",
                     "mock-emp-3" to "L1"
+                ),
+                management = DashboardManagementUiModel(
+                    calendar = ManagementCalendarUiModel(
+                        dayOfMonth = "19",
+                        monthLabel = "Mar",
+                        weekdayLabel = "Thu",
+                        presentCount = 38,
+                        absentCount = 7,
+                        totalHeadcount = 45,
+                        attendanceRatePercent = 84
+                    ),
+                    security = ManagementSecurityUiModel(
+                        totalUsers = 45,
+                        submissionsCount = 20,
+                        submitted = 20,
+                        pending = 5,
+                        notSubmitted = 20
+                    )
                 )
             )
         }

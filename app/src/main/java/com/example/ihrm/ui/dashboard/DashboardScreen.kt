@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -33,21 +32,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.ihrm.R
-import com.example.ihrm.ui.components.CustomButton
-import com.example.ihrm.ui.components.EmployeeCard
 import com.example.ihrm.ui.theme.DashboardGradientMid
 import com.example.ihrm.ui.theme.DashboardGradientSoft
 import com.example.ihrm.ui.theme.DashboardGradientTop
 import com.example.ihrm.ui.theme.FABGradientEnd
 import com.example.ihrm.ui.theme.FABGradientStart
 import com.example.ihrm.ui.theme.IHRMTheme
-import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.util.base.header.DashboardHomeTab
 import com.example.ihrm.util.base.header.DashboardHomeTabSubtitle
 import com.example.ihrm.util.base.header.DashboardHomeTabSwitcher
@@ -69,38 +62,6 @@ fun DashboardScreen(
         modifier = Modifier.fillMaxSize().navigationBarsPadding(),
         containerColor = Color.Transparent,
         contentWindowInsets = WindowInsets(top = 0),
-        floatingActionButton = {
-            if (selectedTab == DashboardHomeTab.Management) {
-                FloatingActionButton(
-                    onClick = onAddEmployee,
-                    modifier = Modifier
-                        .navigationBarsPadding()
-                        .size(56.dp),
-                    shape = CircleShape,
-                    containerColor = Color.Transparent,
-                    contentColor = Color.White,
-                    elevation = FloatingActionButtonDefaults.elevation(8.dp, 8.dp),
-                    content = {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(
-                                    brush = Brush.linearGradient(
-                                        colors = listOf(FABGradientStart, FABGradientEnd)
-                                    ),
-                                    shape = CircleShape
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = stringResource(R.string.dashboard_fab_add)
-                            )
-                        }
-                    }
-                )
-            }
-        }
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -161,68 +122,11 @@ fun DashboardScreen(
 
                     DashboardHomeTab.Management -> {
                         item {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.dashboard_management_section_title),
-                                    style = TextStyle(
-                                        fontFamily = InterFontFamily,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 18.sp,
-                                        color = Color.White
-                                    )
-                                )
-                                Text(
-                                    text = stringResource(R.string.dashboard_management_section_body),
-                                    style = TextStyle(
-                                        fontFamily = InterFontFamily,
-                                        fontWeight = FontWeight.Normal,
-                                        fontSize = 14.sp,
-                                        lineHeight = 20.sp,
-                                        color = Color.White.copy(alpha = 0.9f)
-                                    )
-                                )
-                                CustomButton(
-                                    text = stringResource(R.string.dashboard_view_stats),
-                                    onClick = onViewStats,
-                                    isPill = true
-                                )
-                                CustomButton(
-                                    text = stringResource(R.string.dashboard_fab_add),
-                                    onClick = onAddEmployee,
-                                    isPill = true
-                                )
-                                Text(
-                                    text = stringResource(R.string.dashboard_management_team_title),
-                                    style = TextStyle(
-                                        fontFamily = InterFontFamily,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 16.sp,
-                                        color = Color.White
-                                    )
-                                )
-                            }
+                            DashboardManagementTabContent(
+                                ui = mock.management,
+                                onNavigate = onViewStats
+                            )
                         }
-                        items(
-                            items = mock.teamEmployees,
-                            key = { it.id }
-                        ) { employee ->
-                            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                                EmployeeCard(
-                                    employee = employee,
-                                    levelCode = mock.teamLevelById[employee.id]
-                                        ?: stringResource(R.string.dashboard_badge_no_level),
-                                    onViewDetails = { onViewDetails(employee.id) },
-                                    onDelete = { }
-                                )
-                                Spacer(modifier = Modifier.height(12.dp))
-                            }
-                        }
-                        item { Spacer(modifier = Modifier.height(72.dp)) }
                     }
                 }
 

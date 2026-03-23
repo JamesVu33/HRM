@@ -72,11 +72,12 @@
 
     <!-- Dashboard home (Figma 871:34818) -->
     <string name="dashboard_cd_open_menu">Open menu</string>
+    <string name="dashboard_cd_navigate_forward">Open</string>
     <string name="dashboard_cd_notifications">Notifications</string>
     <string name="dashboard_tab_personal">Personal</string>
     <string name="dashboard_tab_management">Management</string>
     <string name="dashboard_tab_subtitle_personal">Your profile, leave balance, and security status</string>
-    <string name="dashboard_tab_subtitle_management">Team roster, approvals, and workforce insights</string>
+    <string name="dashboard_tab_subtitle_management">Team attendance, calendar, and security oversight</string>
     <string name="dashboard_mock_profile_name">Tiểu Long Nữ</string>
     <string name="dashboard_mock_profile_id">0909999999</string>
     <string name="dashboard_mock_department">Engineering</string>
@@ -108,6 +109,28 @@
     <string name="dashboard_management_section_title">Team overview</string>
     <string name="dashboard_management_section_body">Review employees, add new hires, and open the full directory.</string>
     <string name="dashboard_management_team_title">Team members</string>
+
+    <!-- Dashboard Management tab (Figma 871:35029) -->
+    <string name="dashboard_mgmt_calendar_title">Calendar</string>
+    <string name="dashboard_mgmt_calendar_subtitle">Today\'s Schedule</string>
+    <string name="dashboard_mgmt_present">Present</string>
+    <string name="dashboard_mgmt_absent">Absent</string>
+    <string name="dashboard_mgmt_team_attendance">Team Attendance</string>
+    <string name="dashboard_mgmt_today_overview">Today\'s overview</string>
+    <string name="dashboard_mgmt_rate">Rate</string>
+    <string name="dashboard_mgmt_total">Total</string>
+    <string name="dashboard_mgmt_users_format">Total Users</string>
+    <string name="dashboard_mgmt_security_title">Security Management</string>
+    <string name="dashboard_mgmt_security_subtitle">Team Overview</string>
+    <string name="dashboard_mgmt_total_users">Total Users</string>
+    <string name="dashboard_mgmt_submissions">Submissions</string>
+    <string name="dashboard_mgmt_submission_status">Submission Status</string>
+    <string name="dashboard_mgmt_this_month">This month</string>
+    <string name="dashboard_mgmt_total_users_header">Total</string>
+    <string name="dashboard_mgmt_total_users_count"> %1$d users</string>
+    <string name="dashboard_mgmt_legend_submitted">Submitted</string>
+    <string name="dashboard_mgmt_legend_pending">Pending</string>
+    <string name="dashboard_mgmt_legend_not_submitted">Not Submitted</string>
 
     <!-- Drawer -->
     <string name="drawer_brand">Shinhan DS</string>

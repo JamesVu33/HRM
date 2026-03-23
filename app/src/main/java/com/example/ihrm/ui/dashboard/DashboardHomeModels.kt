@@ -43,5 +43,31 @@ data class DashboardHomeMockModel(
     val leaveStats: List<LeaveStatModel>,
     val securityMonthly: SecurityMonthlyModel,
     val teamEmployees: List<Employee>,
-    val teamLevelById: Map<String, String>
+    val teamLevelById: Map<String, String>,
+    /** Management tab: calendar + security overview (Figma 871:35029). */
+    val management: DashboardManagementUiModel
+)
+
+/** Mock / API-ready model for the Dashboard Management tab. */
+data class DashboardManagementUiModel(
+    val calendar: ManagementCalendarUiModel,
+    val security: ManagementSecurityUiModel
+)
+
+data class ManagementCalendarUiModel(
+    val dayOfMonth: String,
+    val monthLabel: String,
+    val weekdayLabel: String,
+    val presentCount: Int,
+    val absentCount: Int,
+    val totalHeadcount: Int,
+    val attendanceRatePercent: Int
+)
+
+data class ManagementSecurityUiModel(
+    val totalUsers: Int,
+    val submissionsCount: Int,
+    val submitted: Int,
+    val pending: Int,
+    val notSubmitted: Int
 )
