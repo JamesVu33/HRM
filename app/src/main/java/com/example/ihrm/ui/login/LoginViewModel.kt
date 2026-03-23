@@ -1,4 +1,4 @@
-package com.example.ihrm.ui.loginTest
+package com.example.ihrm.ui.login
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
@@ -17,12 +17,12 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import javax.inject.Inject
 
-data class LoginTestUiState(
+data class LoginUiState(
     val employeeId: String = "",
     val password: String = "",
     val isLoading: Boolean = false,
-    val employeeIdError: LoginTestFieldError? = null,
-    val passwordError: LoginTestFieldError? = null,
+    val employeeIdError: LoginFieldError? = null,
+    val passwordError: LoginFieldError? = null,
     val isLoginSuccess: Boolean = false,
     val isPasswordVisible: Boolean = false,
     val loginError: String? = null
@@ -31,21 +31,21 @@ data class LoginTestUiState(
 /** API requires employeeId exactly 8 characters. */
 const val EMPLOYEE_ID_EXACT_LENGTH = 8
 
-sealed interface LoginTestFieldError {
-    data object Required : LoginTestFieldError
-    data object TooShort : LoginTestFieldError
-    data object InvalidLength : LoginTestFieldError  // not exactly 8 chars
-    data object InvalidRules : LoginTestFieldError
+sealed interface LoginFieldError {
+    data object Required : LoginFieldError
+    data object TooShort : LoginFieldError
+    data object InvalidLength : LoginFieldError  // not exactly 8 chars
+    data object InvalidRules : LoginFieldError
 }
 
 @HiltViewModel
-class LoginTestViewModel @Inject constructor(
+class LoginViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(LoginTestUiState())
-    val uiState: StateFlow<LoginTestUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(LoginUiState())
+    val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
     fun updateEmployeeId(employeeId: String) {
         val error = validateEmployeeId(employeeId)
@@ -78,14 +78,14 @@ class LoginTestViewModel @Inject constructor(
 
             if (employeeId.isEmpty()) {
                 _uiState.value = _uiState.value.copy(
-                    employeeIdError = LoginTestFieldError.Required
+                    employeeIdError = LoginFieldError.Required
                 )
                 return@launch
             }
 
             if (password.isEmpty()) {
                 _uiState.value = _uiState.value.copy(
-                    passwordError = LoginTestFieldError.Required
+                    passwordError = LoginFieldError.Required
                 )
                 return@launch
             }
@@ -139,16 +139,16 @@ class LoginTestViewModel @Inject constructor(
         }
     }
 
-    private fun validateEmployeeId(employeeId: String): LoginTestFieldError? {
+    private fun validateEmployeeId(employeeId: String): LoginFieldError? {
         if (employeeId.isBlank()) return null
         val len = employeeId.trim().length
         return when {
-            len != EMPLOYEE_ID_EXACT_LENGTH -> LoginTestFieldError.InvalidLength
+            len != EMPLOYEE_ID_EXACT_LENGTH -> LoginFieldError.InvalidLength
             else -> null
         }
     }
 
-    private fun validatePassword(password: String): LoginTestFieldError? {
+    private fun validatePassword(password: String): LoginFieldError? {
         if (password.isEmpty()) return null
         val hasUpperCase = password.any { it.isUpperCase() }
         val hasLowerCase = password.any { it.isLowerCase() }
@@ -165,6 +165,6 @@ class LoginTestViewModel @Inject constructor(
     }
 
     fun reset() {
-        _uiState.value = LoginTestUiState()
+        _uiState.value = LoginUiState()
     }
 }

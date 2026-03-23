@@ -1,4 +1,4 @@
-package com.example.ihrm.ui.loginTest
+package com.example.ihrm.ui.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,14 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,14 +35,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -74,10 +65,9 @@ import com.example.ihrm.ui.theme.Primary50
 import com.example.ihrm.ui.theme.Primary500
 
 @Composable
-fun LoginTestScreen(
+fun LoginScreen(
     onLoginSuccess: () -> Unit,
-    onNavigateToSignUp: () -> Unit,
-    viewModel: LoginTestViewModel = hiltViewModel()
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -372,21 +362,21 @@ fun LoginTestScreen(
     }
 }
 
-private fun LoginTestFieldError.toEmployeeIdMessageResId(): Int {
+private fun LoginFieldError.toEmployeeIdMessageResId(): Int {
     return when (this) {
-        LoginTestFieldError.Required -> R.string.login_test_error_employee_id_required
-        LoginTestFieldError.TooShort -> R.string.login_test_error_employee_id_too_short
-        LoginTestFieldError.InvalidLength -> R.string.login_test_error_employee_id_invalid_length
-        LoginTestFieldError.InvalidRules -> R.string.login_test_error_password_rules
+        LoginFieldError.Required -> R.string.login_test_error_employee_id_required
+        LoginFieldError.TooShort -> R.string.login_test_error_employee_id_too_short
+        LoginFieldError.InvalidLength -> R.string.login_test_error_employee_id_invalid_length
+        LoginFieldError.InvalidRules -> R.string.login_test_error_password_rules
     }
 }
 
-private fun LoginTestFieldError.toPasswordMessageResId(): Int {
+private fun LoginFieldError.toPasswordMessageResId(): Int {
     return when (this) {
-        LoginTestFieldError.Required -> R.string.login_test_error_password_required
-        LoginTestFieldError.TooShort -> R.string.login_test_error_employee_id_too_short
-        LoginTestFieldError.InvalidLength -> R.string.login_test_error_employee_id_invalid_length
-        LoginTestFieldError.InvalidRules -> R.string.login_test_error_password_rules
+        LoginFieldError.Required -> R.string.login_test_error_password_required
+        LoginFieldError.TooShort -> R.string.login_test_error_employee_id_too_short
+        LoginFieldError.InvalidLength -> R.string.login_test_error_employee_id_invalid_length
+        LoginFieldError.InvalidRules -> R.string.login_test_error_password_rules
     }
 }
 

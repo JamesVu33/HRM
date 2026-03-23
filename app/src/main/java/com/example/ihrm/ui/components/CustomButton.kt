@@ -41,7 +41,6 @@ import com.example.ihrm.ui.theme.Primary300
 import com.example.ihrm.ui.theme.Primary400
 import com.example.ihrm.ui.theme.Primary50
 import com.example.ihrm.ui.theme.Primary500
-import com.example.ihrm.util.dropShadow
 
 /**
  * Button size variants

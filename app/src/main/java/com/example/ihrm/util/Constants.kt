@@ -1,9 +1,6 @@
 package com.example.ihrm.util
 
 object Constants {
-    /** Backend base URL. Use be-nest-hrm or be-nest-hem depending on your Render service name. */
-    const val BASE_URL = "https://be-nest-hrm.onrender.com/"
-    const val DATABASE_NAME = "employee_database"
     const val AUTH_PREFS_NAME = "auth_prefs"
     const val PREF_ACCESS_TOKEN = "access_token"
     const val PREF_REFRESH_TOKEN = "refresh_token"

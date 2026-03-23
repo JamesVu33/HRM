@@ -3,6 +3,7 @@ package com.example.ihrm.ui.employee.list
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ihrm.core.viewmodel.BaseViewmodel
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.model.EmployeeUiModel
 import com.example.ihrm.domain.model.Level
@@ -35,7 +36,7 @@ class EmployeeListViewModel @Inject constructor(
     private val getLevelByIdUseCase: GetLevelByIdUseCase,
     private val deleteEmployeeUseCase: DeleteEmployeeUseCase,
     private val syncEmployeesUseCase: SyncEmployeesUseCase
-) : ViewModel() {
+) : BaseViewmodel() {
 
     private val _uiState = MutableStateFlow(EmployeeListUiState())
     val uiState: StateFlow<EmployeeListUiState> = _uiState.asStateFlow()

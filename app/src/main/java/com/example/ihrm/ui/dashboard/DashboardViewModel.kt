@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ihrm.core.viewmodel.BaseViewmodel
 import com.example.ihrm.data.remote.dto.UserMetaResponseDto
 import com.example.ihrm.domain.UnauthorizedException
 import com.example.ihrm.domain.model.Employee
@@ -59,7 +60,7 @@ class DashboardViewModel @Inject constructor(
     private val getMeEmployeeInfoUseCase: GetMeEmployeeInfoUseCase,
     private val getEmployeesMetaUseCase: GetEmployeesMetaUseCase,
     private val deleteEmployeeUseCase: DeleteEmployeeUseCase
-) : ViewModel() {
+) : BaseViewmodel() {
 
     private val _uiState = MutableStateFlow(DashboardUiState())
 

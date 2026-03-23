@@ -6,6 +6,9 @@ import com.example.ihrm.data.remote.dto.LoginResponseDto
 
 /**
  * Holds auth state and tokens. Call [init] from [android.app.Application.onCreate].
+ *
+ * #coreFeature
+ * migrate to version 2: migrate to DataStore
  */
 object AuthManager {
 
