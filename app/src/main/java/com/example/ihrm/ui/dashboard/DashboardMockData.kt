@@ -31,7 +31,7 @@ object DashboardMockData {
                     departmentDetail = dept,
                     avatarUrl = null,
                     avatarInitials = avatarInitialsFromDisplayName(name),
-                    avatarSecurity = "test"
+                    avatarSecurity = null
                 ),
                 leaveStats = listOf(
                     LeaveStatModel(

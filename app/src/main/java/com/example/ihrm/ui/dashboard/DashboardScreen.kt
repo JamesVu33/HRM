@@ -11,23 +11,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -35,12 +26,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ihrm.R
+import com.example.ihrm.ui.dashboard.dashboardSections.DashboardLeaveSection
+import com.example.ihrm.ui.dashboard.extra.DashboardSecurityCardManagement
+import com.example.ihrm.ui.dashboard.extra.DashboardManagementTabContent
+import com.example.ihrm.ui.dashboard.extra.DashboardProfileCardManagement
+import com.example.ihrm.ui.dashboard.personal.DashboardProfileCardPersonal
 import com.example.ihrm.ui.theme.DashboardGradientMid
 import com.example.ihrm.ui.theme.DashboardGradientSoft
 import com.example.ihrm.ui.theme.DashboardGradientTop
-import com.example.ihrm.ui.theme.FABGradientEnd
-import com.example.ihrm.ui.theme.FABGradientStart
 import com.example.ihrm.ui.theme.IHRMTheme
+import com.example.ihrm.util.AuthManager
 import com.example.ihrm.util.base.header.DashboardHomeTab
 import com.example.ihrm.util.base.header.DashboardHomeTabSubtitle
 import com.example.ihrm.util.base.header.DashboardHomeTabSwitcher
@@ -56,6 +51,17 @@ fun DashboardScreen(
     onViewStats: () -> Unit
 ) {
     val mock = DashboardMockData.rememberHomeModel()
+    val role = remember(
+        AuthManager.getUserEmail(),
+        AuthManager.getUserFullName()
+    ) {
+        resolveDashboardRoleAfterLogin(
+            email = AuthManager.getUserEmail(),
+            fullName = AuthManager.getUserFullName()
+        )
+    }
+    val personalUi = remember(mock) { buildPersonalRoleUi(mock) }
+    val extraUi = remember(mock) { buildExtraRoleUi(mock) }
     var selectedTab by remember { mutableStateOf(DashboardHomeTab.Personal) }
 
     Scaffold(
@@ -92,49 +98,91 @@ fun DashboardScreen(
                         showBellBadge = true
                     )
                 }
-                item {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    DashboardHomeTabSwitcher(
-                        selected = selectedTab,
-                        onSelect = { selectedTab = it }
-                    )
+
+                if (role == DashboardRole.Extra) {
+                    item {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        DashboardHomeTabSwitcher(
+                            selected = selectedTab,
+                            onSelect = { selectedTab = it }
+                        )
+                    }
+                    item {
+                        DashboardHomeTabSubtitle(tab = selectedTab)
+                    }
                 }
-                item {
-                    DashboardHomeTabSubtitle(tab = selectedTab)
-                }
+
                 item { Spacer(modifier = Modifier.height(16.dp)) }
 
-                when (selectedTab) {
-                    DashboardHomeTab.Personal -> {
-                        item {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                DashboardProfileCard(profile = mock.profile)
-                                DashboardLeaveSection(stats = mock.leaveStats)
-                                DashboardSecurityCard(monthly = mock.securityMonthly, profile = mock.profile)
+                if (role == DashboardRole.Personal) {
+                    item {
+                        DashboardPersonalRoleSection(personalUi = personalUi)
+                    }
+                    item { Spacer(modifier = Modifier.height(32.dp)) }
+                } else {
+                    when (selectedTab) {
+                        DashboardHomeTab.Personal -> {
+                            item {
+                                DashboardExtraRoleSection(
+                                    personalUi = DashboardPersonalRoleUi(
+                                        profile = extraUi.profile,
+                                        leaveStats = extraUi.leaveStats,
+                                        securityMonthly = extraUi.securityMonthly
+                                    )
+                                )
+                            }
+                        }
+
+                        DashboardHomeTab.Management -> {
+                            item {
+                                DashboardManagementTabContent(
+                                    ui = extraUi.management,
+                                    onNavigate = onViewStats
+                                )
                             }
                         }
                     }
 
-                    DashboardHomeTab.Management -> {
-                        item {
-                            DashboardManagementTabContent(
-                                ui = mock.management,
-                                onNavigate = onViewStats
-                            )
-                        }
+                    if (selectedTab == DashboardHomeTab.Personal) {
+                        item { Spacer(modifier = Modifier.height(32.dp)) }
                     }
-                }
-
-                if (selectedTab == DashboardHomeTab.Personal) {
-                    item { Spacer(modifier = Modifier.height(32.dp)) }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun DashboardExtraRoleSection(
+    personalUi: DashboardPersonalRoleUi
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // Personal role dashboard UI (Figma 871:30135).
+        DashboardProfileCardManagement(profile = personalUi.profile)
+        DashboardLeaveSection(stats = personalUi.leaveStats)
+        DashboardSecurityCardManagement(monthly = personalUi.securityMonthly, profile = personalUi.profile)
+    }
+}
+
+@Composable
+private fun DashboardPersonalRoleSection(
+    personalUi: DashboardPersonalRoleUi
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // Personal role dashboard UI (Figma 871:30135).
+        DashboardProfileCardPersonal(profile = personalUi.profile)
+        DashboardLeaveSection(stats = personalUi.leaveStats)
+        DashboardSecurityCardManagement(monthly = personalUi.securityMonthly, profile = personalUi.profile)
     }
 }
 
