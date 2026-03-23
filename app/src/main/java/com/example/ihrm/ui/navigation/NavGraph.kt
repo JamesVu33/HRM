@@ -94,7 +94,8 @@ fun NavGraph(
                 },
                 onAddEmployeeClick = {
                     navController.navigate(Screen.AddEmployee.route)
-                }
+                },
+                onBackClick = { navController.popBackStack() }
             )
         }
 

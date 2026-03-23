@@ -57,6 +57,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -470,43 +471,48 @@ private fun DashboardSearchBar(
         modifier = Modifier
             .fillMaxWidth()
             .height(44.dp)
-            .border(
-                width = 1.dp,
-                color = StrokeColor,
-                shape = RoundedCornerShape(14.dp)
-            )
+            .border(1.dp, StrokeColor, RoundedCornerShape(14.dp))
             .clip(RoundedCornerShape(14.dp))
             .background(EdittextBg_70)
-            .padding(horizontal = 16.dp, vertical = 10.dp)
+            .padding(horizontal = 16.dp)
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = null,
                 tint = White,
                 modifier = Modifier.size(20.dp)
             )
+
             Spacer(modifier = Modifier.width(12.dp))
+
             BasicTextField(
                 value = query,
                 onValueChange = onQueryChange,
-                modifier = Modifier
-                    .weight(1f),
+                modifier = Modifier.weight(1f),
                 singleLine = true,
-                textStyle = androidx.compose.ui.text.TextStyle(
+                textStyle = TextStyle(
                     color = White,
                     fontSize = 15.sp
                 ),
                 cursorBrush = SolidColor(Neutral700),
                 decorationBox = { inner ->
-                    if (query.isEmpty()) {
-                        Text(
-                            text = placeholder,
-                            color = White,
-                            fontSize = 15.sp
-                        )
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        if (query.isEmpty()) {
+                            Text(
+                                text = placeholder,
+                                color = White,
+                                fontSize = 15.sp
+                            )
+                        }
+                        inner()
                     }
-                    inner()
                 }
             )
         }
