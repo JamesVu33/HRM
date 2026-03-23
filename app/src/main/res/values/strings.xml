@@ -70,6 +70,45 @@
     <string name="dashboard_error_unauthorized">Phiên đăng nhập hết hạn, vui lòng đăng nhập lại.</string>
     <string name="dashboard_badge_no_level">—</string>
 
+    <!-- Dashboard home (Figma 871:34818) -->
+    <string name="dashboard_cd_open_menu">Open menu</string>
+    <string name="dashboard_cd_notifications">Notifications</string>
+    <string name="dashboard_tab_personal">Personal</string>
+    <string name="dashboard_tab_management">Management</string>
+    <string name="dashboard_tab_subtitle_personal">Your profile, leave balance, and security status</string>
+    <string name="dashboard_tab_subtitle_management">Team roster, approvals, and workforce insights</string>
+    <string name="dashboard_mock_profile_name">Tiểu Long Nữ</string>
+    <string name="dashboard_mock_profile_id">0909999999</string>
+    <string name="dashboard_mock_department">Engineering</string>
+    <string name="dashboard_mock_email">brninh343456@company.com</string>
+    <string name="dashboard_mock_phone">0901234672</string>
+    <string name="dashboard_mock_joined">Jan 2024</string>
+    <string name="dashboard_mock_date">Thursday, 19 March 2025</string>
+    <string name="dashboard_profile_email_label">Email Address</string>
+    <string name="dashboard_profile_phone_label">Phone Number</string>
+    <string name="dashboard_profile_joined_label">Joined</string>
+    <string name="dashboard_profile_department_label">Department</string>
+    <string name="dashboard_leave_section_title">Leave Management</string>
+    <string name="dashboard_leave_total_title">Total Allowance</string>
+    <string name="dashboard_leave_total_desc">Annual leave days granted for current year</string>
+    <string name="dashboard_leave_used_title">Used</string>
+    <string name="dashboard_leave_used_desc">Approved leave days you have taken</string>
+    <string name="dashboard_leave_pending_title">Pending</string>
+    <string name="dashboard_leave_pending_desc">Leave requests awaiting manager approval</string>
+    <string name="dashboard_leave_remaining_title">Remaining</string>
+    <string name="dashboard_leave_remaining_desc">Available leave days you can still use</string>
+    <string name="dashboard_security_title">Security Check</string>
+    <string name="dashboard_security_subtitle">Real-time monitoring</string>
+    <string name="dashboard_security_in_review">In Review</string>
+    <string name="dashboard_security_in_review_body">Security check being reviewed. Wait for approval.</string>
+    <string name="dashboard_security_this_month">This Month</string>
+    <string name="dashboard_security_approved">Approved</string>
+    <string name="dashboard_security_rechecking">Re-checking</string>
+    <string name="dashboard_security_rejected">Rejected</string>
+    <string name="dashboard_management_section_title">Team overview</string>
+    <string name="dashboard_management_section_body">Review employees, add new hires, and open the full directory.</string>
+    <string name="dashboard_management_team_title">Team members</string>
+
     <!-- Drawer -->
     <string name="drawer_brand">Shinhan DS</string>
     <string name="drawer_section_dashboard">Dashboard</string>
