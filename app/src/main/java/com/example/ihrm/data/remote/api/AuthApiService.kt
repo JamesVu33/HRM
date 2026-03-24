@@ -3,6 +3,7 @@ package com.example.ihrm.data.remote.api
 import com.example.ihrm.data.remote.dto.ApiResponseDto
 import com.example.ihrm.data.remote.dto.LoginDto
 import com.example.ihrm.data.remote.dto.LoginResponseDto
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
 
@@ -16,5 +17,5 @@ interface AuthApiService {
 
     /** POST /auth/login — [LoginDto]: employeeId, password. */
     @POST("auth/login")
-    suspend fun login(@Body body: LoginDto): ApiResponseDto<LoginResponseDto>
+    suspend fun login(@Body body: LoginDto): Response<ApiResponseDto<LoginResponseDto>>
 }

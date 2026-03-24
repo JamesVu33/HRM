@@ -1,9 +1,8 @@
 package com.example.ihrm.ui.login
 
 import android.content.Context
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ihrm.R
+import com.example.ihrm.core.viewmodel.BaseViewmodel
 import com.example.ihrm.domain.repository.AuthRepository
 import com.example.ihrm.util.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,9 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.net.ConnectException
-import java.net.SocketTimeoutException
-import java.net.UnknownHostException
 import javax.inject.Inject
 
 data class LoginUiState(
@@ -42,7 +38,7 @@ sealed interface LoginFieldError {
 class LoginViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val authRepository: AuthRepository
-) : ViewModel() {
+) : BaseViewmodel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
@@ -107,33 +103,18 @@ class LoginViewModel @Inject constructor(
                 loginError = null
             )
 
-            val result = authRepository.login(employeeId, password)
-
-            _uiState.value = _uiState.value.copy(isLoading = false)
-
-            result.fold(
+            handleApiResponse(
+                authRepository.login(employeeId, password),
                 onSuccess = { data ->
                     AuthManager.saveTokens(data)
-                    _uiState.value = _uiState.value.copy(isLoginSuccess = true)
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        isLoginSuccess = true
+                    )
                     onSuccess()
                 },
-                onFailure = { e ->
-                    val msg = e.message?.lowercase() ?: ""
-                    val isNetworkOrUnreachable = e is UnknownHostException
-                            || e is SocketTimeoutException
-                            || e is ConnectException
-                            || msg.contains("unable to resolve host", ignoreCase = true)
-                            || msg.contains("no address associated with the hostname", ignoreCase = true)
-                            || msg.contains("connection refused", ignoreCase = true)
-                            || msg.contains("failed to connect", ignoreCase = true)
-                            || msg.contains("timeout", ignoreCase = true)
-                            || msg.contains("timed out", ignoreCase = true)
-                    val message = if (isNetworkOrUnreachable) {
-                        context.getString(R.string.login_test_error_network)
-                    } else {
-                        e.message ?: context.getString(R.string.login_test_error_api)
-                    }
-                    _uiState.value = _uiState.value.copy(loginError = message)
+                onFailure = {
+                    _uiState.value = _uiState.value.copy(isLoading = false)
                 }
             )
         }
@@ -160,6 +141,7 @@ class LoginViewModel @Inject constructor(
             !isValidLength || !hasUpperCase || !hasLowerCase || !hasDigit || !hasSpecialChar -> {
                 null
             }
+
             else -> null
         }
     }

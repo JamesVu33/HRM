@@ -34,7 +34,6 @@ object NetworkModule {
     @Singleton
     fun provideOkHttpClient(gson: Gson): OkHttpClient {
         val authInterceptor = AuthInterceptor()
-        val errorHandler = ErrorInterceptor(gson)
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
@@ -42,7 +41,6 @@ object NetworkModule {
         return OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
             .addInterceptor(loggingInterceptor)
-            .addInterceptor(errorHandler)
             .connectTimeout(30L, TimeUnit.SECONDS)
             .readTimeout(30L, TimeUnit.SECONDS)
             .writeTimeout(30L, TimeUnit.SECONDS)

@@ -1,7 +1,7 @@
 package com.example.ihrm.ui.employee.detail
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ihrm.core.viewmodel.BaseViewmodel
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.usecase.DeleteEmployeeUseCase
 import com.example.ihrm.domain.usecase.GetEmployeeByIdUseCase
@@ -25,7 +25,7 @@ class EmployeeDetailViewModel @Inject constructor(
     private val getEmployeeByIdUseCase: GetEmployeeByIdUseCase,
     private val deleteEmployeeUseCase: DeleteEmployeeUseCase,
     private val updateEmployeeUseCase: UpdateEmployeeUseCase
-) : ViewModel() {
+) : BaseViewmodel() {
 
     private val _uiState = MutableStateFlow(EmployeeDetailUiState())
     val uiState: StateFlow<EmployeeDetailUiState> = _uiState.asStateFlow()
@@ -53,14 +53,15 @@ class EmployeeDetailViewModel @Inject constructor(
 
     fun deleteEmployee(employeeId: String, onSuccess: () -> Unit) {
         viewModelScope.launch {
-            deleteEmployeeUseCase(employeeId).fold(
+            handleApiResponse(
+                deleteEmployeeUseCase(employeeId),
                 onSuccess = {
                     onSuccess()
                 },
-                onFailure = { exception ->
-                    _uiState.value = _uiState.value.copy(
-                        error = exception.message ?: "Failed to delete employee"
-                    )
+                onFailure = {
+//                    _uiState.value = _uiState.value.copy(
+//                        error = exception.message ?: "Failed to delete employee"
+//                    )
                 }
             )
         }
@@ -68,15 +69,16 @@ class EmployeeDetailViewModel @Inject constructor(
 
     fun updateEmployee(employee: Employee, onSuccess: () -> Unit) {
         viewModelScope.launch {
-            updateEmployeeUseCase(employee).fold(
+            handleApiResponse(
+                updateEmployeeUseCase(employee),
                 onSuccess = {
                     _uiState.value = _uiState.value.copy(updateSuccess = true)
                     onSuccess()
                 },
-                onFailure = { e ->
-                    _uiState.value = _uiState.value.copy(
-                        error = e.message ?: "Failed to update"
-                    )
+                onFailure = {
+//                    _uiState.value = _uiState.value.copy(
+//                        error = e.message ?: "Failed to update"
+//                    )
                 }
             )
         }

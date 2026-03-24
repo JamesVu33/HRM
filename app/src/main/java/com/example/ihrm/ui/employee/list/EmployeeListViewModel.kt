@@ -1,7 +1,6 @@
 package com.example.ihrm.ui.employee.list
 
 import android.util.Log
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ihrm.core.viewmodel.BaseViewmodel
 import com.example.ihrm.domain.model.Employee
@@ -97,20 +96,17 @@ class EmployeeListViewModel @Inject constructor(
             Log.d("Vinh", "mergeEmployeesWithLevels: $levelCache")
             buildEmployeeUiModels(employees, levelCache)
         }
+
     fun refreshEmployees() {
         viewModelScope.launch {
             _uiState.update { it.copy(isRefreshing = true) }
-            syncEmployeesUseCase().fold(
+            handleApiResponse(
+                syncEmployeesUseCase(),
                 onSuccess = {
                     _uiState.update { it.copy(isRefreshing = false) }
                 },
-                onFailure = { exception ->
-                    _uiState.update {
-                        it.copy(
-                            isRefreshing = false,
-                            error = exception.message ?: "Failed to sync employees"
-                        )
-                    }
+                onFailure = {
+                    _uiState.update { it.copy(isRefreshing = false) }
                 }
             )
         }
@@ -118,12 +114,13 @@ class EmployeeListViewModel @Inject constructor(
 
     fun deleteEmployee(employeeId: String) {
         viewModelScope.launch {
-            deleteEmployeeUseCase(employeeId).fold(
+            handleApiResponse(
+                deleteEmployeeUseCase(employeeId),
                 onSuccess = { /* list cập nhật qua Flow */ },
-                onFailure = { exception ->
-                    _uiState.update {
-                        it.copy(error = exception.message ?: "Failed to delete employee")
-                    }
+                onFailure = {
+//                    _uiState.update {
+//                        it.copy(error = exception.message ?: "Failed to delete employee")
+//                    }
                 }
             )
         }

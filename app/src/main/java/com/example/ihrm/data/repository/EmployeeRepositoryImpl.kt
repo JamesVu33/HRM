@@ -3,8 +3,8 @@ package com.example.ihrm.data.repository
 import com.example.ihrm.data.local.dao.EmployeeDao
 import com.example.ihrm.data.remote.api.EmployeeApiService
 import com.example.ihrm.data.remote.base.safeApiCall
-import com.example.ihrm.data.remote.base.safeApiCallList
 import com.example.ihrm.data.remote.dto.MeEmployeeResponse
+import com.example.ihrm.data.remote.dto.NetworkResult
 import com.example.ihrm.data.remote.dto.UserMetaResponseDto
 import com.example.ihrm.data.remote.mapper.toEmployee
 import com.example.ihrm.data.remote.mapper.toEmployeeEntity
@@ -14,11 +14,13 @@ import com.example.ihrm.domain.model.Level
 import com.example.ihrm.domain.repository.EmployeeRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import retrofit2.Retrofit
 import javax.inject.Inject
 
 class EmployeeRepositoryImpl @Inject constructor(
     private val employeeDao: EmployeeDao,
-    private val apiService: EmployeeApiService
+    private val apiService: EmployeeApiService,
+    private val retrofit: Retrofit,
 ) : EmployeeRepository {
 
     override fun getAllEmployees(): Flow<List<Employee>> {
@@ -31,125 +33,127 @@ class EmployeeRepositoryImpl @Inject constructor(
         return employeeDao.getEmployeeById(id).map { it?.toEmployee() }
     }
 
-    override suspend fun addEmployee(employee: Employee): Result<Unit> {
-        return try {
-            // Try to add to API first
-            val dto = com.example.ihrm.data.remote.dto.EmployeeDto(
-                id = employee.id,
-                name = employee.name,
-                email = employee.email,
-                phone = employee.phone,
-                department = employee.department,
-                position = employee.position,
-                hireDate = employee.hireDate,
-                salary = employee.salary,
-                address = employee.address,
-                englishName = employee.englishName,
-                gender = employee.gender,
-                personalId = employee.personalId,
-                idIssueDate = employee.idIssueDate,
-                createdAt = employee.createdAt,
-                updatedAt = employee.updatedAt
-            )
-            apiService.createEmployee(dto)
-            
-            // Save to local database
+    override suspend fun addEmployee(employee: Employee): NetworkResult<Unit> {
+        val dto = com.example.ihrm.data.remote.dto.EmployeeDto(
+            id = employee.id,
+            name = employee.name,
+            email = employee.email,
+            phone = employee.phone,
+            department = employee.department,
+            position = employee.position,
+            hireDate = employee.hireDate,
+            salary = employee.salary,
+            address = employee.address,
+            englishName = employee.englishName,
+            gender = employee.gender,
+            personalId = employee.personalId,
+            idIssueDate = employee.idIssueDate,
+            createdAt = employee.createdAt,
+            updatedAt = employee.updatedAt
+        )
+        val result = safeApiCall(retrofit) { apiService.createEmployee(dto) }
+        if (result is NetworkResult.Success) {
             employeeDao.insertEmployee(employee.toEmployeeEntity())
-            Result.success(Unit)
-        } catch (e: Exception) {
-            // If API fails, still save locally
-            try {
-                employeeDao.insertEmployee(employee.toEmployeeEntity())
-                Result.success(Unit)
-            } catch (dbException: Exception) {
-                Result.failure(dbException)
-            }
+            return NetworkResult.Success(Unit, result.message)
         }
+        return result.map { Unit }
     }
 
-    override suspend fun updateEmployee(employee: Employee): Result<Unit> {
-        val entity = employee.toEmployeeEntity()
-        return try {
-            // Try to update via API first
-            val dto = com.example.ihrm.data.remote.dto.EmployeeDto(
-                id = employee.id,
-                name = employee.name,
-                email = employee.email,
-                phone = employee.phone,
-                department = employee.department,
-                position = employee.position,
-                hireDate = employee.hireDate,
-                salary = employee.salary,
-                address = employee.address,
-                englishName = employee.englishName,
-                gender = employee.gender,
-                personalId = employee.personalId,
-                idIssueDate = employee.idIssueDate,
-                createdAt = employee.createdAt,
-                updatedAt = employee.updatedAt
-            )
-            apiService.updateEmployee(employee.id, dto)
-            // Update local database (REPLACE ensures row is overwritten)
-            employeeDao.insertEmployee(entity)
-            Result.success(Unit)
-        } catch (e: Exception) {
-            // If API fails, still update locally
-            try {
-                employeeDao.insertEmployee(entity)
-                Result.success(Unit)
-            } catch (dbException: Exception) {
-                Result.failure(dbException)
-            }
+    override suspend fun updateEmployee(employee: Employee): NetworkResult<Unit> {
+        val dto = com.example.ihrm.data.remote.dto.EmployeeDto(
+            id = employee.id,
+            name = employee.name,
+            email = employee.email,
+            phone = employee.phone,
+            department = employee.department,
+            position = employee.position,
+            hireDate = employee.hireDate,
+            salary = employee.salary,
+            address = employee.address,
+            englishName = employee.englishName,
+            gender = employee.gender,
+            personalId = employee.personalId,
+            idIssueDate = employee.idIssueDate,
+            createdAt = employee.createdAt,
+            updatedAt = employee.updatedAt
+        )
+        val result = safeApiCall(retrofit) { apiService.updateEmployee(employee.id, dto) }
+        if (result is NetworkResult.Success) {
+            employeeDao.insertEmployee(employee.toEmployeeEntity())
+            return NetworkResult.Success(Unit, result.message)
         }
+        return result.map { Unit }
     }
 
-    override suspend fun deleteEmployee(id: String): Result<Unit> {
-        return try {
-            // Try to delete from API first
-            apiService.deleteEmployee(id)
-            
-            // Delete from local database
+    override suspend fun deleteEmployee(id: String): NetworkResult<Unit> {
+        val result = safeApiCall(retrofit) { apiService.deleteEmployee(id) }
+        if (result is NetworkResult.Success) {
             employeeDao.deleteEmployee(id)
-            Result.success(Unit)
-        } catch (e: Exception) {
-            // If API fails, still delete locally
-            try {
-                employeeDao.deleteEmployee(id)
-                Result.success(Unit)
-            } catch (dbException: Exception) {
-                Result.failure(dbException)
+            return NetworkResult.Success(Unit, result.message)
+        }
+        return result.map { Unit }
+    }
+
+    override suspend fun syncEmployees(meta: UserMetaResponseDto?): NetworkResult<Unit> {
+        val result = safeApiCall(retrofit) { apiService.getAllEmployees() }
+        return when (result) {
+            is NetworkResult.Success -> {
+                employeeDao.deleteAllEmployees()
+                employeeDao.insertEmployees(result.data.map { it.toEmployeeEntity(meta) })
+                NetworkResult.Success(Unit, result.message)
             }
+
+            is NetworkResult.ApiError -> NetworkResult.ApiError(result.error)
+            is NetworkResult.Exception -> NetworkResult.Exception(result.e)
         }
     }
 
-    override suspend fun syncEmployees(meta: UserMetaResponseDto?): Result<Unit> =
-        safeApiCallList { apiService.getAllEmployees() }.fold(
-            onSuccess = { list ->
-                employeeDao.deleteAllEmployees()
-                employeeDao.insertEmployees(list.map { it.toEmployeeEntity(meta) })
-                Result.success(Unit)
-            },
-            onFailure = { Result.failure(it) }
-        )
+    override suspend fun getLevelsMap(): NetworkResult<Map<Int, String>> {
+        val result = safeApiCall(retrofit) { apiService.getAllLevels() }
+        return when (result) {
+            is NetworkResult.Success -> {
+                val map = result.data.associate { it.id to it.code }
+                NetworkResult.Success(map, result.message)
+            }
 
-    override suspend fun getLevelsMap(): Result<Map<Int, String>> =
-        safeApiCallList { apiService.getAllLevels() }.map { list -> list.associate { it.id to it.code } }
+            is NetworkResult.ApiError -> NetworkResult.ApiError(result.error)
+            is NetworkResult.Exception -> NetworkResult.Exception(result.e)
+        }
+    }
 
-    override suspend fun getLevelById(id: Int): Result<Level?> =
-        safeApiCall { apiService.getLevelById(id) }.map { dto -> dto?.toLevel() }
+    override suspend fun getLevelById(id: Int): NetworkResult<Level?> {
+        val result = safeApiCall(retrofit) { apiService.getLevelById(id) }
+        return when (result) {
+            is NetworkResult.Success -> NetworkResult.Success(result.data.toLevel(), result.message)
+            is NetworkResult.ApiError -> NetworkResult.ApiError(result.error)
+            is NetworkResult.Exception -> NetworkResult.Exception(result.e)
+        }
+    }
 
-    override suspend fun getLevelByEmployeeId(employeeId: String): Result<Level?> =
-        safeApiCall { apiService.getEmployeeById(employeeId) }.map { dto -> dto?.level?.toLevel() }
+    override suspend fun getLevelByEmployeeId(employeeId: String): NetworkResult<Level?> {
+        val result = safeApiCall(retrofit) { apiService.getEmployeeById(employeeId) }
+        return when (result) {
+            is NetworkResult.Success -> NetworkResult.Success(
+                result.data.level?.toLevel(),
+                result.message
+            )
 
-    override suspend fun getMeEmployeeInfo(): Result<MeEmployeeResponse> =
-        safeApiCall { apiService.getMeEmployeeInfo() }.fold(
-            onSuccess = { data -> if (data != null) Result.success(data) else Result.failure(Exception("No employee info")) },
-            onFailure = { Result.failure(it) }
-        )
+            is NetworkResult.ApiError -> NetworkResult.ApiError(result.error)
+            is NetworkResult.Exception -> NetworkResult.Exception(result.e)
+        }
+    }
 
-    override suspend fun getEmployeesMeta(): Result<UserMetaResponseDto> =
-        safeApiCall { apiService.getEmployeesMeta() }.fold(
-            onSuccess = { data -> if (data != null) Result.success(data) else Result.failure(Exception("No meta")) },
-            onFailure = { Result.failure(it) }
-        )
+    override suspend fun getMeEmployeeInfo(): NetworkResult<MeEmployeeResponse> =
+        safeApiCall(retrofit) { apiService.getMeEmployeeInfo() }
+
+    override suspend fun getEmployeesMeta(): NetworkResult<UserMetaResponseDto> =
+        safeApiCall(retrofit) { apiService.getEmployeesMeta() }
+
+    private fun <T, R> NetworkResult<T>.map(transform: (T) -> R): NetworkResult<R> {
+        return when (this) {
+            is NetworkResult.Success -> NetworkResult.Success(transform(data), message)
+            is NetworkResult.ApiError -> NetworkResult.ApiError(error)
+            is NetworkResult.Exception -> NetworkResult.Exception(e)
+        }
+    }
 }

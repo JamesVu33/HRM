@@ -1,12 +1,9 @@
 package com.example.ihrm.ui.dashboard
 
 import android.os.Build
-import androidx.annotation.RequiresApi
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ihrm.core.viewmodel.BaseViewmodel
 import com.example.ihrm.data.remote.dto.UserMetaResponseDto
-import com.example.ihrm.domain.UnauthorizedException
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.usecase.DeleteEmployeeUseCase
 import com.example.ihrm.domain.usecase.GetEmployeesMetaUseCase
@@ -15,21 +12,18 @@ import com.example.ihrm.domain.usecase.GetLevelByEmployeeIdUseCase
 import com.example.ihrm.domain.usecase.GetMeEmployeeInfoUseCase
 import com.example.ihrm.domain.usecase.SyncEmployeesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -155,16 +149,16 @@ class DashboardViewModel @Inject constructor(
             syncError.value = null
             syncErrorUnauthorized.value = false
             val meta = getMetaIfS1OrS2()
-            syncEmployeesUseCase(meta)
-                .onSuccess { refreshTrigger.emit(Unit) }
-                .onFailure { e ->
-                    if (e is UnauthorizedException) {
-                        syncErrorUnauthorized.value = true
-                    } else {
-                        syncError.value = e.message
-                    }
+            handleApiResponse(
+                syncEmployeesUseCase(meta),
+                onSuccess = {
+                    refreshTrigger.tryEmit(Unit)
+                    syncLoading.value = false
+                },
+                onFailure = {
+                    syncLoading.value = false
                 }
-            syncLoading.value = false
+            )
         }
     }
 
@@ -175,11 +169,16 @@ class DashboardViewModel @Inject constructor(
                 val ids = employees.map { it.id }.distinct()
                 val missing = ids.filter { it !in levelCodeCache }
                 for (id in missing) {
-                    getLevelByEmployeeIdUseCase(id).getOrNull()?.code?.let { code ->
-                        levelCodeCache[id] = code
-                    }
+                    handleApiResponse(
+                        getLevelByEmployeeIdUseCase(id),
+                        onSuccess = {
+                            it?.code?.let { code ->
+                                levelCodeCache[id] = code
+                            }
+                            levelCodeByEmployeeId.value = levelCodeCache.toMap()
+                        },
+                    )
                 }
-                levelCodeByEmployeeId.value = levelCodeCache.toMap()
             }
         }
     }
@@ -198,7 +197,12 @@ class DashboardViewModel @Inject constructor(
 
     fun deleteEmployee(id: String) {
         viewModelScope.launch {
-            deleteEmployeeUseCase(id)
+            handleApiResponse(
+                deleteEmployeeUseCase(id),
+                onSuccess = {
+                    // Success is handled via Flow from DB
+                }
+            )
         }
     }
 

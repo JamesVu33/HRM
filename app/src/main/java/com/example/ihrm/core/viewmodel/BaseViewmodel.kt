@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ihrm.core.errorHandler.CommonErrorException
+import com.example.ihrm.data.remote.dto.NetworkResult
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +22,7 @@ import java.net.UnknownHostException
 import javax.net.ssl.SSLException
 
 typealias EmptyFunc = () -> Unit
+typealias ParamFunc<T> = (data: T) -> Unit
 typealias FetchSupFunc<T> = suspend () -> T
 
 interface CallbackWrapper<T> {
@@ -106,6 +108,22 @@ abstract class BaseViewmodel : ViewModel() {
                     _loading.value = false
                 }
                 callbackWrapper.onSuccess(response)
+            }
+        }
+    }
+
+    fun <T> handleApiResponse(response: NetworkResult<T>, onSuccess: ParamFunc<T>?, onFailure: EmptyFunc? = null) {
+        when (response) {
+            is NetworkResult.Success -> {
+                onSuccess?.invoke(response.data)
+            }
+            is NetworkResult.ApiError -> {
+                onFailure?.invoke()
+                _error.tryEmit(CommonErrorException.InvalidInputException(null, response.error.errorType, response.error.errors))
+            }
+            is NetworkResult.Exception -> {
+                onFailure?.invoke()
+                _error.tryEmit(CommonErrorException.NetworkException(response.e.message))
             }
         }
     }
