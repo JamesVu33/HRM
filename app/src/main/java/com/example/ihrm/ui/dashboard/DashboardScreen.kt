@@ -31,6 +31,7 @@ import com.example.ihrm.ui.dashboard.extra.DashboardSecurityCardManagement
 import com.example.ihrm.ui.dashboard.extra.DashboardManagementTabContent
 import com.example.ihrm.ui.dashboard.extra.DashboardProfileCardManagement
 import com.example.ihrm.ui.dashboard.personal.DashboardProfileCardPersonal
+import com.example.ihrm.ui.dashboard.personal.DashboardSecurityCardPersonal
 import com.example.ihrm.ui.theme.DashboardGradientMid
 import com.example.ihrm.ui.theme.DashboardGradientSoft
 import com.example.ihrm.ui.theme.DashboardGradientTop
@@ -46,8 +47,6 @@ fun DashboardScreen(
     onMenuClick: () -> Unit,
     onProfileClick: () -> Unit,
     onBellClick: () -> Unit = onProfileClick,
-    onViewDetails: (String) -> Unit,
-    onAddEmployee: () -> Unit,
     onViewStats: () -> Unit
 ) {
     val mock = DashboardMockData.rememberHomeModel()
@@ -182,7 +181,7 @@ private fun DashboardPersonalRoleSection(
         // Personal role dashboard UI (Figma 871:30135).
         DashboardProfileCardPersonal(profile = personalUi.profile)
         DashboardLeaveSection(stats = personalUi.leaveStats)
-        DashboardSecurityCardManagement(monthly = personalUi.securityMonthly, profile = personalUi.profile)
+        DashboardSecurityCardPersonal(monthly = personalUi.securityMonthly, profile = personalUi.profile)
     }
 }
 
@@ -193,8 +192,6 @@ private fun DashboardScreenPreview() {
         DashboardScreen(
             onMenuClick = {},
             onProfileClick = {},
-            onViewDetails = {},
-            onAddEmployee = {},
             onViewStats = {}
         )
     }

@@ -1,4 +1,4 @@
-package com.example.ihrm.ui.dashboard.extra
+package com.example.ihrm.ui.dashboard.personal
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -46,7 +46,7 @@ import com.example.ihrm.util.txtInterBold16
 import com.example.ihrm.util.txtInterRegular12
 
 @Composable
-fun DashboardSecurityCardManagement(
+fun DashboardSecurityCardPersonal(
     monthly: SecurityMonthlyModel,
     profile: DashboardProfileModel,
     modifier: Modifier = Modifier
@@ -115,49 +115,48 @@ fun DashboardSecurityCardManagement(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Avatar(
-                    imageUrl = profile.avatarSecurity,
-                    initials = profile.avatarInitials,
-                    isSecurity = true,
-                    placeholderImage = painterResource(R.drawable.ic_avatar_security),
-                    errorImage = painterResource(R.drawable.ic_avatar_security)
-                )
                 Column(
                     modifier = Modifier
-                        .weight(1f)
                         .clip(RoundedCornerShape(14.dp))
                         .border(1.dp, Color(0xFFDBEAFE), RoundedCornerShape(14.dp))
                         .background(
                             brush = Brush.linearGradient(
                                 colors = listOf(
                                     Color(0xFFEFF6FF),
-                                    Color(0xFFEFF7FF),
-                                    Color(0xFFEFF8FF),
-                                    Color(0xFFEFF9FF),
-                                    Color(0xFFEFFAFF),
-                                    Color(0xFFEDFBFF),
-                                    Color(0xFFEDFCFF),
-                                    Color(0xFFECFDFF),
-                                    Color(0xFFECFEFF)
+                                    Color(0xFFECFEFF),
                                 )
                             )
                         )
                         .padding(12.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.dashboard_security_in_review),
+                        text = stringResource(R.string.dashboard_security_in_review_personal),
                         style = txtInterBold16
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
                     Text(
-                        text = stringResource(R.string.dashboard_security_in_review_body),
+                        text = stringResource(R.string.dashboard_security_in_review_body_personal),
                         style = txtInterRegular12
                     )
                 }
             }
+            Spacer(modifier = Modifier.height(16.dp))
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
 
+            ) {
+                Avatar(
+                    imageUrl = profile.avatarSecurity,
+                    initials = profile.avatarInitials,
+                    isSecurity = true,
+                    placeholderImage = painterResource(R.drawable.ic_avatar_security),
+                    errorImage = painterResource(R.drawable.ic_avatar_security),
+                    size = 112.dp
+                )
+            }
+            Spacer(modifier = Modifier.height(24.dp))
             SecurityCheckThisMonthProgressSection(monthly)
         }
     }

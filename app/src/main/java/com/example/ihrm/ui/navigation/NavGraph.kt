@@ -75,12 +75,6 @@ fun NavGraph(
             DashboardScreen(
                 onMenuClick = { scope.launch { drawerState?.open() } },
                 onProfileClick = { },
-                onViewDetails = { employeeId ->
-                    navController.navigate(Screen.EmployeeDetail.createRoute(employeeId))
-                },
-                onAddEmployee = {
-                    navController.navigate(Screen.AddEmployee.route)
-                },
                 onViewStats = {
                     navController.navigate(Screen.EmployeeList.route)
                 }

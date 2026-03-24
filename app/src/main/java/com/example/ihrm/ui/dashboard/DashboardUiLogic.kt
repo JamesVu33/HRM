@@ -19,16 +19,14 @@ data class DashboardExtraRoleUi(
 )
 
 /**
- * Share of rejected items in the monthly security breakdown (Figma progress emphasis on rejected).
+ * Share of items in the monthly security breakdown.
  */
-internal fun securityRejectedShare(
-    approved: Int,
-    rechecking: Int,
-    rejected: Int
+internal fun calculateShare(
+    target: Int,
+    values: List<Int>
 ): Float {
-    val total = approved + rechecking + rejected
-    if (total <= 0) return 0f
-    return rejected.toFloat() / total.toFloat()
+    val total = values.sum()
+    return if (total > 0) (target.toFloat() / total).coerceIn(0f, 1f) else 0f
 }
 
 /**
@@ -54,7 +52,7 @@ internal fun resolveDashboardRoleAfterLogin(
         "s2",
         "extra"
     )
-    return if (extraHints.any { key.contains(it) }) DashboardRole.Personal else DashboardRole.Personal
+    return if (extraHints.any { key.contains(it) }) DashboardRole.Personal else DashboardRole.Extra
 }
 
 internal fun buildPersonalRoleUi(source: DashboardHomeMockModel): DashboardPersonalRoleUi {

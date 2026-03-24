@@ -42,8 +42,6 @@ data class DashboardHomeMockModel(
     val profile: DashboardProfileModel,
     val leaveStats: List<LeaveStatModel>,
     val securityMonthly: SecurityMonthlyModel,
-    val teamEmployees: List<Employee>,
-    val teamLevelById: Map<String, String>,
     /** Management tab: calendar + security overview (Figma 871:35029). */
     val management: DashboardManagementUiModel
 )
