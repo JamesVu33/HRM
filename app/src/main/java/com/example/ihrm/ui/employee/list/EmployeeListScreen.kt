@@ -25,7 +25,7 @@ import com.example.ihrm.ui.theme.Primary200
 import com.example.ihrm.ui.theme.Primary400
 import com.example.ihrm.ui.theme.Primary50
 import com.example.ihrm.ui.theme.Primary500
-import com.example.ihrm.util.base.header.BaseHeader
+import com.example.ihrm.ui.common.header.BaseHeader
 
 @Composable
 fun EmployeeListScreen(

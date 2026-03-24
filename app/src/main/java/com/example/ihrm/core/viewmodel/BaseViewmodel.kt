@@ -8,6 +8,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.ihrm.core.errorHandler.CommonErrorException
 import com.example.ihrm.data.remote.dto.AppErrorResponseDto
 import com.example.ihrm.data.remote.dto.NetworkResult
+import com.example.ihrm.util.EmptyFunc
+import com.example.ihrm.util.ParamFunc
+import com.example.ihrm.util.SupEmptyFunc
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,14 +25,13 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import javax.net.ssl.SSLException
 
-typealias EmptyFunc = () -> Unit
-typealias ParamFunc<T> = (data: T) -> Unit
-typealias FetchSupFunc<T> = suspend () -> T
-
 interface CallbackWrapper<T> {
     fun onSuccess(data: T) {}
+    // in case mapping data or do another work in background
     suspend fun doOnBackground(data: T) {}
+    // for API calling error exception handler
     fun onError(e: CommonErrorException) {}
+    // for API calling failure case (400...)
     fun onFail(e: AppErrorResponseDto) {}
 }
 
@@ -89,7 +91,7 @@ abstract class BaseViewmodel : ViewModel() {
      */
     fun <R> fetchOriginData(
         onLoading: EmptyFunc? = null,
-        fetching: FetchSupFunc<R>,
+        fetching: SupEmptyFunc<R>,
         callbackWrapper: CallbackWrapper<R>,
     ) {
         viewModelScope.launch(Dispatchers.IO + errorCatcher(callbackWrapper)) {
@@ -120,7 +122,7 @@ abstract class BaseViewmodel : ViewModel() {
             onLoading?.invoke() ?: _loading.tryEmit(true)
             val response = fetching()
             launch(Dispatchers.Main) {
-                _loading.tryEmit(false)
+                _loading.emit(false)
                 handleApiResponse(response, callbackWrapper)
             }
         }

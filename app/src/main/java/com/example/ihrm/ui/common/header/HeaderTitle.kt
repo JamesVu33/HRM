@@ -1,4 +1,4 @@
-package com.example.ihrm.util.base.header
+package com.example.ihrm.ui.common.header
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
