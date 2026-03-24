@@ -134,6 +134,45 @@
     <string name="dashboard_mgmt_legend_pending">Pending</string>
     <string name="dashboard_mgmt_legend_not_submitted">Not Submitted</string>
 
+    <!-- Calendar Management (Figma 871:35255) -->
+    <string name="calendar_mgmt_title">Calendar Management</string>
+    <string name="calendar_mgmt_stat_leaves_today">Employees\u2019 Leaves Today</string>
+    <string name="calendar_mgmt_stat_total_requested">Total Leaves Requested</string>
+    <string name="calendar_mgmt_stat_pending">Leave Requests Pending</string>
+    <string name="calendar_mgmt_stat_approved">Leave Requests Approved</string>
+    <string name="calendar_mgmt_filter_leave_types">Filter Leave Types</string>
+    <string name="calendar_mgmt_filter_popup_title">Filter Leave Types</string>
+    <string name="calendar_mgmt_filter_popup_subtitle">Select the leave types you want to see</string>
+    <string name="calendar_mgmt_close_popup">Close filter popup</string>
+    <string name="calendar_mgmt_select_all">Select All</string>
+    <string name="calendar_mgmt_clear_all">Clear All</string>
+    <string name="calendar_mgmt_cd_prev_month">Previous month</string>
+    <string name="calendar_mgmt_cd_next_month">Next month</string>
+    <string name="calendar_weekday_sun">S</string>
+    <string name="calendar_weekday_mon">M</string>
+    <string name="calendar_weekday_tue">T</string>
+    <string name="calendar_weekday_wed">W</string>
+    <string name="calendar_weekday_thu">T</string>
+    <string name="calendar_weekday_fri">F</string>
+    <string name="calendar_weekday_sat">S</string>
+    <string name="calendar_mgmt_upcoming_leaves">Upcoming Leaves</string>
+    <string name="calendar_mgmt_status_approved">APPROVED</string>
+    <string name="calendar_mgmt_status_pending">PENDING</string>
+    <string name="calendar_mgmt_demo_sarah_name">Sarah Johnson</string>
+    <string name="calendar_mgmt_demo_sarah_mar2">Annual Leave - Mar 2</string>
+    <string name="calendar_mgmt_demo_chris_name">Chris Brown</string>
+    <string name="calendar_mgmt_demo_chris_dates">Annual Leave - Mar 8 - Mar 10</string>
+    <string name="calendar_mgmt_demo_ricardo_name">Ricardo Taylor</string>
+    <string name="calendar_mgmt_demo_ricardo_dates">Sick Leave - Mar 15 - Mar 18</string>
+    <string name="calendar_mgmt_demo_sophia_name">Sophia Martinez</string>
+    <string name="calendar_mgmt_demo_sophia_dates">Maternity Leave - Mar 15 - Mar 31</string>
+    <string name="calendar_mgmt_demo_sarah_sick_detail">Sick Leave - Mar 22</string>
+    <string name="calendar_mgmt_leave_type_annual">Annual Leave</string>
+    <string name="calendar_mgmt_leave_type_sick">Sick Leave</string>
+    <string name="calendar_mgmt_leave_type_maternity">Maternity Leave</string>
+    <string name="calendar_mgmt_leave_type_unpaid">Unpaid Leave</string>
+    <string name="calendar_mgmt_leave_type_personal">Work From Home</string>
+
     <!-- Drawer -->
     <string name="drawer_brand">Shinhan DS</string>
     <string name="drawer_section_dashboard">Dashboard</string>

@@ -69,6 +69,7 @@ val StrokeColor = Color(0x63FFFFFF)
 val ColorBgSuccessGradientTop = Color(0xFFE6EDFF)
 val ColorBgSuccessGradientMiddle = Color(0xFFE6EDFF)
 val ColorBgSuccessGradientBottom = Color.White
+val ColorBgSuccessGradientBottom80Percent = Color.White.copy(alpha = 0.8f)
 
 // Figma dashboard (node 871:34818) — gradient & accents
 val DashboardGradientTop = Color(0xFF0052CC)

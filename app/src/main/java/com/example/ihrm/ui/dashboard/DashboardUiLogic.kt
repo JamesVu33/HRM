@@ -29,6 +29,16 @@ internal fun calculateShare(
     return if (total > 0) (target.toFloat() / total).coerceIn(0f, 1f) else 0f
 }
 
+/** Rejected slice of the security monthly breakdown (approved / rechecking / rejected). */
+internal fun securityRejectedShare(
+    approved: Int,
+    rechecking: Int,
+    rejected: Int
+): Float {
+    val total = approved + rechecking + rejected
+    return if (total > 0) rejected.toFloat() / total else 0f
+}
+
 /**
  * Simple role resolver for Dashboard right after login.
  * `Extra` users are those likely to have management permissions.
@@ -52,7 +62,7 @@ internal fun resolveDashboardRoleAfterLogin(
         "s2",
         "extra"
     )
-    return if (extraHints.any { key.contains(it) }) DashboardRole.Personal else DashboardRole.Extra
+    return if (extraHints.any { key.contains(it) }) DashboardRole.Extra else DashboardRole.Extra
 }
 
 internal fun buildPersonalRoleUi(source: DashboardHomeMockModel): DashboardPersonalRoleUi {
