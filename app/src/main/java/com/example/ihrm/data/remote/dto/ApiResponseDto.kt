@@ -11,5 +11,7 @@ data class ApiResponseDto<T>(
     @SerializedName("message")
     val message: String,
     @SerializedName("data")
-    val data: T?
+    val data: T?,
+    @SerializedName("meta")
+    val meta: MetaDto? = null
 )

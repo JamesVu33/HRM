@@ -3,7 +3,6 @@ package com.example.ihrm.ui.dashboard.personal
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
@@ -26,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -37,17 +34,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ihrm.R
+import com.example.ihrm.ui.common.Avatar
 import com.example.ihrm.ui.dashboard.DashboardMockData
 import com.example.ihrm.ui.dashboard.DashboardProfileModel
 import com.example.ihrm.ui.dashboard.buildPersonalRoleUi
 import com.example.ihrm.ui.dashboard.dashboardSections.ProfileInfoItemSection
-import com.example.ihrm.ui.dashboard.extra.DashboardProfileCardManagement
 import com.example.ihrm.ui.theme.DashboardFigmaMuted
 import com.example.ihrm.ui.theme.DashboardProfileTitleBlue
 import com.example.ihrm.ui.theme.DashboardTabActiveBlue
 import com.example.ihrm.ui.theme.InterFontFamily
-import com.example.ihrm.ui.theme.PrimaryTint
-import com.example.ihrm.util.Avatar
 
 @Composable
 fun DashboardProfileCardPersonal(
@@ -75,7 +70,7 @@ fun DashboardProfileCardPersonal(
                 .padding(24.dp),
         ) {
 
-            Column (
+            Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
 

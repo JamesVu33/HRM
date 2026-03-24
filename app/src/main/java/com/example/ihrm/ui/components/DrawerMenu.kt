@@ -55,7 +55,6 @@ import androidx.compose.ui.window.Dialog
 import com.example.ihrm.R
 import com.example.ihrm.ui.theme.DrawerSectionLabel
 import com.example.ihrm.ui.theme.DrawerItemSelected
-import com.example.ihrm.ui.theme.FABGradientEnd
 import com.example.ihrm.ui.theme.FABGradientStart
 import com.example.ihrm.ui.theme.LogoutBorder
 import com.example.ihrm.ui.theme.LogoutIconBgEnd

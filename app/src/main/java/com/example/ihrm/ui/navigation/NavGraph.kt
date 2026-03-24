@@ -6,16 +6,17 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.ihrm.ui.auth.SignUpScreen
 import com.example.ihrm.ui.auth.SplashScreen
+import com.example.ihrm.ui.dashboard.DashboardScreen
 import com.example.ihrm.ui.employee.addedit.AddEditEmployeeScreen
 import com.example.ihrm.ui.employee.detail.EmployeeDetailScreen
-import com.example.ihrm.ui.dashboard.DashboardScreen
 import com.example.ihrm.ui.employee.list.EmployeeListScreen
-import com.example.ihrm.ui.loginTest.LoginTestScreen
+import com.example.ihrm.ui.login.LoginScreen
 import com.example.ihrm.util.AuthManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+
+private const val EMPLOYEE_ID_PARAM = "employeeId"
 
 @Composable
 fun NavGraph(
@@ -31,7 +32,7 @@ fun NavGraph(
         composable(Screen.Splash.route) {
             SplashScreen(
                 onNavigateToLogin = {
-                    navController.navigate(Screen.LoginTest.route) {
+                    navController.navigate(Screen.Login.route) {
                         popUpTo(Screen.Splash.route) { inclusive = true }
                     }
                 },
@@ -44,30 +45,14 @@ fun NavGraph(
             )
         }
 
-        composable(Screen.LoginTest.route) {
-            LoginTestScreen(
+        composable(Screen.Login.route) {
+            LoginScreen(
                 onLoginSuccess = {
                     AuthManager.setLoggedIn(true)
                     navController.navigate(Screen.Dashboard.route) {
-                        popUpTo(Screen.LoginTest.route) { inclusive = true }
+                        popUpTo(Screen.Login.route) { inclusive = true }
                     }
                 },
-                onNavigateToSignUp = {
-                    navController.navigate(Screen.SignUp.route)
-                }
-            )
-        }
-
-        composable(Screen.SignUp.route) {
-            SignUpScreen(
-                onSignUpSuccess = {
-                    navController.navigate(Screen.LoginTest.route) {
-                        popUpTo(Screen.SignUp.route) { inclusive = true }
-                    }
-                },
-                onNavigateToLogin = {
-                    navController.popBackStack()
-                }
             )
         }
 
@@ -95,9 +80,10 @@ fun NavGraph(
 
         composable(
             route = Screen.EmployeeDetail.route,
-            arguments = listOf(navArgument("employeeId") {})
+            arguments = listOf(navArgument(EMPLOYEE_ID_PARAM) {})
         ) { backStackEntry ->
-            val employeeId = backStackEntry.arguments?.getString("employeeId") ?: return@composable
+            val employeeId =
+                backStackEntry.arguments?.getString(EMPLOYEE_ID_PARAM) ?: return@composable
             EmployeeDetailScreen(
                 employeeId = employeeId,
                 onEditClick = { id ->
@@ -120,9 +106,10 @@ fun NavGraph(
 
         composable(
             route = Screen.EditEmployee.route,
-            arguments = listOf(navArgument("employeeId") {})
+            arguments = listOf(navArgument(EMPLOYEE_ID_PARAM) {})
         ) { backStackEntry ->
-            val employeeId = backStackEntry.arguments?.getString("employeeId") ?: return@composable
+            val employeeId =
+                backStackEntry.arguments?.getString(EMPLOYEE_ID_PARAM) ?: return@composable
             AddEditEmployeeScreen(
                 employeeId = employeeId,
                 onSaveSuccess = { navController.popBackStack() },

@@ -1,5 +1,6 @@
 package com.example.ihrm.domain.usecase
 
+import com.example.ihrm.data.remote.dto.NetworkResult
 import com.example.ihrm.domain.model.Level
 import com.example.ihrm.domain.repository.EmployeeRepository
 import javax.inject.Inject
@@ -10,5 +11,5 @@ import javax.inject.Inject
 class GetLevelByIdUseCase @Inject constructor(
     private val repository: EmployeeRepository
 ) {
-    suspend operator fun invoke(id: Int): Result<Level?> = repository.getLevelById(id)
+    suspend operator fun invoke(id: Int): NetworkResult<Level?> = repository.getLevelById(id)
 }

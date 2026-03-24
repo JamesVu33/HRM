@@ -1,7 +1,9 @@
 package com.example.ihrm.ui.employee.addedit
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ihrm.core.viewmodel.BaseViewmodel
+import com.example.ihrm.core.viewmodel.CallbackWrapper
+import com.example.ihrm.data.remote.dto.AppErrorResponseDto
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.usecase.AddEmployeeUseCase
 import com.example.ihrm.domain.usecase.GetEmployeeByIdUseCase
@@ -27,7 +29,7 @@ class AddEditEmployeeViewModel @Inject constructor(
     private val getEmployeeByIdUseCase: GetEmployeeByIdUseCase,
     private val addEmployeeUseCase: AddEmployeeUseCase,
     private val updateEmployeeUseCase: UpdateEmployeeUseCase
-) : ViewModel() {
+) : BaseViewmodel() {
 
     private val _uiState = MutableStateFlow(AddEditEmployeeUiState())
     val uiState: StateFlow<AddEditEmployeeUiState> = _uiState.asStateFlow()
@@ -114,25 +116,26 @@ class AddEditEmployeeViewModel @Inject constructor(
                 )
             }
 
-            val useCase = if (_uiState.value.employee != null) {
+            val result = if (_uiState.value.employee != null) {
                 updateEmployeeUseCase(employee)
             } else {
                 addEmployeeUseCase(employee)
             }
 
-            useCase.fold(
-                onSuccess = {
-                    _uiState.value = _uiState.value.copy(
-                        isSaving = false,
-                        isSuccess = true
-                    )
-                    onSuccess()
-                },
-                onFailure = { exception ->
-                    _uiState.value = _uiState.value.copy(
-                        isSaving = false,
-                        error = exception.message ?: "Failed to save employee"
-                    )
+            fetchData(
+                fetching = { result },
+                callbackWrapper = object : CallbackWrapper<Unit> {
+                    override fun onSuccess(data: Unit) {
+                        _uiState.value = _uiState.value.copy(
+                            isSaving = false,
+                            isSuccess = true
+                        )
+                        onSuccess()
+                    }
+
+                    override fun onFail(e: AppErrorResponseDto) {
+                        _uiState.value = _uiState.value.copy(isSaving = false)
+                    }
                 }
             )
         }

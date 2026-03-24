@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ihrm.R
+import com.example.ihrm.ui.common.Avatar
 import com.example.ihrm.ui.dashboard.DashboardProfileModel
 import com.example.ihrm.ui.dashboard.SecurityMonthlyModel
 import com.example.ihrm.ui.dashboard.dashboardSections.SecurityCheckThisMonthProgressSection
@@ -41,7 +42,6 @@ import com.example.ihrm.ui.theme.DashboardFigmaMuted
 import com.example.ihrm.ui.theme.DashboardShieldCyan
 import com.example.ihrm.ui.theme.DashboardTabActiveBlue
 import com.example.ihrm.ui.theme.InterFontFamily
-import com.example.ihrm.util.Avatar
 import com.example.ihrm.util.txtInterBold16
 import com.example.ihrm.util.txtInterRegular12
 

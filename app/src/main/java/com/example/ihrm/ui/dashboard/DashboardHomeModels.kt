@@ -11,7 +11,7 @@ data class DashboardProfileModel(
     val phone: String,
     val joined: String,
     val departmentDetail: String,
-    /** Remote avatar; when null or blank, [avatarInitials] is shown (see [com.example.ihrm.util.Avatar]). */
+    /** Remote avatar; when null or blank, [avatarInitials] is shown (see [com.example.ihrm.ui.common.Avatar]). */
     val avatarUrl: String? = null,
     /** Fallback letters when [avatarUrl] is missing. */
     val avatarInitials: String,

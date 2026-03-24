@@ -36,11 +36,11 @@ import com.example.ihrm.ui.theme.DashboardGradientMid
 import com.example.ihrm.ui.theme.DashboardGradientSoft
 import com.example.ihrm.ui.theme.DashboardGradientTop
 import com.example.ihrm.ui.theme.IHRMTheme
+import com.example.ihrm.ui.common.header.DashboardHomeTab
+import com.example.ihrm.ui.common.header.DashboardHomeTabSubtitle
+import com.example.ihrm.ui.common.header.DashboardHomeTabSwitcher
+import com.example.ihrm.ui.common.header.DashboardHomeTopBar
 import com.example.ihrm.util.AuthManager
-import com.example.ihrm.util.base.header.DashboardHomeTab
-import com.example.ihrm.util.base.header.DashboardHomeTabSubtitle
-import com.example.ihrm.util.base.header.DashboardHomeTabSwitcher
-import com.example.ihrm.util.base.header.DashboardHomeTopBar
 
 @Composable
 fun DashboardScreen(

@@ -1,7 +1,8 @@
 package com.example.ihrm.ui.employee.detail
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ihrm.core.viewmodel.BaseViewmodel
+import com.example.ihrm.core.viewmodel.CallbackWrapper
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.usecase.DeleteEmployeeUseCase
 import com.example.ihrm.domain.usecase.GetEmployeeByIdUseCase
@@ -25,7 +26,7 @@ class EmployeeDetailViewModel @Inject constructor(
     private val getEmployeeByIdUseCase: GetEmployeeByIdUseCase,
     private val deleteEmployeeUseCase: DeleteEmployeeUseCase,
     private val updateEmployeeUseCase: UpdateEmployeeUseCase
-) : ViewModel() {
+) : BaseViewmodel() {
 
     private val _uiState = MutableStateFlow(EmployeeDetailUiState())
     val uiState: StateFlow<EmployeeDetailUiState> = _uiState.asStateFlow()
@@ -52,34 +53,26 @@ class EmployeeDetailViewModel @Inject constructor(
     }
 
     fun deleteEmployee(employeeId: String, onSuccess: () -> Unit) {
-        viewModelScope.launch {
-            deleteEmployeeUseCase(employeeId).fold(
-                onSuccess = {
+        fetchData(
+            fetching = { deleteEmployeeUseCase(employeeId) },
+            callbackWrapper = object : CallbackWrapper<Unit> {
+                override fun onSuccess(data: Unit) {
                     onSuccess()
-                },
-                onFailure = { exception ->
-                    _uiState.value = _uiState.value.copy(
-                        error = exception.message ?: "Failed to delete employee"
-                    )
                 }
-            )
-        }
+            }
+        )
     }
 
     fun updateEmployee(employee: Employee, onSuccess: () -> Unit) {
-        viewModelScope.launch {
-            updateEmployeeUseCase(employee).fold(
-                onSuccess = {
+        fetchData(
+            fetching = { updateEmployeeUseCase(employee) },
+            callbackWrapper = object : CallbackWrapper<Unit> {
+                override fun onSuccess(data: Unit) {
                     _uiState.value = _uiState.value.copy(updateSuccess = true)
                     onSuccess()
-                },
-                onFailure = { e ->
-                    _uiState.value = _uiState.value.copy(
-                        error = e.message ?: "Failed to update"
-                    )
                 }
-            )
-        }
+            }
+        )
     }
 
     fun clearError() {

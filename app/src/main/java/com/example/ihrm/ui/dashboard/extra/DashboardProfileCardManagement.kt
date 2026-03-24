@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ihrm.R
+import com.example.ihrm.ui.common.Avatar
 import com.example.ihrm.ui.dashboard.DashboardProfileModel
 import com.example.ihrm.ui.dashboard.dashboardSections.ProfileInfoItemSection
 import com.example.ihrm.ui.theme.DashboardFigmaMuted
@@ -42,7 +43,6 @@ import com.example.ihrm.ui.theme.DashboardProfileTitleBlue
 import com.example.ihrm.ui.theme.DashboardTabActiveBlue
 import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.ui.theme.PrimaryTint
-import com.example.ihrm.util.Avatar
 
 @Composable
 fun DashboardProfileCardManagement(

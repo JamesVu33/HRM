@@ -1,8 +1,9 @@
 package com.example.ihrm.ui.employee.list
 
 import android.util.Log
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ihrm.core.viewmodel.BaseViewmodel
+import com.example.ihrm.core.viewmodel.CallbackWrapper
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.model.EmployeeUiModel
 import com.example.ihrm.domain.model.Level
@@ -35,7 +36,7 @@ class EmployeeListViewModel @Inject constructor(
     private val getLevelByIdUseCase: GetLevelByIdUseCase,
     private val deleteEmployeeUseCase: DeleteEmployeeUseCase,
     private val syncEmployeesUseCase: SyncEmployeesUseCase
-) : ViewModel() {
+) : BaseViewmodel() {
 
     private val _uiState = MutableStateFlow(EmployeeListUiState())
     val uiState: StateFlow<EmployeeListUiState> = _uiState.asStateFlow()
@@ -96,36 +97,23 @@ class EmployeeListViewModel @Inject constructor(
             Log.d("Vinh", "mergeEmployeesWithLevels: $levelCache")
             buildEmployeeUiModels(employees, levelCache)
         }
+
     fun refreshEmployees() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isRefreshing = true) }
-            syncEmployeesUseCase().fold(
-                onSuccess = {
-                    _uiState.update { it.copy(isRefreshing = false) }
-                },
-                onFailure = { exception ->
-                    _uiState.update {
-                        it.copy(
-                            isRefreshing = false,
-                            error = exception.message ?: "Failed to sync employees"
-                        )
-                    }
-                }
-            )
-        }
+        fetchData(
+            fetching = { syncEmployeesUseCase() },
+            callbackWrapper = object : CallbackWrapper<Unit> {
+
+            }
+        )
     }
 
     fun deleteEmployee(employeeId: String) {
-        viewModelScope.launch {
-            deleteEmployeeUseCase(employeeId).fold(
-                onSuccess = { /* list cập nhật qua Flow */ },
-                onFailure = { exception ->
-                    _uiState.update {
-                        it.copy(error = exception.message ?: "Failed to delete employee")
-                    }
-                }
-            )
-        }
+        fetchData(
+            fetching = { deleteEmployeeUseCase(employeeId) },
+            callbackWrapper = object : CallbackWrapper<Unit> {
+
+            }
+        )
     }
 
     fun clearError() {

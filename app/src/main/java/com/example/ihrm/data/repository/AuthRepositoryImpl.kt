@@ -1,25 +1,32 @@
 package com.example.ihrm.data.repository
 
 import com.example.ihrm.data.remote.api.AuthApiService
-import com.example.ihrm.data.remote.dto.AppErrorResponseDto
+import com.example.ihrm.data.remote.base.safeApiCall
 import com.example.ihrm.data.remote.dto.LoginDto
 import com.example.ihrm.data.remote.dto.LoginResponseDto
+import com.example.ihrm.data.remote.dto.NetworkResult
 import com.example.ihrm.domain.repository.AuthRepository
-import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import retrofit2.HttpException
-import java.io.IOException
+import retrofit2.Retrofit
 import javax.inject.Inject
 
 /** Gọi API auth be-nest-hrm: POST /auth/login (base URL từ Constants.BASE_URL). */
 class AuthRepositoryImpl @Inject constructor(
     private val authApiService: AuthApiService,
-    private val gson: Gson
+    private val retrofit: Retrofit
 ) : AuthRepository {
 
-    override suspend fun login(employeeId: String, password: String): Result<LoginResponseDto> =
+    override suspend fun login(employeeId: String, password: String): NetworkResult<LoginResponseDto> =
+        safeApiCall(retrofit) {
+            authApiService.login(
+                LoginDto(employeeId = employeeId.trim(), password = password)
+            )
+        }
+
+
+
+
+    /*
+     override suspend fun login(employeeId: String, password: String): Result<LoginResponseDto> =
         withContext(Dispatchers.IO) {
             try {
                 val response = authApiService.login(
@@ -72,4 +79,5 @@ class AuthRepositoryImpl @Inject constructor(
             else -> "Something went wrong. Please try again."
         }
     }
+     */
 }
