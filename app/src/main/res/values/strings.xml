@@ -102,7 +102,9 @@
     <string name="dashboard_security_subtitle">Real-time monitoring</string>
     <string name="dashboard_security_in_review">In Review</string>
     <string name="dashboard_security_in_review_body">Security check being reviewed. Wait for approval.</string>
-    <string name="dashboard_security_this_month">This Month</string>
+    <string name="dashboard_security_in_review_personal">Submission in review</string>
+    <string name="dashboard_security_in_review_body_personal">Your security check is being reviewed. Please wait for the approval status</string>
+    <string name="dashboard_security_this_month">This Month Progress</string>
     <string name="dashboard_security_approved">Approved</string>
     <string name="dashboard_security_rechecking">Re-checking</string>
     <string name="dashboard_security_rejected">Rejected</string>

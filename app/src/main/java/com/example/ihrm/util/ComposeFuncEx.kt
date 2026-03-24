@@ -101,9 +101,8 @@ fun Avatar(
         if (isSecurity) {
             Box(
                 modifier = Modifier
-                    .size(24.dp)
                     .align(Alignment.BottomEnd)
-                    .offset(x= 2.dp, y = 12.dp)
+                    .size(size * 0.25f)
                     .dropShadow(
                         shape = CircleShape,
                         color = Color.Black.copy(alpha = 0.2f),
@@ -122,7 +121,7 @@ fun Avatar(
                     ),
             ) {
                 Image(
-                    modifier = Modifier.size(12.dp).align(Alignment.Center),
+                    modifier = Modifier.size(size * 0.18f).align(Alignment.Center),
                     imageVector = ImageVector.vectorResource(R.drawable.ic_security),
                     contentDescription = ""
                 )

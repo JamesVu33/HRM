@@ -31,7 +31,7 @@ object DashboardMockData {
                     departmentDetail = dept,
                     avatarUrl = null,
                     avatarInitials = avatarInitialsFromDisplayName(name),
-                    avatarSecurity = "test"
+                    avatarSecurity = null
                 ),
                 leaveStats = listOf(
                     LeaveStatModel(
@@ -63,12 +63,6 @@ object DashboardMockData {
                     approved = 0,
                     rechecking = 1,
                     rejected = 3
-                ),
-                teamEmployees = mockTeamEmployees(name, email, phone, dept),
-                teamLevelById = mapOf(
-                    "mock-emp-1" to "S2",
-                    "mock-emp-2" to "L3",
-                    "mock-emp-3" to "L1"
                 ),
                 management = DashboardManagementUiModel(
                     calendar = ManagementCalendarUiModel(
@@ -102,45 +96,4 @@ object DashboardMockData {
             else -> "?"
         }
     }
-
-    private fun mockTeamEmployees(
-        leadName: String,
-        leadEmail: String,
-        leadPhone: String,
-        dept: String
-    ): List<Employee> = listOf(
-        Employee(
-            id = "mock-emp-1",
-            name = leadName,
-            email = leadEmail,
-            phone = leadPhone,
-            department = dept,
-            position = "Engineering Lead",
-            hireDate = "2024-01-01",
-            salary = null,
-            address = null
-        ),
-        Employee(
-            id = "mock-emp-2",
-            name = "Alex Tran",
-            email = "alex.tran@company.com",
-            phone = "0909888777",
-            department = dept,
-            position = "Developer",
-            hireDate = "2024-06-15",
-            salary = null,
-            address = null
-        ),
-        Employee(
-            id = "mock-emp-3",
-            name = "Minh Nguyen",
-            email = "minh.nguyen@company.com",
-            phone = "0909111222",
-            department = "HR",
-            position = "HR Partner",
-            hireDate = "2023-11-01",
-            salary = null,
-            address = null
-        )
-    )
 }

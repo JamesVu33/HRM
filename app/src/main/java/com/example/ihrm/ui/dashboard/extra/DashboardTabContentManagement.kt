@@ -1,6 +1,6 @@
-package com.example.ihrm.ui.dashboard
+package com.example.ihrm.ui.dashboard.extra
 
-import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -18,8 +18,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -42,9 +40,13 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ihrm.R
+import com.example.ihrm.ui.dashboard.DashboardManagementUiModel
+import com.example.ihrm.ui.dashboard.ManagementCalendarUiModel
+import com.example.ihrm.ui.dashboard.ManagementSecurityUiModel
 import com.example.ihrm.ui.theme.DashboardFigmaInk
 import com.example.ihrm.ui.theme.DashboardFigmaMuted
 import com.example.ihrm.ui.theme.DashboardLeaveBlueEnd
@@ -52,7 +54,6 @@ import com.example.ihrm.ui.theme.DashboardLeaveBlueStart
 import com.example.ihrm.ui.theme.DashboardTabActiveBlue
 import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.ui.theme.Primary400
-import com.example.ihrm.ui.theme.Primary500
 import kotlin.math.min
 
 private val MgmtPresentGreen = Color(0xFF00BC7D)
@@ -99,7 +100,7 @@ private fun ManagementCalendarCard(
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.6f))
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.6f))
     ) {
         Column(
             modifier = Modifier
@@ -490,7 +491,7 @@ private fun ManagementSecurityCard(
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.6f))
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.6f))
     ) {
         Column(
             modifier = Modifier
@@ -827,7 +828,7 @@ private fun DonutChartTriple(
     modifier: Modifier = Modifier,
     fractions: List<Float>,
     colors: List<Color>,
-    strokeWidth: androidx.compose.ui.unit.Dp
+    strokeWidth: Dp
 ) {
     Canvas(modifier = modifier) {
         val n = fractions.size
