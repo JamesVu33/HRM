@@ -3,6 +3,7 @@ package com.example.ihrm.ui.employee.list
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.ihrm.core.viewmodel.BaseViewmodel
+import com.example.ihrm.core.viewmodel.CallbackWrapper
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.model.EmployeeUiModel
 import com.example.ihrm.domain.model.Level
@@ -98,32 +99,21 @@ class EmployeeListViewModel @Inject constructor(
         }
 
     fun refreshEmployees() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isRefreshing = true) }
-            handleApiResponse(
-                syncEmployeesUseCase(),
-                onSuccess = {
-                    _uiState.update { it.copy(isRefreshing = false) }
-                },
-                onFailure = {
-                    _uiState.update { it.copy(isRefreshing = false) }
-                }
-            )
-        }
+        fetchData(
+            fetching = { syncEmployeesUseCase() },
+            callbackWrapper = object : CallbackWrapper<Unit> {
+
+            }
+        )
     }
 
     fun deleteEmployee(employeeId: String) {
-        viewModelScope.launch {
-            handleApiResponse(
-                deleteEmployeeUseCase(employeeId),
-                onSuccess = { /* list cập nhật qua Flow */ },
-                onFailure = {
-//                    _uiState.update {
-//                        it.copy(error = exception.message ?: "Failed to delete employee")
-//                    }
-                }
-            )
-        }
+        fetchData(
+            fetching = { deleteEmployeeUseCase(employeeId) },
+            callbackWrapper = object : CallbackWrapper<Unit> {
+
+            }
+        )
     }
 
     fun clearError() {

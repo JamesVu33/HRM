@@ -3,8 +3,11 @@ package com.example.ihrm.ui.dashboard
 import android.os.Build
 import androidx.lifecycle.viewModelScope
 import com.example.ihrm.core.viewmodel.BaseViewmodel
+import com.example.ihrm.core.viewmodel.CallbackWrapper
+import com.example.ihrm.data.remote.dto.NetworkResult
 import com.example.ihrm.data.remote.dto.UserMetaResponseDto
 import com.example.ihrm.domain.model.Employee
+import com.example.ihrm.domain.model.Level
 import com.example.ihrm.domain.usecase.DeleteEmployeeUseCase
 import com.example.ihrm.domain.usecase.GetEmployeesMetaUseCase
 import com.example.ihrm.domain.usecase.GetEmployeesUseCase
@@ -12,6 +15,7 @@ import com.example.ihrm.domain.usecase.GetLevelByEmployeeIdUseCase
 import com.example.ihrm.domain.usecase.GetMeEmployeeInfoUseCase
 import com.example.ihrm.domain.usecase.SyncEmployeesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +28,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -149,14 +156,14 @@ class DashboardViewModel @Inject constructor(
             syncError.value = null
             syncErrorUnauthorized.value = false
             val meta = getMetaIfS1OrS2()
-            handleApiResponse(
-                syncEmployeesUseCase(meta),
-                onSuccess = {
-                    refreshTrigger.tryEmit(Unit)
-                    syncLoading.value = false
-                },
-                onFailure = {
-                    syncLoading.value = false
+            
+            fetchData(
+                fetching = { syncEmployeesUseCase(meta) },
+                callbackWrapper = object : CallbackWrapper<Unit> {
+                    override fun onSuccess(data: Unit) {
+                        refreshTrigger.tryEmit(Unit)
+                        syncLoading.value = false
+                    }
                 }
             )
         }
@@ -164,18 +171,20 @@ class DashboardViewModel @Inject constructor(
 
     /** Khi danh sách employees đổi, gọi GET /employees/{id} cho từng id (chưa cache) để lấy level code. */
     private fun loadLevelCodesWhenEmployeesChange() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             employeesWithRefresh.collect { employees ->
                 val ids = employees.map { it.id }.distinct()
                 val missing = ids.filter { it !in levelCodeCache }
                 for (id in missing) {
-                    handleApiResponse(
-                        getLevelByEmployeeIdUseCase(id),
-                        onSuccess = {
-                            it?.code?.let { code ->
-                                levelCodeCache[id] = code
+                    fetchData(
+                        fetching = { getLevelByEmployeeIdUseCase(id) },
+                        callbackWrapper = object : CallbackWrapper<Level?> {
+                            override fun onSuccess(data: Level?) {
+                                data?.code?.let { code ->
+                                    levelCodeCache[id] = code
+                                }
+                                levelCodeByEmployeeId.value = levelCodeCache.toMap()
                             }
-                            levelCodeByEmployeeId.value = levelCodeCache.toMap()
                         },
                     )
                 }
@@ -196,20 +205,20 @@ class DashboardViewModel @Inject constructor(
     }
 
     fun deleteEmployee(id: String) {
-        viewModelScope.launch {
-            handleApiResponse(
-                deleteEmployeeUseCase(id),
-                onSuccess = {
-                    // Success is handled via Flow from DB
+        fetchData(
+            fetching = { deleteEmployeeUseCase(id) },
+            callbackWrapper = object : CallbackWrapper<Unit> {
+                override fun onSuccess(data: Unit) {
+                    refreshEmployees()
                 }
-            )
-        }
+            }
+        )
     }
 
 
     private fun getGreeting(): String {
         val hour = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            java.time.LocalTime.now().hour
+            LocalTime.now().hour
         } else {
             Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         }
@@ -224,11 +233,11 @@ class DashboardViewModel @Inject constructor(
 
     private fun getTodayDate(): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val formatter = java.time.format.DateTimeFormatter.ofPattern(
+            val formatter = DateTimeFormatter.ofPattern(
                 "EEEE, dd MMM yyyy",
                 Locale.getDefault()
             )
-            java.time.LocalDate.now().format(formatter)
+            LocalDate.now().format(formatter)
         } else {
             val formatter = SimpleDateFormat(
                 "EEEE, dd MMM yyyy",

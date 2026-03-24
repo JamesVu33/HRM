@@ -2,6 +2,7 @@ package com.example.ihrm.ui.employee.detail
 
 import androidx.lifecycle.viewModelScope
 import com.example.ihrm.core.viewmodel.BaseViewmodel
+import com.example.ihrm.core.viewmodel.CallbackWrapper
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.usecase.DeleteEmployeeUseCase
 import com.example.ihrm.domain.usecase.GetEmployeeByIdUseCase
@@ -52,36 +53,26 @@ class EmployeeDetailViewModel @Inject constructor(
     }
 
     fun deleteEmployee(employeeId: String, onSuccess: () -> Unit) {
-        viewModelScope.launch {
-            handleApiResponse(
-                deleteEmployeeUseCase(employeeId),
-                onSuccess = {
+        fetchData(
+            fetching = { deleteEmployeeUseCase(employeeId) },
+            callbackWrapper = object : CallbackWrapper<Unit> {
+                override fun onSuccess(data: Unit) {
                     onSuccess()
-                },
-                onFailure = {
-//                    _uiState.value = _uiState.value.copy(
-//                        error = exception.message ?: "Failed to delete employee"
-//                    )
                 }
-            )
-        }
+            }
+        )
     }
 
     fun updateEmployee(employee: Employee, onSuccess: () -> Unit) {
-        viewModelScope.launch {
-            handleApiResponse(
-                updateEmployeeUseCase(employee),
-                onSuccess = {
+        fetchData(
+            fetching = { updateEmployeeUseCase(employee) },
+            callbackWrapper = object : CallbackWrapper<Unit> {
+                override fun onSuccess(data: Unit) {
                     _uiState.value = _uiState.value.copy(updateSuccess = true)
                     onSuccess()
-                },
-                onFailure = {
-//                    _uiState.value = _uiState.value.copy(
-//                        error = e.message ?: "Failed to update"
-//                    )
                 }
-            )
-        }
+            }
+        )
     }
 
     fun clearError() {

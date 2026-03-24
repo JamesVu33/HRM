@@ -3,6 +3,9 @@ package com.example.ihrm.ui.login
 import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.example.ihrm.core.viewmodel.BaseViewmodel
+import com.example.ihrm.core.viewmodel.CallbackWrapper
+import com.example.ihrm.data.remote.dto.AppErrorResponseDto
+import com.example.ihrm.data.remote.dto.LoginResponseDto
 import com.example.ihrm.domain.repository.AuthRepository
 import com.example.ihrm.util.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -103,18 +106,21 @@ class LoginViewModel @Inject constructor(
                 loginError = null
             )
 
-            handleApiResponse(
-                authRepository.login(employeeId, password),
-                onSuccess = { data ->
-                    AuthManager.saveTokens(data)
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        isLoginSuccess = true
-                    )
-                    onSuccess()
-                },
-                onFailure = {
-                    _uiState.value = _uiState.value.copy(isLoading = false)
+            fetchData(
+                fetching = { authRepository.login(employeeId, password) },
+                callbackWrapper = object : CallbackWrapper<LoginResponseDto> {
+                    override fun onSuccess(data: LoginResponseDto) {
+                        AuthManager.saveTokens(data)
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            isLoginSuccess = true
+                        )
+                        onSuccess()
+                    }
+
+                    override fun onFail(e: AppErrorResponseDto) {
+                        _uiState.value = _uiState.value.copy(isLoading = false)
+                    }
                 }
             )
         }

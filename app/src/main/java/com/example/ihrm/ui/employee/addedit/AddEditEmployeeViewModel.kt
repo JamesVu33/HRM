@@ -2,6 +2,8 @@ package com.example.ihrm.ui.employee.addedit
 
 import androidx.lifecycle.viewModelScope
 import com.example.ihrm.core.viewmodel.BaseViewmodel
+import com.example.ihrm.core.viewmodel.CallbackWrapper
+import com.example.ihrm.data.remote.dto.AppErrorResponseDto
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.usecase.AddEmployeeUseCase
 import com.example.ihrm.domain.usecase.GetEmployeeByIdUseCase
@@ -120,17 +122,20 @@ class AddEditEmployeeViewModel @Inject constructor(
                 addEmployeeUseCase(employee)
             }
 
-            handleApiResponse(
-                result,
-                onSuccess = {
-                    _uiState.value = _uiState.value.copy(
-                        isSaving = false,
-                        isSuccess = true
-                    )
-                    onSuccess()
-                },
-                onFailure = {
-                    _uiState.value = _uiState.value.copy(isSaving = false)
+            fetchData(
+                fetching = { result },
+                callbackWrapper = object : CallbackWrapper<Unit> {
+                    override fun onSuccess(data: Unit) {
+                        _uiState.value = _uiState.value.copy(
+                            isSaving = false,
+                            isSuccess = true
+                        )
+                        onSuccess()
+                    }
+
+                    override fun onFail(e: AppErrorResponseDto) {
+                        _uiState.value = _uiState.value.copy(isSaving = false)
+                    }
                 }
             )
         }

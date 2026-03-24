@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ihrm.core.errorHandler.CommonErrorException
+import com.example.ihrm.data.remote.dto.AppErrorResponseDto
 import com.example.ihrm.data.remote.dto.NetworkResult
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +30,7 @@ interface CallbackWrapper<T> {
     fun onSuccess(data: T) {}
     suspend fun doOnBackground(data: T) {}
     fun onError(e: CommonErrorException) {}
+    fun onFail(e: AppErrorResponseDto) {}
 }
 
 @Immutable
@@ -63,7 +65,7 @@ abstract class BaseViewmodel : ViewModel() {
                         throwable.message ?: "An unexpected error occurred"
                     )
                 }
-                // will define another exception for this, instead of network exception if has
+
                 is IOException -> CommonErrorException.NetworkException(
                     throwable.message ?: "An unexpected error occurred"
                 )
@@ -83,47 +85,113 @@ abstract class BaseViewmodel : ViewModel() {
         }
 
     /**
-     * common fetch data function
-     *
+     * common fetch data function using CallbackWrapper
      */
-    fun <R> fetchData(
+    fun <R> fetchOriginData(
         onLoading: EmptyFunc? = null,
         fetching: FetchSupFunc<R>,
         callbackWrapper: CallbackWrapper<R>,
     ) {
         viewModelScope.launch(Dispatchers.IO + errorCatcher(callbackWrapper)) {
-            onLoading?.invoke()
-            _loading.tryEmit(true)
+            onLoading?.invoke() ?: _loading.tryEmit(true)
 
-            // globalCoroutineExceptionHandler will handle error exception about API fetching
-            // for business/logic exception when handle data after fetched
-            // please handle in useCase class instead
             val response = fetching()
 
             launch(Dispatchers.Default) {
                 callbackWrapper.doOnBackground(response)
             }
             launch(Dispatchers.Main) {
-                if (_loading.value) {
-                    _loading.value = false
-                }
+                _loading.tryEmit(false)
                 callbackWrapper.onSuccess(response)
             }
         }
     }
 
-    fun <T> handleApiResponse(response: NetworkResult<T>, onSuccess: ParamFunc<T>?, onFailure: EmptyFunc? = null) {
+    /**
+     * New fetchData overload specifically for NetworkResult with lambda callbacks.
+     * Manages loading state and error handling automatically.
+     */
+    fun <T> fetchData(
+        onLoading: EmptyFunc? = null,
+        fetching: suspend () -> NetworkResult<T>,
+        callbackWrapper: CallbackWrapper<T>,
+    ) {
+        viewModelScope.launch(Dispatchers.IO + errorCatcher(callbackWrapper)) {
+            onLoading?.invoke() ?: _loading.tryEmit(true)
+            val response = fetching()
+            launch(Dispatchers.Main) {
+                _loading.tryEmit(false)
+                handleApiResponse(response, callbackWrapper)
+            }
+        }
+    }
+
+
+    /**
+     * handle API response with callback wrapper and error handling using by [fetchData]
+     */
+    private fun <T> handleApiResponse(
+        response: NetworkResult<T>,
+        onCallbackWrapper: CallbackWrapper<T>
+    ) {
+        when (response) {
+            is NetworkResult.Success -> {
+                onCallbackWrapper.onSuccess(response.data)
+            }
+
+            is NetworkResult.ApiError -> {
+                onCallbackWrapper.onFail(response.error)
+                _error.tryEmit(
+                    CommonErrorException.InvalidInputException(
+                        null,
+                        response.error.errorType,
+                        response.error.errors
+                    )
+                )
+            }
+
+            is NetworkResult.Exception -> {
+                onCallbackWrapper.onError(CommonErrorException.UnknownException(response.e.message))
+                _error.tryEmit(
+                    CommonErrorException.NetworkException(
+                        response.e.message ?: "Network error"
+                    )
+                )
+            }
+        }
+    }
+
+    /**
+     * handle API response with lambda callbacks and error handling using [fetchData]
+     */
+    fun <T> handleApiResponse(
+        response: NetworkResult<T>,
+        onSuccess: ParamFunc<T>?,
+        onFailure: EmptyFunc? = null
+    ) {
         when (response) {
             is NetworkResult.Success -> {
                 onSuccess?.invoke(response.data)
             }
+
             is NetworkResult.ApiError -> {
                 onFailure?.invoke()
-                _error.tryEmit(CommonErrorException.InvalidInputException(null, response.error.errorType, response.error.errors))
+                _error.tryEmit(
+                    CommonErrorException.InvalidInputException(
+                        null,
+                        response.error.errorType,
+                        response.error.errors
+                    )
+                )
             }
+
             is NetworkResult.Exception -> {
                 onFailure?.invoke()
-                _error.tryEmit(CommonErrorException.NetworkException(response.e.message))
+                _error.tryEmit(
+                    CommonErrorException.NetworkException(
+                        response.e.message ?: "Network error"
+                    )
+                )
             }
         }
     }
