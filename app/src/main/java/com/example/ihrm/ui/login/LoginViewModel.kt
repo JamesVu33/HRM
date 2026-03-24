@@ -1,10 +1,12 @@
 package com.example.ihrm.ui.login
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.example.ihrm.core.errorHandler.CommonErrorException
 import com.example.ihrm.core.viewmodel.BaseViewmodel
 import com.example.ihrm.core.viewmodel.CallbackWrapper
-import com.example.ihrm.data.remote.dto.AppErrorResponseDto
-import com.example.ihrm.data.remote.dto.LoginResponseDto
+import com.example.ihrm.data.remote.base.AppErrorResponse
+import com.example.ihrm.data.remote.login.LoginResponse
 import com.example.ihrm.domain.repository.AuthRepository
 import com.example.ihrm.util.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -115,8 +117,9 @@ class LoginViewModel @Inject constructor(
 
             fetchData(
                 fetching = { authRepository.login(employeeId, password) },
-                callbackWrapper = object : CallbackWrapper<LoginResponseDto> {
-                    override fun onSuccess(data: LoginResponseDto) {
+                callbackWrapper = object : CallbackWrapper<LoginResponse> {
+                    override fun onSuccess(data: LoginResponse) {
+                        Log.d("loginTest", "onSuccess: $data")
                         AuthManager.saveTokens(data)
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
@@ -125,8 +128,14 @@ class LoginViewModel @Inject constructor(
                         onSuccess()
                     }
 
-                    override fun onFail(e: AppErrorResponseDto) {
+                    override fun onFail(e: CommonErrorException) {
                         _uiState.value = _uiState.value.copy(isLoading = false)
+                        Log.d("loginTest", "onFail: ${e.message}")
+
+                        /*
+                         * error cases:
+                         * AUTH_ERROR_CREDENTIAL_INCORRECT
+                         */
                     }
                 }
             )

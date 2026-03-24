@@ -4,7 +4,7 @@ import android.os.Build
 import androidx.lifecycle.viewModelScope
 import com.example.ihrm.core.viewmodel.BaseViewmodel
 import com.example.ihrm.core.viewmodel.CallbackWrapper
-import com.example.ihrm.data.remote.dto.NetworkResult
+import com.example.ihrm.data.remote.base.NetworkResult
 import com.example.ihrm.data.remote.dto.UserMetaResponseDto
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.model.Level

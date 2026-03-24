@@ -2,23 +2,6 @@ package com.example.ihrm.core.errorHandler
 
 interface IErrorType
 
-sealed class GlobalErrorException(open val errorKey: String?) : IErrorType {
-
-    /**
-     * response code: 401
-     * this means current token is expired or has not access token
-     * if the refresh_token exist, should auto invoke refresh-token API endpoint to get new access_token
-     */
-    class UnauthorizedException(override val errorKey: String?) : GlobalErrorException(errorKey)
-
-
-    /**
-     * response code: 403
-     * this means, this account is not allow to enter this feature
-     */
-    class NotPermissionException(override val errorKey: String?) : GlobalErrorException(errorKey)
-}
-
 sealed class CommonErrorException(open val errorKey: String?) : Exception(errorKey), IErrorType {
     /**
      * response code: 400
@@ -27,9 +10,10 @@ sealed class CommonErrorException(open val errorKey: String?) : Exception(errorK
      * currently, API responses error each field as one
      */
     class InvalidInputException(
-        val errorField: String?,
+        val errorField: String?, // base on request data class to detect which field is invalid
+        errorMsg: String?,
         override val errorKey: String?,
-        val errorParams: Map<String, Any>?
+//        val errorParams: Map<String, Any>?
     ) : CommonErrorException(errorKey)
 
 
@@ -37,11 +21,23 @@ sealed class CommonErrorException(open val errorKey: String?) : Exception(errorK
      * Code logic exception, to display UI to notify User
      */
     class InvalidLogicException(
-        val errorField: String?,
         override val errorKey: String?,
-        val errorParams: Map<String, Any>?
+        errorMsg: String?,
     ) : CommonErrorException(errorKey)
 
+    /**
+     * response code: 401
+     * this means current token is expired or has not access token
+     * if the refresh_token exist, should auto invoke refresh-token API endpoint to get new access_token
+     */
+    class UnauthorizedException(override val errorKey: String?) : CommonErrorException(errorKey)
+
+
+    /**
+     * response code: 403
+     * this means, this account is not allow to enter this feature
+     */
+    class NotPermissionException(override val errorKey: String?) : CommonErrorException(errorKey)
 
     /**
      * Network exception

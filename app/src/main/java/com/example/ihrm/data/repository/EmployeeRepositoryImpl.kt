@@ -4,7 +4,7 @@ import com.example.ihrm.data.local.dao.EmployeeDao
 import com.example.ihrm.data.remote.api.EmployeeApiService
 import com.example.ihrm.data.remote.base.safeApiCall
 import com.example.ihrm.data.remote.dto.MeEmployeeResponse
-import com.example.ihrm.data.remote.dto.NetworkResult
+import com.example.ihrm.data.remote.base.NetworkResult
 import com.example.ihrm.data.remote.dto.UserMetaResponseDto
 import com.example.ihrm.data.remote.mapper.toEmployee
 import com.example.ihrm.data.remote.mapper.toEmployeeEntity
@@ -103,7 +103,7 @@ class EmployeeRepositoryImpl @Inject constructor(
                 NetworkResult.Success(Unit, result.message)
             }
 
-            is NetworkResult.ApiError -> NetworkResult.ApiError(result.error)
+            is NetworkResult.Failure -> NetworkResult.Failure(result.error)
             is NetworkResult.Exception -> NetworkResult.Exception(result.e)
         }
     }
@@ -116,7 +116,7 @@ class EmployeeRepositoryImpl @Inject constructor(
                 NetworkResult.Success(map, result.message)
             }
 
-            is NetworkResult.ApiError -> NetworkResult.ApiError(result.error)
+            is NetworkResult.Failure -> NetworkResult.Failure(result.error)
             is NetworkResult.Exception -> NetworkResult.Exception(result.e)
         }
     }
@@ -125,7 +125,7 @@ class EmployeeRepositoryImpl @Inject constructor(
         val result = safeApiCall(retrofit) { apiService.getLevelById(id) }
         return when (result) {
             is NetworkResult.Success -> NetworkResult.Success(result.data.toLevel(), result.message)
-            is NetworkResult.ApiError -> NetworkResult.ApiError(result.error)
+            is NetworkResult.Failure -> NetworkResult.Failure(result.error)
             is NetworkResult.Exception -> NetworkResult.Exception(result.e)
         }
     }
@@ -138,7 +138,7 @@ class EmployeeRepositoryImpl @Inject constructor(
                 result.message
             )
 
-            is NetworkResult.ApiError -> NetworkResult.ApiError(result.error)
+            is NetworkResult.Failure -> NetworkResult.Failure(result.error)
             is NetworkResult.Exception -> NetworkResult.Exception(result.e)
         }
     }
@@ -152,7 +152,7 @@ class EmployeeRepositoryImpl @Inject constructor(
     private fun <T, R> NetworkResult<T>.map(transform: (T) -> R): NetworkResult<R> {
         return when (this) {
             is NetworkResult.Success -> NetworkResult.Success(transform(data), message)
-            is NetworkResult.ApiError -> NetworkResult.ApiError(error)
+            is NetworkResult.Failure -> NetworkResult.Failure(error)
             is NetworkResult.Exception -> NetworkResult.Exception(e)
         }
     }

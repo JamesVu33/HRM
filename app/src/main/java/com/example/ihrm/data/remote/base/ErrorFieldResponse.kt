@@ -1,8 +1,8 @@
-package com.example.ihrm.data.remote.dto
+package com.example.ihrm.data.remote.base
 
 import com.google.gson.annotations.SerializedName
 
-data class ErrorFieldDto(
+data class ErrorFieldResponse(
     @SerializedName("key")
     val key: String,
     @SerializedName("params")

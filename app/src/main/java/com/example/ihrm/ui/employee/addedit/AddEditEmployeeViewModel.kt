@@ -1,9 +1,10 @@
 package com.example.ihrm.ui.employee.addedit
 
 import androidx.lifecycle.viewModelScope
+import com.example.ihrm.core.errorHandler.CommonErrorException
 import com.example.ihrm.core.viewmodel.BaseViewmodel
 import com.example.ihrm.core.viewmodel.CallbackWrapper
-import com.example.ihrm.data.remote.dto.AppErrorResponseDto
+import com.example.ihrm.data.remote.base.AppErrorResponse
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.usecase.AddEmployeeUseCase
 import com.example.ihrm.domain.usecase.GetEmployeeByIdUseCase
@@ -133,7 +134,7 @@ class AddEditEmployeeViewModel @Inject constructor(
                         onSuccess()
                     }
 
-                    override fun onFail(e: AppErrorResponseDto) {
+                    override fun onFail(e: CommonErrorException) {
                         _uiState.value = _uiState.value.copy(isSaving = false)
                     }
                 }

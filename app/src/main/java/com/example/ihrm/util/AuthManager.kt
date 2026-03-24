@@ -2,7 +2,7 @@ package com.example.ihrm.util
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.ihrm.data.remote.dto.LoginResponseDto
+import com.example.ihrm.data.remote.login.LoginResponse
 
 /**
  * Holds auth state and tokens. Call [init] from [android.app.Application.onCreate].
@@ -38,7 +38,7 @@ object AuthManager {
     /**
      * Saves tokens and user session (including fullName, email) after successful login.
      */
-    fun saveTokens(response: LoginResponseDto) {
+    fun saveTokens(response: LoginResponse) {
         prefs?.edit()
             ?.putString(Constants.PREF_ACCESS_TOKEN, response.accessToken)
             ?.putString(Constants.PREF_REFRESH_TOKEN, response.refreshToken)
