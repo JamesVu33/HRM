@@ -50,7 +50,8 @@ fun NavGraph(
                         popUpTo(Screen.Splash.route) { inclusive = true }
                     }
                 },
-                isLoggedIn = AuthManager.isUserLoggedIn()
+                isLoggedIn = AuthManager.isUserLoggedIn() && !AuthManager.getAccessToken()
+                    .isNullOrEmpty()
             )
         }
 
