@@ -65,3 +65,27 @@ val txtInterBold24 = TextStyle(
     fontSize = 24.sp,
     color = ColorBgSuccessGradientBottom
 )
+
+
+val LabelTextStyle13MediumGrey = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.Medium,
+    fontSize = 13.sp,
+    color = DashboardFigmaMuted,
+    letterSpacing = (-0.0762).sp
+)
+
+val ValueTextStyle32BoldBlack = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.Bold,
+    fontSize = 32.sp,
+    color = DashboardFigmaInk,
+    letterSpacing = 0.4.sp
+)
+
+val CaptionTextStyle12NormalGrey = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.Normal,
+    fontSize = 12.sp,
+    color = DashboardFigmaMuted
+)

@@ -65,9 +65,31 @@ fun DashboardScreen(
     var selectedTab by remember { mutableStateOf(DashboardHomeTab.Personal) }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize().navigationBarsPadding(),
+        modifier = Modifier
+            .fillMaxSize()
+            .navigationBarsPadding(),
         containerColor = Color.Transparent,
-        contentWindowInsets = WindowInsets(top = 0),
+        topBar = {
+            Column (
+                modifier = Modifier.fillMaxWidth().statusBarsPadding()
+            ){
+                DashboardHomeTopBar(
+                    greeting = stringResource(R.string.dashboard_good_morning),
+                    dateText = stringResource(R.string.dashboard_mock_date),
+                    onMenuClick = onMenuClick,
+                    onBellClick = onBellClick,
+                    showBellBadge = true
+                )
+                if (role == DashboardRole.Extra) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    DashboardHomeTabSwitcher(
+                        selected = selectedTab,
+                        onSelect = { selectedTab = it }
+                    )
+                    DashboardHomeTabSubtitle(tab = selectedTab)
+                }
+            }
+        }
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -86,34 +108,8 @@ fun DashboardScreen(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .statusBarsPadding()
                     .padding(paddingValues)
             ) {
-                item {
-                    DashboardHomeTopBar(
-                        greeting = stringResource(R.string.dashboard_good_morning),
-                        dateText = stringResource(R.string.dashboard_mock_date),
-                        onMenuClick = onMenuClick,
-                        onBellClick = onBellClick,
-                        showBellBadge = true
-                    )
-                }
-
-                if (role == DashboardRole.Extra) {
-                    item {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        DashboardHomeTabSwitcher(
-                            selected = selectedTab,
-                            onSelect = { selectedTab = it }
-                        )
-                    }
-                    item {
-                        DashboardHomeTabSubtitle(tab = selectedTab)
-                    }
-                }
-
-                item { Spacer(modifier = Modifier.height(16.dp)) }
-
                 if (role == DashboardRole.Personal) {
                     item {
                         DashboardPersonalRoleSection(personalUi = personalUi)
@@ -166,7 +162,10 @@ private fun DashboardExtraRoleSection(
         // Personal role dashboard UI (Figma 871:30135).
         DashboardProfileCardManagement(profile = personalUi.profile)
         DashboardLeaveSection(stats = personalUi.leaveStats)
-        DashboardSecurityCardManagement(monthly = personalUi.securityMonthly, profile = personalUi.profile)
+        DashboardSecurityCardManagement(
+            monthly = personalUi.securityMonthly,
+            profile = personalUi.profile
+        )
     }
 }
 
@@ -183,7 +182,10 @@ private fun DashboardPersonalRoleSection(
         // Personal role dashboard UI (Figma 871:30135).
         DashboardProfileCardPersonal(profile = personalUi.profile)
         DashboardLeaveSection(stats = personalUi.leaveStats)
-        DashboardSecurityCardPersonal(monthly = personalUi.securityMonthly, profile = personalUi.profile)
+        DashboardSecurityCardPersonal(
+            monthly = personalUi.securityMonthly,
+            profile = personalUi.profile
+        )
     }
 }
 

@@ -172,38 +172,20 @@ fun EmployeeCard(
                     .padding(top = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(PrimaryTint),
-                    contentAlignment = Alignment.Center
-                ) {
-                    TextButton(onClick = onViewDetails) {
-                        Text(
-                            text = stringResource(R.string.dashboard_view_details),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Primary400
-                        )
-                    }
-                }
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(ErrorLight),
-                    contentAlignment = Alignment.Center
-                ) {
-                    TextButton(onClick = onDelete) {
-                        Text(
-                            text = stringResource(R.string.dashboard_delete),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Error
-                        )
-                    }
-                }
+                FlatButton(
+                    text = stringResource(R.string.dashboard_view_details),
+                    textColor = Primary400,
+                    backgroundColor = PrimaryTint,
+                    onClick = onViewDetails,
+                    modifier = Modifier.weight(1f)
+                )
+                FlatButton(
+                    text = stringResource(R.string.dashboard_delete),
+                    textColor = Error,
+                    backgroundColor = ErrorLight,
+                    onClick = onDelete,
+                    modifier = Modifier.weight(1f)
+                )
             }
         }
     }

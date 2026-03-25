@@ -121,7 +121,11 @@ private fun DrawerContent(
 
                         Screen.EmployeeList.route -> {
                             navController.navigate(route) {
-                                popUpTo(Screen.EmployeeList.route) { inclusive = true }
+                                popUpTo(Screen.Dashboard.route) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
                             }
                         }
                     }

@@ -8,12 +8,12 @@ import com.example.ihrm.ui.theme.Primary50
 import com.example.ihrm.ui.theme.Primary500
 
 object DashboardBrush {
-    val BaseBackground = Brush.linearGradient(
-        colors = listOf(
-            Primary500,
-            Primary400,
-            Primary200,
-            Primary50
+    val BaseBackground = Brush.verticalGradient(
+        colorStops = arrayOf(
+            0.00f to Primary500,
+            0.50f to Primary400,
+            0.75f to Primary200,
+            1.00f to Primary50,
         )
     )
 

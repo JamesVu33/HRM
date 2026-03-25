@@ -135,7 +135,7 @@
     <string name="dashboard_mgmt_legend_not_submitted">Not Submitted</string>
 
     <!-- Calendar Management (Figma 871:35255) -->
-    <string name="calendar_mgmt_title">Calendar Management</string>
+    <string name="calendar_mgmt_title">Leave Management</string>
     <string name="calendar_mgmt_stat_leaves_today">Employees\u2019 Leaves Today</string>
     <string name="calendar_mgmt_stat_total_requested">Total Leaves Requested</string>
     <string name="calendar_mgmt_stat_pending">Leave Requests Pending</string>
@@ -243,6 +243,30 @@
     <string name="employee_info_update_success">Information updated successfully</string>
     <string name="employee_info_create_member">Create Member</string>
     <string name="employee_list_title">Employees</string>
+    <string name="employee_list_load_error">Could not load employees. Pull to refresh or try again later.</string>
+    <string name="employee_list_no_match">No employees match your search.</string>
+    <!-- Team / statistics screen (Figma 871:34408) -->
+    <string name="team_statistics_title">Statistics information</string>
+    <string name="team_statistics_active_employees_hint">Active employees</string>
+    <string name="team_statistics_active_now">Active now</string>
+    <string name="team_statistics_working_today">Working today</string>
+    <string name="team_statistics_dept_title">Department distribution</string>
+    <string name="team_statistics_dept_subtitle">Total employees of each department</string>
+    <string name="team_statistics_status_title">Status distribution</string>
+    <string name="team_statistics_status_subtitle">Employees by employment status</string>
+    <string name="team_statistics_center_total">Total</string>
+    <string name="team_statistics_center_employees">Employees</string>
+    <string name="team_statistics_center_status_label">Status</string>
+    <string name="team_statistics_dept_gdc">GDC</string>
+    <string name="team_statistics_dept_bank_biz">Bank biz 1</string>
+    <string name="team_statistics_dept_operation">Operation biz</string>
+    <string name="team_statistics_dept_it">IT biz</string>
+    <string name="team_statistics_dept_other">Other biz</string>
+    <string name="team_statistics_status_working">Working</string>
+    <string name="team_statistics_status_resigned">Resigned</string>
+    <string name="team_statistics_status_suspended">Suspended</string>
+    <string name="team_statistics_status_probation">Probation</string>
+    <string name="team_statistics_status_intern">Intern</string>
     <!-- Role options -->
     <string name="employee_info_role1">Role1</string>
     <string name="employee_info_role2">Role2</string>

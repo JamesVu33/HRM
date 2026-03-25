@@ -1,7 +1,6 @@
 package com.example.ihrm.ui.dashboard.extra
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,19 +27,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ihrm.R
@@ -53,8 +47,8 @@ import com.example.ihrm.ui.theme.DashboardLeaveBlueEnd
 import com.example.ihrm.ui.theme.DashboardLeaveBlueStart
 import com.example.ihrm.ui.theme.DashboardTabActiveBlue
 import com.example.ihrm.ui.theme.InterFontFamily
+import com.example.ihrm.ui.common.DonutChartTriple
 import com.example.ihrm.ui.theme.Primary400
-import kotlin.math.min
 
 private val MgmtPresentGreen = Color(0xFF00BC7D)
 private val MgmtAbsentRed = Color(0xFFFF6467)
@@ -817,66 +811,6 @@ private fun SecurityLegendLine(color: Color, text: String, title: Int) {
                     color = DashboardFigmaInk
                 )
             )
-        }
-    }
-}
-
-/**
- * Three-segment donut matching Figma PieChart (871:35217): white gaps between arcs,
- * flat stroke caps, ring inset inside the canvas (6.67% vertical, 17.5% horizontal).
- */
-@Composable
-private fun DonutChartTriple(
-    modifier: Modifier = Modifier,
-    fractions: List<Float>,
-    colors: List<Color>,
-    strokeWidth: Dp
-) {
-    Canvas(modifier = modifier) {
-        val n = fractions.size
-        if (n == 0 || colors.size != n) return@Canvas
-
-        val sum = fractions.sum()
-        if (sum <= 0f) return@Canvas
-        val normalized = fractions.map { it / sum }
-
-        // Figma: thin gaps between segments (background shows through).
-        val gapDegrees = 3.2f
-        val totalGaps = n * gapDegrees
-        val sweepBudget = (360f - totalGaps).coerceAtLeast(0f)
-        if (sweepBudget <= 0f) return@Canvas
-
-        // Figma Surface inset on the pie: ~6.67% vertical, ~17.5% horizontal.
-        val padH = size.width * 0.175f
-        val padV = size.height * 0.0667f
-        val innerW = (size.width - 2f * padH).coerceAtLeast(0f)
-        val innerH = (size.height - 2f * padV).coerceAtLeast(0f)
-        val diameter = min(innerW, innerH)
-        if (diameter <= 0f) return@Canvas
-
-        val left = padH + (innerW - diameter) / 2f
-        val top = padV + (innerH - diameter) / 2f
-        val topLeft = Offset(left, top)
-        val arcSize = Size(diameter, diameter)
-
-        val strokePx = strokeWidth.toPx()
-        val strokeStyle = Stroke(width = strokePx, cap = StrokeCap.Butt)
-
-        var startAngle = -90f
-        normalized.zip(colors).forEach { (fraction, color) ->
-            val sweep = fraction * sweepBudget
-            if (sweep > 0.05f) {
-                drawArc(
-                    color = color,
-                    startAngle = startAngle,
-                    sweepAngle = sweep,
-                    useCenter = false,
-                    topLeft = topLeft,
-                    size = arcSize,
-                    style = strokeStyle
-                )
-            }
-            startAngle += sweep + gapDegrees
         }
     }
 }

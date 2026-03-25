@@ -12,6 +12,7 @@ import com.example.ihrm.ui.dashboard.DashboardScreen
 import com.example.ihrm.ui.employee.addedit.AddEditEmployeeScreen
 import com.example.ihrm.ui.employee.detail.EmployeeDetailScreen
 import com.example.ihrm.ui.employee.list.EmployeeListScreen
+import com.example.ihrm.ui.stats.TeamStatisticsScreen
 import com.example.ihrm.ui.login.LoginScreen
 import com.example.ihrm.util.AuthManager
 import kotlinx.coroutines.CoroutineScope
@@ -84,6 +85,13 @@ fun NavGraph(
                 onAddEmployeeClick = {
                     navController.navigate(Screen.AddEmployee.route)
                 },
+                onBackClick = { navController.popBackStack() },
+                onViewStats = { navController.navigate(Screen.TeamStatistics.route) }
+            )
+        }
+
+        composable(Screen.TeamStatistics.route) {
+            TeamStatisticsScreen(
                 onBackClick = { navController.popBackStack() }
             )
         }

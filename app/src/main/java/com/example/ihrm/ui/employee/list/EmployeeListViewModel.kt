@@ -1,6 +1,5 @@
 package com.example.ihrm.ui.employee.list
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.ihrm.core.viewmodel.BaseViewmodel
 import com.example.ihrm.core.viewmodel.CallbackWrapper
@@ -61,7 +60,6 @@ class EmployeeListViewModel @Inject constructor(
             try {
                 getEmployeesUseCase().collect { employees ->
                     val uiModels = mergeEmployeesWithLevels(employees)
-                    Log.d("Vinh", "loadEmployeesWithLevels: $uiModels")
                     _uiState.update {
                         it.copy(employeeUiModels = uiModels, isLoading = false)
                     }
@@ -94,7 +92,6 @@ class EmployeeListViewModel @Inject constructor(
                 }
             }
 
-            Log.d("Vinh", "mergeEmployeesWithLevels: $levelCache")
             buildEmployeeUiModels(employees, levelCache)
         }
 

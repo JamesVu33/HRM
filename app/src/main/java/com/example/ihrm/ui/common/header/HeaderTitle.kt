@@ -60,8 +60,7 @@ fun BaseHeader(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .align(Alignment.Center)
-                .padding(horizontal = 16.dp),
+                .align(Alignment.Center),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {

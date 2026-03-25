@@ -6,14 +6,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -142,15 +146,8 @@ fun CalendarManagementScreen(
         modifier = modifier
             .fillMaxSize()
             .navigationBarsPadding(),
-        topBar = {
-            BaseHeader(
-                modifier = Modifier.statusBarsPadding(),
-                title = stringResource(R.string.calendar_mgmt_title),
-                showNavigationIcon = true,
-                onNavigationClick = onBackClick,
-                containerColor = Color.Transparent
-            )
-        }
+        containerColor = Color.Transparent,
+        contentWindowInsets = WindowInsets(top = 0),
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -162,8 +159,23 @@ fun CalendarManagementScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
                     .padding(horizontal = 16.dp),
+                contentPadding = PaddingValues(
+                    top = paddingValues.calculateTopPadding() + WindowInsets.statusBars
+                        .asPaddingValues()
+                        .calculateTopPadding(),
+                    bottom = paddingValues.calculateBottomPadding()
+                ),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                item {
+                    BaseHeader(
+                        modifier = Modifier,
+                        title = stringResource(R.string.calendar_mgmt_title),
+                        showNavigationIcon = true,
+                        onNavigationClick = onBackClick,
+                        containerColor = Color.Transparent
+                    )
+                }
                 item { Spacer(modifier = Modifier.height(24.dp)) }
 
                 item {

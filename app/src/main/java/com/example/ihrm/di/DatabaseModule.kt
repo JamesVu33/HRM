@@ -3,9 +3,6 @@ package com.example.ihrm.di
 import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SimpleSQLiteQuery
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.ihrm.data.local.EmployeeDatabase
 import com.example.ihrm.data.local.dao.EmployeeDao
 import dagger.Module
