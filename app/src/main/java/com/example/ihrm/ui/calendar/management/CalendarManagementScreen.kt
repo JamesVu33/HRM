@@ -26,7 +26,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -53,7 +52,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -63,13 +61,9 @@ import com.example.ihrm.ui.common.header.BaseHeader
 import com.example.ihrm.ui.components.ButtonSize
 import com.example.ihrm.ui.components.ButtonVariant
 import com.example.ihrm.ui.components.CustomButton
-import com.example.ihrm.ui.theme.ColorBgSuccessGradientBottom80Percent
 import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.ui.theme.Neutral500
 import com.example.ihrm.ui.theme.Neutral700
-import com.example.ihrm.ui.theme.Primary200
-import com.example.ihrm.ui.theme.Primary400
-import com.example.ihrm.ui.theme.Primary50
 import com.example.ihrm.ui.theme.Primary500
 import com.example.ihrm.util.DashboardBrush
 import com.example.ihrm.util.txtInterBold24
@@ -106,13 +100,37 @@ fun CalendarManagementScreen(
     var yearMonth by remember { mutableStateOf(YearMonth.of(2026, 3)) }
     var selectedDay by remember { mutableIntStateOf(11) }
     var showFilterPopup by remember { mutableStateOf(false) }
+    var appliedLeaveFilters by remember { mutableStateOf(LeaveFilterType.All) }
+    var pendingLeaveFilters by remember { mutableStateOf(LeaveFilterType.All) }
 
-    val dotMap = remember(yearMonth) {
+    val leaveTypesByDay = remember(yearMonth) {
         if (yearMonth == YearMonth.of(2026, 3)) {
-            CalendarManagementDemoData.march2026DotArgbByDay
+            CalendarManagementDemoData.march2026LeaveTypesByDay
         } else {
             emptyMap()
         }
+    }
+
+    val filteredDotMap = remember(yearMonth, appliedLeaveFilters, leaveTypesByDay) {
+        buildFilteredDotMapByDay(leaveTypesByDay, appliedLeaveFilters)
+    }
+
+    val legendLeaveTypes = remember(appliedLeaveFilters) {
+        LeaveFilterType.entries.filter { it in appliedLeaveFilters }
+    }
+
+    val filterHintText = when {
+        appliedLeaveFilters.isEmpty() ->
+            stringResource(R.string.calendar_mgmt_filter_calendar_hint_empty)
+
+        appliedLeaveFilters.size < LeaveFilterType.entries.size ->
+            stringResource(
+                R.string.calendar_mgmt_filter_calendar_hint_partial,
+                appliedLeaveFilters.size,
+                LeaveFilterType.entries.size
+            )
+
+        else -> null
     }
 
     val monthTitle = remember(yearMonth) {
@@ -168,8 +186,13 @@ fun CalendarManagementScreen(
                         yearMonth = yearMonth,
                         selectedDay = selectedDay,
                         onSelectDay = { selectedDay = it },
-                        onFilterClick = { showFilterPopup = true },
-                        dotArgbByDay = dotMap
+                        onFilterClick = {
+                            pendingLeaveFilters = appliedLeaveFilters
+                            showFilterPopup = true
+                        },
+                        dotArgbByDay = filteredDotMap,
+                        filterHintText = filterHintText,
+                        legendLeaveTypes = legendLeaveTypes
                     )
                 }
 
@@ -182,7 +205,13 @@ fun CalendarManagementScreen(
 
             if (showFilterPopup) {
                 FilterLeaveTypePopup(
-                    onDismiss = { showFilterPopup = false }
+                    pendingSelection = pendingLeaveFilters,
+                    onPendingChange = { pendingLeaveFilters = it },
+                    onDismiss = { showFilterPopup = false },
+                    onApply = {
+                        appliedLeaveFilters = pendingLeaveFilters
+                        showFilterPopup = false
+                    }
                 )
             }
         }
@@ -328,7 +357,9 @@ private fun CalendarCard(
     onPrevMonth: () -> Unit,
     onNextMonth: () -> Unit,
     onFilterClick: () -> Unit,
-    dotArgbByDay: Map<Int, List<Long>>
+    dotArgbByDay: Map<Int, List<Long>>,
+    filterHintText: String?,
+    legendLeaveTypes: List<LeaveFilterType>
 ) {
     val grid = remember(yearMonth, selectedDay, dotArgbByDay) {
         buildCalendarGrid42(
@@ -419,12 +450,56 @@ private fun CalendarCard(
                         modifier = Modifier.size(18.dp)
                     )
                 }
+                if (filterHintText != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = filterHintText,
+                        fontFamily = InterFontFamily,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 11.sp,
+                        lineHeight = 14.sp,
+                        color = Neutral500,
+                        modifier = Modifier.padding(horizontal = 4.dp)
+                    )
+                }
             }
 
             Column(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                if (legendLeaveTypes.isNotEmpty()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        legendLeaveTypes.forEach { type ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(6.dp)
+                                        .clip(CircleShape)
+                                        .background(Color((type.dotArgb and 0xFFFFFFFFL).toInt()))
+                                )
+                                Text(
+                                    text = stringResource(type.labelRes),
+                                    fontFamily = InterFontFamily,
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 10.sp,
+                                    color = Neutral500,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        }
+                    }
+                }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
@@ -670,20 +745,13 @@ private fun UpcomingLeaveRow(
     }
 }
 
-@Preview
 @Composable
 private fun FilterLeaveTypePopup(
-    onDismiss: () -> Unit = {}
+    pendingSelection: Set<LeaveFilterType>,
+    onPendingChange: (Set<LeaveFilterType>) -> Unit,
+    onDismiss: () -> Unit,
+    onApply: () -> Unit
 ) {
-    val options = listOf(
-        Triple(R.string.calendar_mgmt_leave_type_annual, Color(0xFF2B7FFF), Color(0xFFE6F1FF)),
-        Triple(R.string.calendar_mgmt_leave_type_sick, Color(0xFFFBBF24), Color(0xFFFEF3C7)),
-        Triple(R.string.calendar_mgmt_leave_type_maternity, Color(0xFFF6339A), Color(0xFFFCE7F3)),
-        Triple(R.string.calendar_mgmt_leave_type_unpaid, Color(0xFF6A7282), Color(0xFFF3F4F6)),
-        Triple(R.string.calendar_mgmt_leave_type_personal, Color(0xFF00BBA7), Color(0xFFD1FAE5))
-    )
-    var selected by remember { mutableStateOf(options.toSet()) }
-
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(
@@ -691,7 +759,9 @@ private fun FilterLeaveTypePopup(
         )
     ) {
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
@@ -746,26 +816,28 @@ private fun FilterLeaveTypePopup(
                             text = stringResource(R.string.calendar_mgmt_select_all),
                             background = Color(0xFFE6F1FF),
                             textColor = StatBlue,
-                            onClick = { selected = options.toSet() }
+                            onClick = { onPendingChange(LeaveFilterType.All) }
                         )
                         FilterPopupActionButton(
                             modifier = Modifier.weight(1f),
                             text = stringResource(R.string.calendar_mgmt_clear_all),
                             background = Color(0xFFF3F4F6),
                             textColor = Neutral500,
-                            onClick = { selected = emptySet() }
+                            onClick = { onPendingChange(emptySet()) }
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    options.forEach { option ->
+                    LeaveFilterType.entries.forEach { type ->
                         FilterPopupCheckboxItem(
-                            label = stringResource(option.first),
-                            checked = selected.contains(option),
+                            label = stringResource(type.labelRes),
+                            checked = pendingSelection.contains(type),
                             onCheckedChange = { checked ->
-                                selected = if (checked) selected + option else selected - option
+                                onPendingChange(
+                                    if (checked) pendingSelection + type else pendingSelection - type
+                                )
                             },
-                            colorBackgroundCheckBox = option.second,
-                            colorBackground = option.third
+                            colorBackgroundCheckBox = Color((type.accentArgb and 0xFFFFFFFFL).toInt()),
+                            colorBackground = Color((type.softRowBackgroundArgb and 0xFFFFFFFFL).toInt())
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                     }
@@ -773,8 +845,8 @@ private fun FilterLeaveTypePopup(
 
 
                 CustomButton(
-                    text = "Apply Filters",
-                    onClick = { },
+                    text = stringResource(R.string.calendar_mgmt_apply_filters),
+                    onClick = onApply,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp)
@@ -824,7 +896,7 @@ private fun FilterPopupCheckboxItem(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(colorBackground)
+            .background(if (checked) colorBackground else Color(0xFFF3F4F6))
             .border(
                 width = 1.dp,
                 color = if (checked) colorBackgroundCheckBox else Color(0xFFE5E7EB),

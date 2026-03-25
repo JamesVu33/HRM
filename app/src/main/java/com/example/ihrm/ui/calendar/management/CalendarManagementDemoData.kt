@@ -12,6 +12,42 @@ internal object CalendarManagementDemoData {
     private val DotPink = 0xFFF6339A
 
     /**
+     * March 2026: which leave categories occur on each day (drives filter Apply).
+     * Derived from the original multi-dot calendar semantics.
+     */
+    val march2026LeaveTypesByDay: Map<Int, Set<LeaveFilterType>> = buildMap {
+        fun putDay(day: Int, vararg types: LeaveFilterType) {
+            put(day, types.toSet())
+        }
+        putDay(2, LeaveFilterType.ANNUAL)
+        putDay(4, LeaveFilterType.ANNUAL)
+        putDay(6, LeaveFilterType.PERSONAL)
+        putDay(8, LeaveFilterType.ANNUAL)
+        putDay(9, LeaveFilterType.ANNUAL)
+        putDay(10, LeaveFilterType.ANNUAL)
+        putDay(12, LeaveFilterType.UNPAID)
+        putDay(13, LeaveFilterType.UNPAID)
+        putDay(14, LeaveFilterType.UNPAID)
+        putDay(15, LeaveFilterType.SICK, LeaveFilterType.MATERNITY)
+        putDay(16, LeaveFilterType.SICK, LeaveFilterType.MATERNITY)
+        putDay(17, LeaveFilterType.SICK, LeaveFilterType.MATERNITY)
+        putDay(18, LeaveFilterType.SICK, LeaveFilterType.MATERNITY)
+        putDay(19, LeaveFilterType.MATERNITY, LeaveFilterType.PERSONAL)
+        putDay(20, LeaveFilterType.MATERNITY, LeaveFilterType.PERSONAL)
+        putDay(21, LeaveFilterType.MATERNITY)
+        putDay(22, LeaveFilterType.SICK, LeaveFilterType.MATERNITY)
+        putDay(23, LeaveFilterType.MATERNITY)
+        putDay(24, LeaveFilterType.MATERNITY, LeaveFilterType.ANNUAL)
+        putDay(25, LeaveFilterType.MATERNITY, LeaveFilterType.ANNUAL)
+        putDay(26, LeaveFilterType.MATERNITY, LeaveFilterType.ANNUAL)
+        putDay(27, LeaveFilterType.MATERNITY)
+        putDay(28, LeaveFilterType.MATERNITY)
+        putDay(29, LeaveFilterType.MATERNITY)
+        putDay(30, LeaveFilterType.MATERNITY)
+        putDay(31, LeaveFilterType.MATERNITY)
+    }
+
+    /**
      * March 2026 leave markers aligned with Figma calendar dots.
      */
     val march2026DotArgbByDay: Map<Int, List<Long>> = buildMap {

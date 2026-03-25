@@ -146,6 +146,9 @@
     <string name="calendar_mgmt_close_popup">Close filter popup</string>
     <string name="calendar_mgmt_select_all">Select All</string>
     <string name="calendar_mgmt_clear_all">Clear All</string>
+    <string name="calendar_mgmt_apply_filters">Apply Filters</string>
+    <string name="calendar_mgmt_filter_calendar_hint_empty">No leave types selected. Open Filter, choose types, then tap Apply to see markers on the calendar.</string>
+    <string name="calendar_mgmt_filter_calendar_hint_partial">Showing %1$d of %2$d leave types on the calendar.</string>
     <string name="calendar_mgmt_cd_prev_month">Previous month</string>
     <string name="calendar_mgmt_cd_next_month">Next month</string>
     <string name="calendar_weekday_sun">S</string>
