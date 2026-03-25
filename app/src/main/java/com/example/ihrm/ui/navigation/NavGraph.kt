@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.ihrm.ui.auth.SplashScreen
+import com.example.ihrm.ui.calendar.management.CalendarManagementScreen
 import com.example.ihrm.ui.dashboard.DashboardScreen
 import com.example.ihrm.ui.employee.addedit.AddEditEmployeeScreen
 import com.example.ihrm.ui.employee.detail.EmployeeDetailScreen
@@ -60,9 +61,18 @@ fun NavGraph(
             DashboardScreen(
                 onMenuClick = { scope.launch { drawerState?.open() } },
                 onProfileClick = { },
+                onCalendarManagement = {
+                    navController.navigate(Screen.CalendarManagement.route)
+                },
                 onViewStats = {
                     navController.navigate(Screen.EmployeeList.route)
                 }
+            )
+        }
+
+        composable(Screen.CalendarManagement.route) {
+            CalendarManagementScreen(
+                onBackClick = { navController.popBackStack() }
             )
         }
 

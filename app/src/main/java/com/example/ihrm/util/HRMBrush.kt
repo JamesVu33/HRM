@@ -2,8 +2,20 @@ package com.example.ihrm.util
 
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.example.ihrm.ui.theme.Primary200
+import com.example.ihrm.ui.theme.Primary400
+import com.example.ihrm.ui.theme.Primary50
+import com.example.ihrm.ui.theme.Primary500
 
 object DashboardBrush {
+    val BaseBackground = Brush.linearGradient(
+        colors = listOf(
+            Primary500,
+            Primary400,
+            Primary200,
+            Primary50
+        )
+    )
 
     val Approved = Brush.horizontalGradient(
         listOf(
@@ -30,6 +42,9 @@ object DashboardBrush {
     )
 
     val Transparent = Brush.horizontalGradient(
-        listOf(Color(0x00000000))
+        listOf(
+            Color(0x00000000),
+            Color(0x00000000),
+        )
     )
 }

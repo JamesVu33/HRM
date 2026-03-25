@@ -65,7 +65,8 @@ private val MgmtSecuritySliceLight = Color(0xFF93C5FD)
 @Composable
 fun DashboardManagementTabContent(
     ui: DashboardManagementUiModel,
-    onNavigate: () -> Unit,
+    onCalendarNavigate: () -> Unit,
+    onSecurityNavigate: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -76,11 +77,11 @@ fun DashboardManagementTabContent(
     ) {
         ManagementCalendarCard(
             data = ui.calendar,
-            onChevronClick = onNavigate
+            onChevronClick = onCalendarNavigate
         )
         ManagementSecurityCard(
             data = ui.security,
-            onChevronClick = onNavigate
+            onChevronClick = onSecurityNavigate
         )
         Spacer(modifier = Modifier.height(72.dp))
     }
@@ -100,7 +101,8 @@ private fun ManagementCalendarCard(
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.6f))
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.6f)),
+        onClick = { onChevronClick() }
     ) {
         Column(
             modifier = Modifier

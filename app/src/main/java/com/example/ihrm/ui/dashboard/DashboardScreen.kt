@@ -47,6 +47,7 @@ fun DashboardScreen(
     onMenuClick: () -> Unit,
     onProfileClick: () -> Unit,
     onBellClick: () -> Unit = onProfileClick,
+    onCalendarManagement: () -> Unit,
     onViewStats: () -> Unit
 ) {
     val mock = DashboardMockData.rememberHomeModel()
@@ -136,7 +137,8 @@ fun DashboardScreen(
                             item {
                                 DashboardManagementTabContent(
                                     ui = extraUi.management,
-                                    onNavigate = onViewStats
+                                    onCalendarNavigate = onCalendarManagement,
+                                    onSecurityNavigate = onViewStats
                                 )
                             }
                         }
@@ -192,6 +194,7 @@ private fun DashboardScreenPreview() {
         DashboardScreen(
             onMenuClick = {},
             onProfileClick = {},
+            onCalendarManagement = {},
             onViewStats = {}
         )
     }
