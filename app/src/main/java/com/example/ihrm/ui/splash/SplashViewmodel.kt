@@ -34,6 +34,7 @@ val languageRepository: LanguageRepository,
 
                 override suspend fun doOnBackground(data: List<LanguageResponse>) {
                     // save into local db
+                    languageRepository.saveLanguages(data)
                 }
             }
         )

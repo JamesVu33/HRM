@@ -122,7 +122,14 @@ abstract class BaseViewmodel : ViewModel() {
             val response = fetching()
             launch(Dispatchers.Main) {
                 _loading.emit(false)
-                handleApiResponse(response, callbackWrapper)
+                handleApiResponse(response, callbackWrapper) {
+                    launch(Dispatchers.Default) {
+                        callbackWrapper.doOnBackground(it)
+                    }
+                    launch {
+                        callbackWrapper.onSuccess(it)
+                    }
+                }
             }
         }
     }
@@ -133,11 +140,12 @@ abstract class BaseViewmodel : ViewModel() {
      */
     private fun <T> handleApiResponse(
         response: NetworkResult<T>,
-        onCallbackWrapper: CallbackWrapper<T>
+        onCallbackWrapper: CallbackWrapper<T>,
+        onSuccess: ParamFunc<T>
     ) {
         when (response) {
             is NetworkResult.Success -> {
-                onCallbackWrapper.onSuccess(response.data)
+                onSuccess(response.data)
             }
 
             is NetworkResult.Failure -> {
