@@ -62,7 +62,7 @@ internal fun resolveDashboardRoleAfterLogin(
         "s2",
         "extra"
     )
-    return if (extraHints.any { key.contains(it) }) DashboardRole.Extra else DashboardRole.Extra
+    return if (extraHints.any { key.contains(it) }) DashboardRole.Extra else DashboardRole.Personal
 }
 
 internal fun buildPersonalRoleUi(source: DashboardHomeMockModel): DashboardPersonalRoleUi {
