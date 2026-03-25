@@ -2,6 +2,8 @@ package com.example.ihrm.util
 
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.example.ihrm.ui.theme.DashboardTabActiveBlue
+import com.example.ihrm.ui.theme.DrawerItemSelected
 import com.example.ihrm.ui.theme.Primary200
 import com.example.ihrm.ui.theme.Primary400
 import com.example.ihrm.ui.theme.Primary50
@@ -14,6 +16,13 @@ object DashboardBrush {
             0.50f to Primary400,
             0.75f to Primary200,
             1.00f to Primary50,
+        )
+    )
+
+    val BaseBackgroundItemSelected = Brush.verticalGradient(
+        colorStops = arrayOf(
+            0.00f to DashboardTabActiveBlue.copy(0.1f),
+            1.00f to DrawerItemSelected.copy(0.05f),
         )
     )
 
