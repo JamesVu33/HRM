@@ -6,7 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.ihrm.ui.auth.SplashScreen
+import com.example.ihrm.ui.splash.SplashScreen
 import com.example.ihrm.ui.calendar.management.CalendarManagementScreen
 import com.example.ihrm.ui.dashboard.DashboardScreen
 import com.example.ihrm.ui.employee.addedit.AddEditEmployeeScreen

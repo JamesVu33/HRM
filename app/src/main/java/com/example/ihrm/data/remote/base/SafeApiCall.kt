@@ -1,5 +1,6 @@
 package com.example.ihrm.data.remote.base
 
+import android.util.Log
 import com.example.ihrm.core.errorHandler.CommonErrorException
 import com.example.ihrm.data.remote.base.ApiSuccessResponse
 import com.example.ihrm.data.remote.base.NetworkResult
@@ -23,12 +24,15 @@ suspend fun <T> safeApiCall(
         val response = execute()
         val body = response.body()
 
+        Log.i("apiFlows", "safeApiCall: - start")
         if (response.isSuccessful && body != null) {
+            Log.i("apiFlows", "safeApiCall: - success")
             // SUCCESS CASE: Extract the generic data 'T'
             // We return body.data because that's the actual object the UI needs
             // Note: If body.data is null but it's Success, we might need to handle it or use a default
-            NetworkResult.Success<T>(body.data as T, body.message)
+            NetworkResult.Success<T>(body.data as T)
         } else {
+            Log.i("apiFlows", "safeApiCall: - failure")
             // ERROR CASE: Manually parse the errorBody
             val errorBody = response.errorBody()
             val adapter = retrofit.responseBodyConverter<AppErrorResponse>(
@@ -46,6 +50,7 @@ suspend fun <T> safeApiCall(
             NetworkResult.Failure(errorType)
         }
     } catch (throwable: Exception) {
+        Log.i("apiFlows", "safeApiCall: - exception: $throwable")
         val errorException = when (throwable) {
             is JSONException, is SocketTimeoutException, is SSLException, is ConnectException, is UnknownHostException -> {
                 CommonErrorException.NetworkException(
@@ -65,6 +70,7 @@ suspend fun <T> safeApiCall(
                 throwable.message ?: "An unexpected error occurred"
             )
         }
+        Log.i("apiFlows", "safeApiCall: - exception: $errorException")
         NetworkResult.Exception(errorException)
     }
 }

@@ -54,7 +54,7 @@ class EmployeeRepositoryImpl @Inject constructor(
         val result = safeApiCall(retrofit) { apiService.createEmployee(dto) }
         if (result is NetworkResult.Success) {
             employeeDao.insertEmployee(employee.toEmployeeEntity())
-            return NetworkResult.Success(Unit, result.message)
+            return NetworkResult.Success(Unit)
         }
         return result.map { Unit }
     }
@@ -80,7 +80,7 @@ class EmployeeRepositoryImpl @Inject constructor(
         val result = safeApiCall(retrofit) { apiService.updateEmployee(employee.id, dto) }
         if (result is NetworkResult.Success) {
             employeeDao.insertEmployee(employee.toEmployeeEntity())
-            return NetworkResult.Success(Unit, result.message)
+            return NetworkResult.Success(Unit)
         }
         return result.map { Unit }
     }
@@ -89,7 +89,7 @@ class EmployeeRepositoryImpl @Inject constructor(
         val result = safeApiCall(retrofit) { apiService.deleteEmployee(id) }
         if (result is NetworkResult.Success) {
             employeeDao.deleteEmployee(id)
-            return NetworkResult.Success(Unit, result.message)
+            return NetworkResult.Success(Unit)
         }
         return result.map { Unit }
     }
@@ -100,7 +100,7 @@ class EmployeeRepositoryImpl @Inject constructor(
             is NetworkResult.Success -> {
                 employeeDao.deleteAllEmployees()
                 employeeDao.insertEmployees(result.data.map { it.toEmployeeEntity(meta) })
-                NetworkResult.Success(Unit, result.message)
+                NetworkResult.Success(Unit)
             }
 
             is NetworkResult.Failure -> NetworkResult.Failure(result.error)
@@ -113,7 +113,7 @@ class EmployeeRepositoryImpl @Inject constructor(
         return when (result) {
             is NetworkResult.Success -> {
                 val map = result.data.associate { it.id to it.code }
-                NetworkResult.Success(map, result.message)
+                NetworkResult.Success(map)
             }
 
             is NetworkResult.Failure -> NetworkResult.Failure(result.error)
@@ -124,7 +124,7 @@ class EmployeeRepositoryImpl @Inject constructor(
     override suspend fun getLevelById(id: Int): NetworkResult<Level?> {
         val result = safeApiCall(retrofit) { apiService.getLevelById(id) }
         return when (result) {
-            is NetworkResult.Success -> NetworkResult.Success(result.data.toLevel(), result.message)
+            is NetworkResult.Success -> NetworkResult.Success(result.data.toLevel())
             is NetworkResult.Failure -> NetworkResult.Failure(result.error)
             is NetworkResult.Exception -> NetworkResult.Exception(result.e)
         }
@@ -134,8 +134,7 @@ class EmployeeRepositoryImpl @Inject constructor(
         val result = safeApiCall(retrofit) { apiService.getEmployeeById(employeeId) }
         return when (result) {
             is NetworkResult.Success -> NetworkResult.Success(
-                result.data.level?.toLevel(),
-                result.message
+                result.data.level?.toLevel()
             )
 
             is NetworkResult.Failure -> NetworkResult.Failure(result.error)
@@ -151,7 +150,7 @@ class EmployeeRepositoryImpl @Inject constructor(
 
     private fun <T, R> NetworkResult<T>.map(transform: (T) -> R): NetworkResult<R> {
         return when (this) {
-            is NetworkResult.Success -> NetworkResult.Success(transform(data), message)
+            is NetworkResult.Success -> NetworkResult.Success(transform(data))
             is NetworkResult.Failure -> NetworkResult.Failure(error)
             is NetworkResult.Exception -> NetworkResult.Exception(e)
         }
