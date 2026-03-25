@@ -88,7 +88,7 @@
     <string name="dashboard_profile_email_label">Email Address</string>
     <string name="dashboard_profile_phone_label">Phone Number</string>
     <string name="dashboard_profile_joined_label">Joined</string>
-    <string name="dashboard_profile_department_label">Department</string>
+    <string name="dashboard_profile_department_label">Role</string>
     <string name="dashboard_leave_section_title">Leave Management</string>
     <string name="dashboard_leave_total_title">Total Allowance</string>
     <string name="dashboard_leave_total_desc">Annual leave days granted for current year</string>
