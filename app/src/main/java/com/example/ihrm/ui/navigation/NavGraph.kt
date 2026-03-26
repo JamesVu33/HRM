@@ -13,6 +13,7 @@ import com.example.ihrm.ui.employee.addedit.AddEditEmployeeScreen
 import com.example.ihrm.ui.employee.detail.EmployeeDetailScreen
 import com.example.ihrm.ui.employee.list.EmployeeListScreen
 import com.example.ihrm.ui.security.checks.SecurityChecksAnalyticsScreen
+import com.example.ihrm.ui.security.checks.SecurityChecksLegendDetailScreen
 import com.example.ihrm.ui.security.checks.SecurityChecksScreen
 import com.example.ihrm.ui.stats.TeamStatisticsScreen
 import com.example.ihrm.ui.login.LoginScreen
@@ -22,6 +23,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 private const val EMPLOYEE_ID_PARAM = "employeeId"
+private const val LEGEND_KEY_PARAM = "legendKey"
 
 @Composable
 fun NavGraph(
@@ -109,12 +111,26 @@ fun NavGraph(
         composable(Screen.SecurityChecks.route) {
             SecurityChecksScreen(
                 onBackClick = { navController.popBackStack() },
-                onSeeChartClick = { navController.navigate(Screen.SecurityChecksAnalytics.route) }
+                onSeeChartClick = { navController.navigate(Screen.SecurityChecksAnalytics.route) },
+                onSecurityCheckClick = { legendKey ->
+                    navController.navigate(Screen.SecurityChecksLegendDetail.createRoute(legendKey))
+                }
             )
         }
 
         composable(Screen.SecurityChecksAnalytics.route) {
             SecurityChecksAnalyticsScreen(
+                onBackClick = { navController.popBackStack() },
+            )
+        }
+
+        composable(
+            route = Screen.SecurityChecksLegendDetail.route,
+            arguments = listOf(navArgument(LEGEND_KEY_PARAM) {})
+        ) { backStackEntry ->
+            val legendKey = backStackEntry.arguments?.getString(LEGEND_KEY_PARAM) ?: return@composable
+            SecurityChecksLegendDetailScreen(
+                legendKey = legendKey,
                 onBackClick = { navController.popBackStack() }
             )
         }

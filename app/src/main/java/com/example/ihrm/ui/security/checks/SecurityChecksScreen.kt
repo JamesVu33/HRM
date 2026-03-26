@@ -1,6 +1,5 @@
 package com.example.ihrm.ui.security.checks
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -56,90 +55,11 @@ import com.example.ihrm.util.LabelTextStyle13RegularWhite
 import com.example.ihrm.util.txtInterBold22White
 import com.example.ihrm.util.txtInterMedium15
 
-enum class SecurityCheckStatus {
-    APPROVED, SUBMITTED, REJECTED
-}
-private data class SecurityCheckItemUi(
-    val teamIndex: Int,
-    val teamName: String,
-    val department: String,
-    val statusLabel: String,
-    val statusColor: Color,
-    val statusBg: Color,
-    /** When non-null, shows grey label + name; when null, single line for [approverName]. */
-    @StringRes val approvedByLabelRes: Int?,
-    val approverName: String,
-    val submittedDate: String,
-    val approvedDate: String,
-    val statusUseApprovedChip: SecurityCheckStatus = SecurityCheckStatus.APPROVED
-)
-
-private val figmaApprovedGreen = Color(0xFF34C759)
-private val figmaApprovedGreenBg = Color(0x1F34C759)
-private val figmaRejectedGreen = Color(0xFFF44336)
-private val figmaRejectedGreenBg = Color(0x21F44336)
-private val figmaSubmittedBlue = Color(0xFF007AFF)
-private val figmaSubmittedBlueBg = Color(0x1F007AFF)
-
-private val demoChecks = listOf(
-    SecurityCheckItemUi(
-        teamIndex = 1,
-        teamName = "GCD",
-        department = "Department",
-        statusLabel = "Approved",
-        statusColor = figmaApprovedGreen,
-        statusBg = figmaApprovedGreenBg,
-        approvedByLabelRes = R.string.security_checks_approved_by,
-        approverName = "Nguyen Van A",
-        submittedDate = "01/01/2000",
-        approvedDate = "01/01/2000",
-        statusUseApprovedChip = SecurityCheckStatus.APPROVED
-    ),
-    SecurityCheckItemUi(
-        teamIndex = 1,
-        teamName = "GCD",
-        department = "Department",
-        statusLabel = "Approved",
-        statusColor = figmaApprovedGreen,
-        statusBg = figmaApprovedGreenBg,
-        approvedByLabelRes = R.string.security_checks_approved_by,
-        approverName = "Nguyen Van A",
-        submittedDate = "01/01/2000",
-        approvedDate = "01/01/2000",
-        statusUseApprovedChip = SecurityCheckStatus.APPROVED
-    ),
-    SecurityCheckItemUi(
-        teamIndex = 1,
-        teamName = "GCD",
-        department = "Department",
-        statusLabel = "Rejected",
-        statusColor = figmaRejectedGreen,
-        statusBg = figmaRejectedGreenBg,
-        approvedByLabelRes = R.string.security_checks_rejected_by,
-        approverName = "Nguyen Van A",
-        submittedDate = "01/01/2000",
-        approvedDate = "01/01/2000",
-        statusUseApprovedChip = SecurityCheckStatus.REJECTED
-    ),
-    SecurityCheckItemUi(
-        teamIndex = 8,
-        teamName = "GCD",
-        department = "Department",
-        statusLabel = "Submitted",
-        statusColor = figmaSubmittedBlue,
-        statusBg = figmaSubmittedBlueBg,
-        approvedByLabelRes = R.string.security_checks_wait_for_approve_by,
-        approverName = "Nguyen Van A",
-        submittedDate = "01/01/2000",
-        approvedDate = "-",
-        statusUseApprovedChip = SecurityCheckStatus.SUBMITTED
-    )
-)
-
 @Composable
 fun SecurityChecksScreen(
     onBackClick: () -> Unit,
     onSeeChartClick: () -> Unit,
+    onSecurityCheckClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -202,7 +122,10 @@ fun SecurityChecksScreen(
                     Spacer(modifier = Modifier.height(12.dp))
                 }
                 items(demoChecks) { check ->
-                    SecurityCheckCard(check)
+                    SecurityCheckCard(
+                        item = check,
+                        onClick = { onSecurityCheckClick(check.statusUseApprovedChip.toLegendKey()) }
+                    )
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
@@ -391,9 +314,15 @@ private val SecurityCheckBadgeGradient = Brush.verticalGradient(
 )
 
 @Composable
-private fun SecurityCheckCard(item: SecurityCheckItemUi) {
+private fun SecurityCheckCard(
+    item: SecurityCheckItemUi,
+    onClick: () -> Unit,
+) {
     Surface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .clickable(onClick = onClick),
         color = White,
         shape = RoundedCornerShape(16.dp),
         tonalElevation = 0.dp

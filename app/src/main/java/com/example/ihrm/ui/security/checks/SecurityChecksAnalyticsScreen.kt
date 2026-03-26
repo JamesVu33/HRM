@@ -105,7 +105,7 @@ private val AnalyticsLegendValueStyle = TextStyle(
 
 @Composable
 fun SecurityChecksAnalyticsScreen(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier
@@ -263,7 +263,9 @@ fun SecurityChecksAnalyticsScreen(
 }
 
 @Composable
-private fun AnalyticsStatusLegendGrid(entries: List<LegendEntry>) {
+private fun AnalyticsStatusLegendGrid(
+    entries: List<LegendEntry>,
+) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         entries.chunked(2).forEach { rowEntries ->
             Row(
@@ -290,7 +292,7 @@ private fun AnalyticsStatusLegendTile(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier.padding(vertical = 2.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

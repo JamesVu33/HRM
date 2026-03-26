@@ -65,7 +65,8 @@ enum class ButtonVariant {
     Secondary,
     Outline,
     Ghost,
-    Danger
+    Danger,
+    Neutral
 }
 
 @Composable
@@ -92,7 +93,7 @@ private fun ButtonContent(
         Text(
             text = text,
             fontSize = fontSize,
-            fontWeight = FontWeight.Medium
+            fontWeight = if (variant == ButtonVariant.Neutral) FontWeight.SemiBold else FontWeight.Medium
         )
     }
 }
@@ -142,14 +143,18 @@ fun CustomButton(
         }
 
         ButtonSize.Large -> {
-            height = 48.dp
+            height = 52.dp
             horizontalPadding = 24.dp
             verticalPadding = 12.dp
             fontSize = 18.sp
         }
     }
 
-    val cornerRadius = if (isPill) 24.dp else 8.dp
+    val cornerRadius = when {
+        isPill -> 24.dp
+        variant == ButtonVariant.Neutral -> 14.dp
+        else -> 14.dp
+    }
 
     // Shadow elevation based on variant and enabled state
     val elevation = when {
@@ -257,6 +262,11 @@ private fun getButtonColors(variant: ButtonVariant, enabled: Boolean): ButtonCol
             contentColor = Color.White
         )
 
+        variant == ButtonVariant.Neutral -> ButtonDefaults.buttonColors(
+            containerColor = Color(0xFFF3F4F6),
+            contentColor = Color(0xFF364153),
+        )
+
         else -> ButtonDefaults.buttonColors()
     }
 }
@@ -296,6 +306,7 @@ private fun getIconColor(variant: ButtonVariant, enabled: Boolean): Color {
         variant == ButtonVariant.Outline -> Neutral600
         variant == ButtonVariant.Ghost -> Primary400
         variant == ButtonVariant.Danger -> Color.White
+        variant == ButtonVariant.Neutral -> Color(0xFF364153)
         else -> Color.White
     }
 }
@@ -419,6 +430,11 @@ private fun ButtonVariantsPreview() {
             text = "Danger",
             onClick = {},
             variant = ButtonVariant.Danger
+        )
+        CustomButton(
+            text = "Neutral",
+            onClick = {},
+            variant = ButtonVariant.Neutral
         )
     }
 }

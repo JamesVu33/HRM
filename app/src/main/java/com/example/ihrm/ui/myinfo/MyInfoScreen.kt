@@ -22,17 +22,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -47,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -60,20 +53,9 @@ import androidx.compose.ui.unit.sp
 import com.example.ihrm.R
 import com.example.ihrm.ui.theme.DashboardFigmaInk
 import com.example.ihrm.ui.theme.InterFontFamily
-import com.example.ihrm.ui.theme.Neutral50
+import com.example.ihrm.util.DashboardBrush.MyInfoHeaderBrush
 import com.example.ihrm.util.dropShadow
 import com.example.ihrm.util.txtInterMedium14White90Percent
-
-/** UI aligned with [Figma 871:37416](https://www.figma.com/design/Q9qmml4Qj4FD73VnYshBsO/HRM-Mobile-App-Ver?node-id=871-37416). */
-private val MyInfoHeaderBrush = Brush.linearGradient(
-    colorStops = arrayOf(
-        0.03f to Color(0xFF0747A6),
-        0.5f to Color(0xFF2684FF),
-        0.97f to Color(0xFFB3D4FF),
-    ),
-    start = androidx.compose.ui.geometry.Offset(0f, Float.POSITIVE_INFINITY),
-    end = androidx.compose.ui.geometry.Offset(Float.POSITIVE_INFINITY, 0f),
-)
 
 private val PageBg = Color(0xFFF9FAFB)
 private val CardBorder = Color(0xFFF3F4F6)

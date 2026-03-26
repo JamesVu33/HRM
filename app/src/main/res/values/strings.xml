@@ -216,6 +216,7 @@
     <string name="logout_dialog_message">Are you sure you want to logout from your account?</string>
     <string name="logout_yes_button">Yes, Logout</string>
     <string name="logout_cancel_button">Cancel</string>
+    <string name="logout_cancel_approve">Approve</string>
     <string name="coming_soon_title">Coming Soon</string>
     <string name="coming_soon_message">The \"%1$s\" feature is currently under development and will be available soon.</string>
     <string name="coming_soon_got_it">Got it</string>
@@ -352,6 +353,7 @@
     <string name="security_checks_analytics_this_month">This month</string>
     <string name="security_checks_analytics_active_users">Active Users</string>
     <string name="security_checks_analytics_trend_percent">+12%</string>
+    <string name="security_checks_detail_section_title">Work Environment &amp; Security Check\n(Moi truong lam viec &amp; Kiem tra an ninh)</string>
     <!-- Role options -->
     <string name="employee_info_role1">Role1</string>
     <string name="employee_info_role2">Role2</string>

@@ -1,5 +1,6 @@
 package com.example.ihrm.util
 
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.colorspace.WhitePoint
@@ -27,6 +28,17 @@ object DashboardBrush {
             0.00f to SplashBlue100,
             1.00f to SplashTitleBlue,
         )
+    )
+
+    /** UI aligned with [Figma 871:37416](https://www.figma.com/design/Q9qmml4Qj4FD73VnYshBsO/HRM-Mobile-App-Ver?node-id=871-37416). */
+    val MyInfoHeaderBrush = Brush.linearGradient(
+        colorStops = arrayOf(
+            0f to Color(0xFF0747A6),
+            0.5f to Color(0xFF2684FF),
+            1f to Color(0xFFB3D4FF),
+        ),
+        start = Offset.Zero,
+        end = Offset.Infinite,
     )
 
     val BaseBackgroundItemSelected = Brush.verticalGradient(
