@@ -70,7 +70,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 /** Routes that have a real screen. Others show Coming Soon. */
-private val IMPLEMENTED_ROUTES = setOf("dashboard", "my_info", "employee_list", "security_checks")
+private val IMPLEMENTED_ROUTES =
+    setOf("dashboard", "my_info", "employee_list", "security_checks", "my_security_check")
 
 data class DrawerMenuItem(
     val route: String,

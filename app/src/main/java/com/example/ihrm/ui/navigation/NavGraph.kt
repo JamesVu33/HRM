@@ -12,6 +12,8 @@ import com.example.ihrm.ui.dashboard.DashboardScreen
 import com.example.ihrm.ui.employee.addedit.AddEditEmployeeScreen
 import com.example.ihrm.ui.employee.detail.EmployeeDetailScreen
 import com.example.ihrm.ui.employee.list.EmployeeListScreen
+import com.example.ihrm.ui.security.checks.CreateSecurityChecklistScreen
+import com.example.ihrm.ui.security.checks.MySecurityCheckScreen
 import com.example.ihrm.ui.security.checks.SecurityChecksAnalyticsScreen
 import com.example.ihrm.ui.security.checks.SecurityChecksLegendDetailScreen
 import com.example.ihrm.ui.security.checks.SecurityChecksScreen
@@ -80,6 +82,24 @@ fun NavGraph(
             MyInfoScreen(
                 onMenuClick = { scope.launch { drawerState?.open() } },
                 onCancelClick = { navController.popBackStack() },
+            )
+        }
+
+        composable(Screen.MySecurityCheck.route) {
+            MySecurityCheckScreen(
+                onMenuClick = { scope.launch { drawerState?.open() } },
+                onChecklistClick = { legendKey ->
+                    navController.navigate(Screen.SecurityChecksLegendDetail.createRoute(legendKey))
+                },
+                onCreateChecklistClick = {
+                    navController.navigate(Screen.CreateSecurityChecklist.route)
+                },
+            )
+        }
+
+        composable(Screen.CreateSecurityChecklist.route) {
+            CreateSecurityChecklistScreen(
+                onBackClick = { navController.popBackStack() }
             )
         }
 

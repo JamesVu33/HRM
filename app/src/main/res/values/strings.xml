@@ -354,6 +354,22 @@
     <string name="security_checks_analytics_active_users">Active Users</string>
     <string name="security_checks_analytics_trend_percent">+12%</string>
     <string name="security_checks_detail_section_title">Work Environment &amp; Security Check\n(Moi truong lam viec &amp; Kiem tra an ninh)</string>
+    <string name="my_security_check_search_placeholder">Search checklists...</string>
+    <string name="my_security_check_items_count">%1$d items</string>
+    <string name="my_security_check_submitted">Submitted</string>
+    <string name="my_security_check_updated">Updated</string>
+    <string name="my_security_check_rejecter">Rejecter</string>
+    <string name="my_security_check_approver">Approver</string>
+    <string name="my_security_check_filter_cd">Open checklist filter</string>
+    <string name="my_security_check_add_cd">Create checklist</string>
+    <string name="my_security_check_exists_dialog_title">Checklist already exists</string>
+    <string name="my_security_check_exists_dialog_message">You already created a security checklist this month.</string>
+    <string name="my_security_check_exists_dialog_ok">OK</string>
+    <string name="create_security_checklist_title">Create New Checklist</string>
+    <string name="create_security_checklist_subtitle">Fill in the required information to create a new security checklist</string>
+    <string name="create_security_checklist_items_title">Security Check Items</string>
+    <string name="create_security_checklist_items_count">2/5</string>
+    <string name="create_security_checklist_submit">Create Checklist</string>
     <!-- Role options -->
     <string name="employee_info_role1">Role1</string>
     <string name="employee_info_role2">Role2</string>

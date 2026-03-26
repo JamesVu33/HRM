@@ -8,6 +8,8 @@ sealed class Screen(val route: String) {
     data object CalendarManagement : Screen("calendar_management")
     data object EmployeeList : Screen("employee_list")
     data object SecurityChecks : Screen("security_checks")
+    data object MySecurityCheck : Screen("my_security_check")
+    data object CreateSecurityChecklist : Screen("create_security_checklist")
     data object SecurityChecksAnalytics : Screen("security_checks_analytics")
     data object SecurityChecksLegendDetail : Screen("security_checks_legend_detail/{legendKey}") {
         fun createRoute(legendKey: String) = "security_checks_legend_detail/$legendKey"
