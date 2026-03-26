@@ -45,7 +45,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ihrm.R
 import com.example.ihrm.ui.common.DonutChartTriple
+import com.example.ihrm.ui.common.TopSummaryCard
 import com.example.ihrm.ui.common.header.BaseHeader
+import com.example.ihrm.ui.theme.CardBorder
 import com.example.ihrm.ui.theme.DashboardFigmaInk
 import com.example.ihrm.ui.theme.DashboardFigmaMuted
 import com.example.ihrm.ui.theme.IHRMTheme

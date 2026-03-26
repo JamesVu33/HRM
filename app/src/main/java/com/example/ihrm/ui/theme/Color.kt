@@ -94,4 +94,5 @@ val DashboardLeaveGreenStart = Color(0xFF05DF72)
 val DashboardLeaveGreenEnd = Color(0xFF00BC7D)
 val DashboardShieldCyan = Color(0xFF00D3F3)
 val DashboardProfileCellBg = Color(0x66EFF6FF)
+val CardBorder = Color(0xFFF0F0F0)
 

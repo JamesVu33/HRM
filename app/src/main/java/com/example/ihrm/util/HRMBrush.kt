@@ -2,12 +2,15 @@ package com.example.ihrm.util
 
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.colorspace.WhitePoint
 import com.example.ihrm.ui.theme.DashboardTabActiveBlue
 import com.example.ihrm.ui.theme.DrawerItemSelected
 import com.example.ihrm.ui.theme.Primary200
 import com.example.ihrm.ui.theme.Primary400
 import com.example.ihrm.ui.theme.Primary50
 import com.example.ihrm.ui.theme.Primary500
+import com.example.ihrm.ui.theme.SplashBlue100
+import com.example.ihrm.ui.theme.SplashTitleBlue
 
 object DashboardBrush {
     val BaseBackground = Brush.verticalGradient(
@@ -16,6 +19,13 @@ object DashboardBrush {
             0.50f to Primary400,
             0.75f to Primary200,
             1.00f to Primary50,
+        )
+    )
+
+    val BaseCardBackground = Brush.verticalGradient(
+        colorStops = arrayOf(
+            0.00f to SplashBlue100,
+            1.00f to SplashTitleBlue,
         )
     )
 
@@ -54,6 +64,13 @@ object DashboardBrush {
         listOf(
             Color(0x00000000),
             Color(0x00000000),
+        )
+    )
+
+    val WhitePoint = Brush.horizontalGradient(
+        listOf(
+            Color(0xFFFFFFFF),
+            Color(0xFFFFFFFF),
         )
     )
 }

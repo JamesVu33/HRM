@@ -128,6 +128,26 @@ private fun DrawerContent(
                                 restoreState = true
                             }
                         }
+
+                        Screen.SecurityChecks.route -> {
+                            navController.navigate(route) {
+                                popUpTo(Screen.Dashboard.route) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+
+                        Screen.MyInfo.route -> {
+                            navController.navigate(route) {
+                                popUpTo(Screen.Dashboard.route) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
                     }
                 },
                 onLogoutClick = { showLogoutDialog = true },

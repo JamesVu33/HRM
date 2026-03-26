@@ -70,7 +70,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 /** Routes that have a real screen. Others show Coming Soon. */
-private val IMPLEMENTED_ROUTES = setOf("dashboard", "employee_list")
+private val IMPLEMENTED_ROUTES = setOf("dashboard", "my_info", "employee_list", "security_checks")
 
 data class DrawerMenuItem(
     val route: String,
@@ -100,8 +100,8 @@ private val DRAWER_SECTIONS: List<DrawerMenuSection> = listOf(
     DrawerMenuSection(
         titleResId = R.string.drawer_section_employee_personal,
         items = listOf(
-            DrawerMenuItem("Employee", R.string.drawer_item_dashboard, R.drawable.ic_employees),
-            DrawerMenuItem("Organization Chart", R.string.drawer_item_my_info, R.drawable.ic_organization_chart),
+            DrawerMenuItem("employee_personal", R.string.drawer_item_employee, R.drawable.ic_employees),
+            DrawerMenuItem("organization_chart_personal", R.string.drawer_organization_chart, R.drawable.ic_organization_chart),
         )
     ),
     DrawerMenuSection(
@@ -131,6 +131,16 @@ private val DRAWER_SECTIONS: List<DrawerMenuSection> = listOf(
         items = listOf(
             DrawerMenuItem("structure", R.string.drawer_item_structure, R.drawable.ic_structure),
             DrawerMenuItem("master_data", R.string.drawer_item_master_data, R.drawable.ic_master_data)
+        )
+    ),
+    DrawerMenuSection(
+        titleResId = R.string.drawer_item_setting,
+        items = listOf(
+            DrawerMenuItem(
+                "translation_keys_personal",
+                R.string.drawer_item_translation_keys,
+                R.drawable.ic_translate_key
+            )
         )
     ),
     DrawerMenuSection(
@@ -244,9 +254,9 @@ private fun rememberVisibleSections(role: DashboardRole): List<DrawerMenuSection
         "my_info",
         "my_leave",
         "my_security_check",
-        "Employee",
-        "Organization Chart",
-        "translation_keys"
+        "employee_personal",
+        "organization_chart_personal",
+        "translation_keys_personal"
     )
     return when (role) {
         DashboardRole.Personal -> DRAWER_SECTIONS.mapNotNull { section ->

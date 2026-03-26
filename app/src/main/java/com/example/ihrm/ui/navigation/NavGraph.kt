@@ -12,8 +12,11 @@ import com.example.ihrm.ui.dashboard.DashboardScreen
 import com.example.ihrm.ui.employee.addedit.AddEditEmployeeScreen
 import com.example.ihrm.ui.employee.detail.EmployeeDetailScreen
 import com.example.ihrm.ui.employee.list.EmployeeListScreen
+import com.example.ihrm.ui.security.checks.SecurityChecksAnalyticsScreen
+import com.example.ihrm.ui.security.checks.SecurityChecksScreen
 import com.example.ihrm.ui.stats.TeamStatisticsScreen
 import com.example.ihrm.ui.login.LoginScreen
+import com.example.ihrm.ui.myinfo.MyInfoScreen
 import com.example.ihrm.util.AuthManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -71,6 +74,13 @@ fun NavGraph(
             )
         }
 
+        composable(Screen.MyInfo.route) {
+            MyInfoScreen(
+                onMenuClick = { scope.launch { drawerState?.open() } },
+                onCancelClick = { navController.popBackStack() },
+            )
+        }
+
         composable(Screen.CalendarManagement.route) {
             CalendarManagementScreen(
                 onBackClick = { navController.popBackStack() }
@@ -92,6 +102,19 @@ fun NavGraph(
 
         composable(Screen.TeamStatistics.route) {
             TeamStatisticsScreen(
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.SecurityChecks.route) {
+            SecurityChecksScreen(
+                onBackClick = { navController.popBackStack() },
+                onSeeChartClick = { navController.navigate(Screen.SecurityChecksAnalytics.route) }
+            )
+        }
+
+        composable(Screen.SecurityChecksAnalytics.route) {
+            SecurityChecksAnalyticsScreen(
                 onBackClick = { navController.popBackStack() }
             )
         }
