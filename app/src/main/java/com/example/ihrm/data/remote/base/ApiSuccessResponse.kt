@@ -10,7 +10,7 @@ data class ApiSuccessResponse<T>(
     @SerializedName("statusCode")
     val statusCode: Int,
     @SerializedName("message")
-    val message: String,
+    val message: String? = null,
     @SerializedName("data")
     val data: T?,
     @SerializedName("meta")

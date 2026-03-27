@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ihrm.R
+import com.example.ihrm.ui.common.BaseHRMCompose
 import com.example.ihrm.ui.components.ButtonSize
 import com.example.ihrm.ui.components.ButtonVariant
 import com.example.ihrm.ui.components.CustomButton
@@ -62,11 +63,24 @@ import com.example.ihrm.ui.theme.Primary300
 import com.example.ihrm.ui.theme.Primary400
 import com.example.ihrm.ui.theme.Primary50
 import com.example.ihrm.ui.theme.Primary500
-
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
     viewModel: LoginViewModel = hiltViewModel()
+) {
+    BaseHRMCompose(
+        content = { LoginScreenContent(onLoginSuccess, viewModel) },
+        viewmodel = viewModel,
+        onErrorAlertClose = { viewModel.reset() }
+    )
+}
+
+
+
+@Composable
+fun LoginScreenContent(
+    onLoginSuccess: () -> Unit,
+    viewModel: LoginViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
 

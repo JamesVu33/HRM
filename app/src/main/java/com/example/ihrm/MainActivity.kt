@@ -74,7 +74,7 @@ fun HRMApp() {
         }
 
         // global error popup
-        ErrorAlert()
+        //ErrorAlert()
 
         // loading
 //        LoadingWidget()

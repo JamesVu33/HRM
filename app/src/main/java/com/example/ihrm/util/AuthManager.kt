@@ -2,6 +2,7 @@ package com.example.ihrm.util
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import com.example.ihrm.data.remote.login.LoginResponse
 import com.example.ihrm.domain.model.AccountType
 import com.example.ihrm.domain.model.AppFeature

@@ -5,6 +5,8 @@ import com.example.ihrm.data.remote.base.safeApiCall
 import com.example.ihrm.data.remote.login.LoginRequest
 import com.example.ihrm.data.remote.login.LoginResponse
 import com.example.ihrm.data.remote.base.NetworkResult
+import com.example.ihrm.data.remote.login.PermissionRequest
+import com.example.ihrm.data.remote.login.PermissionResponse
 import com.example.ihrm.domain.repository.AuthRepository
 import retrofit2.Retrofit
 import javax.inject.Inject
@@ -22,7 +24,10 @@ class AuthRepositoryImpl @Inject constructor(
             )
         }
 
-
+    override suspend fun getPermission(employeeId: Int): NetworkResult<List<PermissionResponse>> =
+        safeApiCall(retrofit) {
+            authApiService.getPermission2()
+        }
 
 
     /*
