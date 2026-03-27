@@ -21,14 +21,19 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -47,9 +52,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.example.ihrm.R
 import com.example.ihrm.ui.theme.DashboardFigmaInk
 import com.example.ihrm.ui.theme.InterFontFamily
@@ -114,6 +124,11 @@ fun MyInfoScreen(
     onChangePhotoClick: () -> Unit = {},
 ) {
     var gender by remember { mutableStateOf(GenderOption.Male) }
+    var showChangePasswordDialog by remember { mutableStateOf(false) }
+
+    if (showChangePasswordDialog) {
+        ChangePasswordDialog(onDismiss = { showChangePasswordDialog = false })
+    }
 
     Column(
         modifier = Modifier
@@ -124,7 +139,10 @@ fun MyInfoScreen(
     ) {
         MyInfoHeader(
             onMenuClick = onMenuClick,
-            onKeyClick = onKeyClick,
+            onKeyClick = {
+                showChangePasswordDialog = true
+                onKeyClick()
+            },
             onChangePhotoClick = onChangePhotoClick,
         )
         Card(
@@ -670,5 +688,205 @@ private fun MyInfoReadOnlyEmployeeField(
                 style = FieldValueStyle.copy(color = MutedValue),
             )
         }
+    }
+}
+
+private val ChangePasswordPlaceholderColor = Color(0xFF101828).copy(alpha = 0.5f)
+
+@Composable
+private fun ChangePasswordDialog(
+    onDismiss: () -> Unit,
+) {
+    var currentPassword by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var currentVisible by remember { mutableStateOf(false) }
+    var newVisible by remember { mutableStateOf(false) }
+    var confirmVisible by remember { mutableStateOf(false) }
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            shape = RoundedCornerShape(32.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.95f)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 20.dp),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(32.dp)),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(125.dp)
+                        .background(MyInfoHeaderBrush),
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 32.dp, top = 32.dp, end = 16.dp, bottom = 24.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.Top,
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            Text(
+                                text = stringResource(R.string.my_info_change_password_title),
+                                style = TextStyle(
+                                    fontFamily = InterFontFamily,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 24.sp,
+                                    lineHeight = 36.sp,
+                                    color = Color.White,
+                                    letterSpacing = (-0.53).sp,
+                                ),
+                            )
+                            Text(
+                                text = stringResource(R.string.my_info_change_password_subtitle),
+                                style = TextStyle(
+                                    fontFamily = InterFontFamily,
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 14.sp,
+                                    lineHeight = 21.sp,
+                                    color = Color.White.copy(alpha = 0.8f),
+                                    letterSpacing = (-0.5).sp,
+                                ),
+                            )
+                        }
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(Color.White.copy(alpha = 0.2f))
+                                .clickable(onClick = onDismiss),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = stringResource(R.string.my_info_change_password_close_cd),
+                                tint = Color.White,
+                                modifier = Modifier.size(20.dp),
+                            )
+                        }
+                    }
+                }
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 32.dp)
+                        .padding(top = 32.dp, bottom = 28.dp),
+                    verticalArrangement = Arrangement.spacedBy(24.dp),
+                ) {
+                    ChangePasswordField(
+                        label = stringResource(R.string.my_info_change_password_current_label),
+                        value = currentPassword,
+                        onValueChange = { currentPassword = it },
+                        placeholder = stringResource(R.string.my_info_change_password_current_placeholder),
+                        visible = currentVisible,
+                        onToggleVisible = { currentVisible = !currentVisible },
+                    )
+                    ChangePasswordField(
+                        label = stringResource(R.string.my_info_change_password_new_label),
+                        value = newPassword,
+                        onValueChange = { newPassword = it },
+                        placeholder = stringResource(R.string.my_info_change_password_new_placeholder),
+                        visible = newVisible,
+                        onToggleVisible = { newVisible = !newVisible },
+                    )
+                    ChangePasswordField(
+                        label = stringResource(R.string.my_info_change_password_confirm_label),
+                        value = confirmPassword,
+                        onValueChange = { confirmPassword = it },
+                        placeholder = stringResource(R.string.my_info_change_password_confirm_placeholder),
+                        visible = confirmVisible,
+                        onToggleVisible = { confirmVisible = !confirmVisible },
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChangePasswordField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    visible: Boolean,
+    onToggleVisible: () -> Unit,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Icon(
+                imageVector = Icons.Default.Lock,
+                contentDescription = null,
+                tint = LabelGray,
+                modifier = Modifier.size(16.dp),
+            )
+            Text(
+                text = label,
+                style = LabelStyle,
+            )
+        }
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(58.dp),
+            placeholder = {
+                Text(
+                    text = placeholder,
+                    style = FieldValueStyle.copy(color = ChangePasswordPlaceholderColor),
+                )
+            },
+            singleLine = true,
+            visualTransformation = if (visible) {
+                VisualTransformation.None
+            } else {
+                PasswordVisualTransformation()
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            trailingIcon = {
+                IconButton(onClick = onToggleVisible) {
+                    Icon(
+                        imageVector = if (visible) {
+                            ImageVector.vectorResource(R.drawable.icon_eye_off)
+                        } else {
+                            ImageVector.vectorResource(R.drawable.icon_remember)
+                        },
+                        contentDescription = stringResource(R.string.my_info_change_password_toggle_visibility_cd),
+                        tint = DashboardFigmaInk,
+                        modifier = Modifier.size(20.dp),
+                    )
+                }
+            },
+            shape = RoundedCornerShape(20.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = PageBg,
+                unfocusedContainerColor = PageBg,
+                disabledContainerColor = PageBg,
+                focusedBorderColor = FieldBorder,
+                unfocusedBorderColor = FieldBorder,
+                cursorColor = PrimaryBar,
+                focusedTextColor = DashboardFigmaInk,
+                unfocusedTextColor = DashboardFigmaInk,
+            ),
+        )
     }
 }

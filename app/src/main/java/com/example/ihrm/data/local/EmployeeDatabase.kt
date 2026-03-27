@@ -7,7 +7,7 @@ import com.example.ihrm.data.local.entity.EmployeeEntity
 
 @Database(
     entities = [EmployeeEntity::class],
-    version = 3,
+    version = 1,
     exportSchema = false
 )
 abstract class EmployeeDatabase : RoomDatabase() {

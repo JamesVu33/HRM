@@ -268,6 +268,18 @@
     <string name="my_info_demo_department">GDC</string>
     <string name="my_info_demo_status">Working</string>
 
+    <!-- Change password dialog (Figma 871:37357) -->
+    <string name="my_info_change_password_title">Change Password</string>
+    <string name="my_info_change_password_subtitle">Update your account security</string>
+    <string name="my_info_change_password_current_label">CURRENT PASSWORD *</string>
+    <string name="my_info_change_password_new_label">NEW PASSWORD *</string>
+    <string name="my_info_change_password_confirm_label">CONFIRM NEW PASSWORD *</string>
+    <string name="my_info_change_password_current_placeholder">Enter current password</string>
+    <string name="my_info_change_password_new_placeholder">Enter new password</string>
+    <string name="my_info_change_password_confirm_placeholder">Confirm new password</string>
+    <string name="my_info_change_password_close_cd">Close</string>
+    <string name="my_info_change_password_toggle_visibility_cd">Toggle password visibility</string>
+
     <!-- Employee Detail -->
     <string name="employee_detail_title">Member Information</string>
     <string name="employee_detail_subtitle_format">%1$s | ID: %2$s</string>
