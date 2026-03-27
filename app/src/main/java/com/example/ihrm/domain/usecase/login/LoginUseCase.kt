@@ -6,7 +6,6 @@ import com.example.ihrm.data.remote.base.NetworkResult
 import com.example.ihrm.data.remote.login.LoginRequest
 import com.example.ihrm.data.remote.login.LoginResponse
 import com.example.ihrm.data.remote.login.PermissionResponse
-import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.repository.AuthRepository
 import com.example.ihrm.domain.repository.LanguageRepository
 import com.example.ihrm.ui.login.LoginFieldError
