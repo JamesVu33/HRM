@@ -61,14 +61,6 @@ fun HRMApp() {
     val showDrawer = currentRoute != Screen.Splash.route &&
             currentRoute != Screen.Login.route
 
-    // listen the global error event
-    val globalMsg = remember { mutableStateOf<String>("") }
-    LaunchedEffect(Unit) {
-        GlobalErrorHandler.globalError.collect { msg ->
-            globalMsg.value = msg
-        }
-    }
-
     Box {
         // page flow
         if (showDrawer) {
