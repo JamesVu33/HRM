@@ -2,9 +2,9 @@ package com.example.ihrm.data.repository
 
 import com.example.ihrm.data.remote.api.AuthApiService
 import com.example.ihrm.data.remote.base.safeApiCall
-import com.example.ihrm.data.remote.dto.LoginDto
-import com.example.ihrm.data.remote.dto.LoginResponseDto
-import com.example.ihrm.data.remote.dto.NetworkResult
+import com.example.ihrm.data.remote.login.LoginRequest
+import com.example.ihrm.data.remote.login.LoginResponse
+import com.example.ihrm.data.remote.base.NetworkResult
 import com.example.ihrm.domain.repository.AuthRepository
 import retrofit2.Retrofit
 import javax.inject.Inject
@@ -15,10 +15,10 @@ class AuthRepositoryImpl @Inject constructor(
     private val retrofit: Retrofit
 ) : AuthRepository {
 
-    override suspend fun login(employeeId: String, password: String): NetworkResult<LoginResponseDto> =
+    override suspend fun login(employeeId: String, password: String): NetworkResult<LoginResponse> =
         safeApiCall(retrofit) {
             authApiService.login(
-                LoginDto(employeeId = employeeId.trim(), password = password)
+                LoginRequest(employeeId = employeeId.trim(), password = password)
             )
         }
 

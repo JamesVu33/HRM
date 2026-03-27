@@ -1,15 +1,17 @@
 package com.example.ihrm.ui.login
 
-import android.content.Context
+import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.example.ihrm.core.errorHandler.CommonErrorException
 import com.example.ihrm.core.viewmodel.BaseViewmodel
 import com.example.ihrm.core.viewmodel.CallbackWrapper
-import com.example.ihrm.data.remote.dto.AppErrorResponseDto
-import com.example.ihrm.data.remote.dto.LoginResponseDto
+import com.example.ihrm.data.remote.base.AppErrorResponse
+import com.example.ihrm.data.remote.login.LoginResponse
 import com.example.ihrm.domain.repository.AuthRepository
+import com.example.ihrm.domain.usecase.login.LoginUseCase
 import com.example.ihrm.util.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,52 +41,59 @@ sealed interface LoginFieldError {
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val authRepository: AuthRepository
+    private val loginUseCase: LoginUseCase
 ) : BaseViewmodel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
+    /**
+     * UI update account ID (employee id) event
+     */
     fun updateEmployeeId(employeeId: String) {
-        val error = validateEmployeeId(employeeId)
+//        val error = validateEmployeeId(employeeId)
         _uiState.value = _uiState.value.copy(
             employeeId = employeeId,
-            employeeIdError = error,
+            employeeIdError = null,
             loginError = null
         )
     }
 
+    /**
+     * UI update password event
+     */
     fun updatePassword(password: String) {
-        val error = validatePassword(password)
+//        val error = validatePassword(password)
         _uiState.value = _uiState.value.copy(
             password = password,
-            passwordError = error,
+            passwordError = null,
             loginError = null
         )
     }
 
+    /**
+     * UI update password display event
+     */
     fun togglePasswordVisibility() {
         _uiState.value = _uiState.value.copy(
             isPasswordVisible = !_uiState.value.isPasswordVisible
         )
     }
 
+    /**
+     * Login event
+     */
     fun login(onSuccess: () -> Unit) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             val employeeId = _uiState.value.employeeId.trim()
             val password = _uiState.value.password
 
-            if (employeeId.isEmpty()) {
+            val errorPwd = validatePassword(password)
+            val errorId = validateEmployeeId(employeeId)
+            if (errorPwd != null || errorId != null) {
                 _uiState.value = _uiState.value.copy(
-                    employeeIdError = LoginFieldError.Required
-                )
-                return@launch
-            }
-
-            if (password.isEmpty()) {
-                _uiState.value = _uiState.value.copy(
-                    passwordError = LoginFieldError.Required
+                    employeeIdError = errorId,
+                    passwordError = errorPwd
                 )
                 return@launch
             }
@@ -107,9 +116,10 @@ class LoginViewModel @Inject constructor(
             )
 
             fetchData(
-                fetching = { authRepository.login(employeeId, password) },
-                callbackWrapper = object : CallbackWrapper<LoginResponseDto> {
-                    override fun onSuccess(data: LoginResponseDto) {
+                fetching = { loginUseCase.login(employeeId, password) },
+                callbackWrapper = object : CallbackWrapper<LoginResponse> {
+                    override fun onSuccess(data: LoginResponse) {
+                        Log.d("loginTest", "onSuccess: $data")
                         AuthManager.saveTokens(data)
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
@@ -118,14 +128,18 @@ class LoginViewModel @Inject constructor(
                         onSuccess()
                     }
 
-                    override fun onFail(e: AppErrorResponseDto) {
+                    override fun onFail(e: CommonErrorException) {
                         _uiState.value = _uiState.value.copy(isLoading = false)
+                        Log.d("loginTest", "onFail: ${e.errorMsg}")
                     }
                 }
             )
         }
     }
 
+    /**
+     * Validate employeeId
+     */
     private fun validateEmployeeId(employeeId: String): LoginFieldError? {
         if (employeeId.isBlank()) return null
         val len = employeeId.trim().length
@@ -135,19 +149,13 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Validate password
+     */
     private fun validatePassword(password: String): LoginFieldError? {
-        if (password.isEmpty()) return null
-        val hasUpperCase = password.any { it.isUpperCase() }
-        val hasLowerCase = password.any { it.isLowerCase() }
-        val hasDigit = password.any { it.isDigit() }
-        val hasSpecialChar = password.any { !it.isLetterOrDigit() }
-        val isValidLength = password.length in 8..16
-
-        return when {
-            !isValidLength || !hasUpperCase || !hasLowerCase || !hasDigit || !hasSpecialChar -> {
-                null
-            }
-
+       return when {
+            password.isEmpty() -> null
+            password.length < 8 -> LoginFieldError.TooShort
             else -> null
         }
     }

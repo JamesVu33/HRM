@@ -6,10 +6,10 @@ import com.example.ihrm.core.viewmodel.CallbackWrapper
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.model.EmployeeUiModel
 import com.example.ihrm.domain.model.Level
-import com.example.ihrm.domain.usecase.DeleteEmployeeUseCase
-import com.example.ihrm.domain.usecase.GetEmployeesUseCase
-import com.example.ihrm.domain.usecase.GetLevelByIdUseCase
-import com.example.ihrm.domain.usecase.SyncEmployeesUseCase
+import com.example.ihrm.domain.usecase.employees.DeleteEmployeeUseCase
+import com.example.ihrm.domain.usecase.employees.GetEmployeesUseCase
+import com.example.ihrm.domain.usecase.employees.GetLevelByIdUseCase
+import com.example.ihrm.domain.usecase.employees.SyncEmployeesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

@@ -6,8 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ihrm.core.errorHandler.CommonErrorException
-import com.example.ihrm.data.remote.dto.AppErrorResponseDto
-import com.example.ihrm.data.remote.dto.NetworkResult
+import com.example.ihrm.data.remote.base.NetworkResult
 import com.example.ihrm.util.EmptyFunc
 import com.example.ihrm.util.ParamFunc
 import com.example.ihrm.util.SupEmptyFunc
@@ -27,12 +26,12 @@ import javax.net.ssl.SSLException
 
 interface CallbackWrapper<T> {
     fun onSuccess(data: T) {}
+
     // in case mapping data or do another work in background
     suspend fun doOnBackground(data: T) {}
-    // for API calling error exception handler
-    fun onError(e: CommonErrorException) {}
+
     // for API calling failure case (400...)
-    fun onFail(e: AppErrorResponseDto) {}
+    fun onFail(e: CommonErrorException) {}
 }
 
 @Immutable
@@ -83,7 +82,7 @@ abstract class BaseViewmodel : ViewModel() {
 
             _loading.tryEmit(false)
             _error.tryEmit(errorException)
-            callbackWrapper.onError(errorException)
+            callbackWrapper.onFail(errorException)
         }
 
     /**
@@ -123,7 +122,14 @@ abstract class BaseViewmodel : ViewModel() {
             val response = fetching()
             launch(Dispatchers.Main) {
                 _loading.emit(false)
-                handleApiResponse(response, callbackWrapper)
+                handleApiResponse(response, callbackWrapper) {
+                    launch(Dispatchers.Default) {
+                        callbackWrapper.doOnBackground(it)
+                    }
+                    launch {
+                        callbackWrapper.onSuccess(it)
+                    }
+                }
             }
         }
     }
@@ -134,26 +140,28 @@ abstract class BaseViewmodel : ViewModel() {
      */
     private fun <T> handleApiResponse(
         response: NetworkResult<T>,
-        onCallbackWrapper: CallbackWrapper<T>
+        onCallbackWrapper: CallbackWrapper<T>,
+        onSuccess: ParamFunc<T>
     ) {
         when (response) {
             is NetworkResult.Success -> {
-                onCallbackWrapper.onSuccess(response.data)
+                onSuccess(response.data)
             }
 
-            is NetworkResult.ApiError -> {
-                onCallbackWrapper.onFail(response.error)
-                _error.tryEmit(
-                    CommonErrorException.InvalidInputException(
-                        null,
-                        response.error.errorType,
-                        response.error.errors
-                    )
-                )
+            is NetworkResult.Failure -> {
+                when (response.error) {
+//                    is CommonErrorException.InvalidLogicException,
+                    is CommonErrorException.InvalidInputException -> {
+                        onCallbackWrapper.onFail(response.error)
+                    }
+                    else -> {
+                        _error.tryEmit(response.error)
+                    }
+                }
             }
 
             is NetworkResult.Exception -> {
-                onCallbackWrapper.onError(CommonErrorException.UnknownException(response.e.message))
+                onCallbackWrapper.onFail(CommonErrorException.UnknownException(response.e.message))
                 _error.tryEmit(
                     CommonErrorException.NetworkException(
                         response.e.message ?: "Network error"
@@ -176,15 +184,9 @@ abstract class BaseViewmodel : ViewModel() {
                 onSuccess?.invoke(response.data)
             }
 
-            is NetworkResult.ApiError -> {
+            is NetworkResult.Failure -> {
                 onFailure?.invoke()
-                _error.tryEmit(
-                    CommonErrorException.InvalidInputException(
-                        null,
-                        response.error.errorType,
-                        response.error.errors
-                    )
-                )
+                _error.tryEmit(response.error)
             }
 
             is NetworkResult.Exception -> {

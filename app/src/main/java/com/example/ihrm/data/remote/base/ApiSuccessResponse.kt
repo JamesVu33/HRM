@@ -1,11 +1,12 @@
-package com.example.ihrm.data.remote.dto
+package com.example.ihrm.data.remote.base
 
+import com.example.ihrm.data.remote.dto.MetaDto
 import com.google.gson.annotations.SerializedName
 
 /**
  * Generic API response wrapper from be-nest-hrm backend.
  */
-data class ApiResponseDto<T>(
+data class ApiSuccessResponse<T>(
     @SerializedName("statusCode")
     val statusCode: Int,
     @SerializedName("message")
