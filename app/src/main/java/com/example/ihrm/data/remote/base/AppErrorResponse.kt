@@ -19,7 +19,8 @@ data class AppErrorResponse(
     val method: String? = null
 ) {
     fun getErrorInfo(): APIErrorInfo = APIErrorInfo(
-        errorType = errors?.keys?.firstOrNull() ?: errorType,
+        errorType = errorType,
+        errorKey = errors?.keys?.firstOrNull() ?: "",
         errorMsg = errors?.values?.firstOrNull() ?: emptyList(),
     )
 }

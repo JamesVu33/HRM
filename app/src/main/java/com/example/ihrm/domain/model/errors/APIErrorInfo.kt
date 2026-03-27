@@ -18,6 +18,7 @@ import com.example.ihrm.data.remote.base.ErrorFieldResponse
  */
 data class APIErrorInfo(
     val errorType: String, // _global, DOMAIN_ERROR, VALIDATION_ERROR, GUARD_ERROR, HTTP_ERROR, DB_KNOWN_ERROR, DB_UNKNOWN_ERROR, INTERNAL_ERROR
+    val errorKey: String, // label of error field
     val errorMsg: List<ErrorFieldResponse>,
 ) {
     /**
@@ -29,9 +30,10 @@ data class APIErrorInfo(
             "VALIDATION_ERROR",
             "DOMAIN_ERROR" -> {
                 CommonErrorException.InvalidInputException(
-                    errorField = "", // base on request data class to detect which field is invalid
+                    errorField = errorKey, // base on request data class to detect which field is invalid
                     errorMsg = "error",
-                    errorKey = errorMsg.firstOrNull()?.key ?: "Unknown"
+                    errorKey = errorMsg.firstOrNull()?.key ?: "Unknown",
+                    errorParams = errorMsg.firstOrNull()?.params
                 )
             }
             "_global" -> CommonErrorException.InvalidLogicException(

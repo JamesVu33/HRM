@@ -10,4 +10,9 @@ data class LoginRequest(
     val employeeId: String,
     @SerializedName("password")
     val password: String
-)
+) {
+    companion object {
+        fun isEmployeeIdField(errorKey: String) = errorKey == "employeeId"
+        fun isPasswordField(errorKey: String) = errorKey == "password"
+    }
+}

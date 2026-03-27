@@ -14,7 +14,7 @@ sealed class CommonErrorException(open val errorKey: String, open var errorMsg: 
         val errorField: String?, // base on request data class to detect which field is invalid
         override var errorMsg: String?,
         override val errorKey: String,
-//        val errorParams: Map<String, Any>?
+        val errorParams: Map<String, String?>?
     ) : CommonErrorException(errorKey, errorMsg)
 
 

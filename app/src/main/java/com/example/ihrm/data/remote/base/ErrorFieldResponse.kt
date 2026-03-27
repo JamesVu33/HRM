@@ -6,5 +6,5 @@ data class ErrorFieldResponse(
     @SerializedName("key")
     val key: String,
     @SerializedName("params")
-    val params: Map<String, Any?>? = null
+    val params: Map<String, String?>? = null
 )
