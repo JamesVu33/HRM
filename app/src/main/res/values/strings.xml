@@ -382,6 +382,8 @@
     <string name="create_security_checklist_items_title">Security Check Items</string>
     <string name="create_security_checklist_items_count">2/5</string>
     <string name="create_security_checklist_submit">Create Checklist</string>
+    <string name="create_security_checklist_expand_translation_cd">Show or hide translation</string>
+    <string name="create_security_checklist_select_item_cd">Select checklist item</string>
     <!-- Role options -->
     <string name="employee_info_role1">Role1</string>
     <string name="employee_info_role2">Role2</string>

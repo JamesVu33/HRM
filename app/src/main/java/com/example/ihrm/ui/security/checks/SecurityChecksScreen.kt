@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -69,15 +70,32 @@ fun SecurityChecksScreen(
         containerColor = Color.Transparent,
         contentWindowInsets = WindowInsets(top = 0),
     ) { paddingValues ->
-        Box(
+        Column (
             modifier = Modifier
                 .fillMaxSize()
                 .background(brush = DashboardBrush.BaseBackground)
         ) {
+            BaseHeader(
+                modifier = Modifier.padding(paddingValues).statusBarsPadding(),
+                title = stringResource(R.string.drawer_item_security_checks),
+                showNavigationIcon = true,
+                onNavigationClick = onBackClick,
+                containerColor = Color.Transparent,
+                navigationIcon = {
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        imageVector = Icons.Default.Menu,
+                        contentDescription = null,
+                        tint = White
+                    )
+                }
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            SecurityFiltersRow()
+            Spacer(modifier = Modifier.height(20.dp))
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
                     .padding(horizontal = 16.dp),
                 contentPadding = PaddingValues(
                     top = paddingValues.calculateTopPadding() + WindowInsets.statusBars
@@ -86,28 +104,6 @@ fun SecurityChecksScreen(
                     bottom = paddingValues.calculateBottomPadding()
                 ),
             ) {
-                item {
-                    BaseHeader(
-                        modifier = Modifier,
-                        title = stringResource(R.string.drawer_item_security_checks),
-                        showNavigationIcon = true,
-                        onNavigationClick = onBackClick,
-                        containerColor = Color.Transparent,
-                        navigationIcon = {
-                            Icon(
-                                modifier = Modifier.size(24.dp),
-                                imageVector = Icons.Default.Menu,
-                                contentDescription = null,
-                                tint = White
-                            )
-                        }
-                    )
-                }
-                item { Spacer(modifier = Modifier.height(12.dp)) }
-                item {
-                    SecurityFiltersRow()
-                    Spacer(modifier = Modifier.height(20.dp))
-                }
                 item {
                     Spacer(modifier = Modifier.height(20.dp))
                     SecuritySummaryCards()
@@ -128,6 +124,7 @@ fun SecurityChecksScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                 }
+                item {  Spacer(modifier = Modifier.height(8.dp)) }
             }
         }
     }

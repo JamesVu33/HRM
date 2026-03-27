@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -57,6 +58,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ihrm.R
+import com.example.ihrm.util.DashboardBrush
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -139,53 +141,47 @@ fun MySecurityCheckScreen(
             }
         }
     ) { paddingValues ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colorStops = arrayOf(
-                            0.0f to Color(0xFF0A53BE),
-                            0.48f to Color(0xFF5A93E5),
-                            0.75f to Color(0xFF9CBFF2),
-                            1.0f to Color(0xFFF3F4F6)
-                        )
-                    )
-                )
+                .background(brush = DashboardBrush.BaseBackground)
                 .padding(horizontal = 16.dp)
                 .padding(paddingValues)
         ) {
+            Column(
+                modifier = Modifier.fillMaxWidth().statusBarsPadding()
+            ) {
+                Header(onMenuClick = onMenuClick)
+                Spacer(modifier = Modifier.height(12.dp))
+                SearchBar(
+                    keyword = keyword,
+                    onKeywordChange = { keyword = it }
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                    Text(
+                        text = stringResource(R.string.my_security_check_items_count, filtered.size),
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(
-                    top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 8.dp,
-                    bottom = 80.dp
+                    bottom = paddingValues.calculateBottomPadding()
                 ),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                item {
-                    Header(onMenuClick = onMenuClick)
-                    Spacer(modifier = Modifier.height(12.dp))
-                    SearchBar(
-                        keyword = keyword,
-                        onKeywordChange = { keyword = it }
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                        Text(
-                            text = stringResource(R.string.my_security_check_items_count, filtered.size),
-                            color = Color.White,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-                }
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ){
                 items(filtered) { item ->
                     ChecklistCard(
                         item = item,
                         onClick = { onChecklistClick(item.status.toLegendKey()) }
                     )
                 }
+                item {  Spacer(modifier = Modifier.height(8.dp)) }
             }
         }
     }
