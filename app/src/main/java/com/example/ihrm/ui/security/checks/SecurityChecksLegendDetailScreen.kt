@@ -59,8 +59,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.example.ihrm.ui.common.ChecklistActionType
 import com.example.ihrm.ui.common.ChecklistConfirmDialog
 import com.example.ihrm.ui.common.PendingActionsRow
-import com.example.ihrm.ui.dashboard.DashboardRole
-import com.example.ihrm.ui.dashboard.resolveDashboardRoleAfterLogin
+import com.example.ihrm.domain.model.AppFeature
 import com.example.ihrm.util.AuthManager
 
 private data class SecurityLegendMeta(
@@ -88,11 +87,7 @@ fun SecurityChecksLegendDetailScreen(
 ) {
     val legend = remember(legendKey) { legendByKey(legendKey) }
     val questions = remember(legendKey) { securityQuestionsByLegend(legend.label) }
-    val userRole = resolveDashboardRoleAfterLogin(
-        email = AuthManager.getUserEmail(),
-        fullName = AuthManager.getUserFullName()
-    )
-    val canReviewChecklist = userRole == DashboardRole.Extra
+    val canReviewChecklist = AuthManager.canModify(AppFeature.SECURITY_CHECK)
     var activeDialogType by remember { mutableStateOf<ChecklistActionType?>(null) }
     Scaffold(
         modifier = Modifier

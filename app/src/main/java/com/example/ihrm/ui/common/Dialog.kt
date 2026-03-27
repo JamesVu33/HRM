@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -38,6 +39,7 @@ import com.example.ihrm.R
 import com.example.ihrm.ui.components.ButtonSize
 import com.example.ihrm.ui.components.ButtonVariant
 import com.example.ihrm.ui.components.CustomButton
+import com.example.ihrm.util.dropShadow
 
 @Composable
 fun ChecklistConfirmDialog(
@@ -53,7 +55,9 @@ fun ChecklistConfirmDialog(
         )
     ) {
         Card(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
             elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
@@ -146,14 +150,32 @@ fun PendingActionsRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         CustomButton(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .dropShadow(
+                    offsetX = 0.dp,
+                    offsetY = 4.dp,
+                    blur = 6.dp,
+                    shape = RoundedCornerShape(14.dp),
+                    color = Color(0x00000000).copy(0.1f),
+                    spread = (-1).dp
+                )
+                .weight(1f),
             size = ButtonSize.Large,
             variant = variantButtonLeft,
             text = textButtonLeft,
             onClick = onLeftClick,
         )
         CustomButton(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .dropShadow(
+                    offsetX = 0.dp,
+                    offsetY = 4.dp,
+                    blur = 6.dp,
+                    shape = RoundedCornerShape(14.dp),
+                    color = Color(0x00000000).copy(0.1f),
+                    spread = (-1).dp
+                ),
             size = ButtonSize.Large,
             variant = variantButtonRight,
             text = textButtonRight,

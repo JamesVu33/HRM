@@ -51,15 +51,8 @@ fun DashboardScreen(
     onViewStats: () -> Unit
 ) {
     val mock = DashboardMockData.rememberHomeModel()
-    val role = remember(
-        AuthManager.getUserEmail(),
-        AuthManager.getUserFullName()
-    ) {
-        resolveDashboardRoleAfterLogin(
-            email = AuthManager.getUserEmail(),
-            fullName = AuthManager.getUserFullName()
-        )
-    }
+    val accountType = AuthManager.getAccountType()
+    val role = remember(accountType) { accountType.toDashboardRole() }
     val personalUi = remember(mock) { buildPersonalRoleUi(mock) }
     val extraUi = remember(mock) { buildExtraRoleUi(mock) }
     var selectedTab by remember { mutableStateOf(DashboardHomeTab.Personal) }

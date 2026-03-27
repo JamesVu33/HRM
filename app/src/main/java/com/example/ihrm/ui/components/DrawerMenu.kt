@@ -53,7 +53,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.ihrm.R
 import com.example.ihrm.ui.dashboard.DashboardRole
-import com.example.ihrm.ui.dashboard.resolveDashboardRoleAfterLogin
+import com.example.ihrm.ui.dashboard.toDashboardRole
 import com.example.ihrm.ui.theme.DrawerItemSelected
 import com.example.ihrm.ui.theme.DrawerSectionLabel
 import com.example.ihrm.ui.theme.FABGradientStart
@@ -168,10 +168,7 @@ fun DrawerMenu(
     onShowComingSoon: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val userRole = resolveDashboardRoleAfterLogin(
-        email = AuthManager.getUserEmail(),
-        fullName = AuthManager.getUserFullName()
-    )
+    val userRole = AuthManager.getAccountType().toDashboardRole()
     val visibleSections = rememberVisibleSections(userRole)
 
     ModalDrawerSheet(
