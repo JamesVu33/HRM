@@ -42,15 +42,14 @@ suspend fun <T> safeApiCall(
             val errorResponse = errorBody?.let { adapter.convert(it) }
                 ?: AppErrorResponse(errorType = "UNKNOWN_ERROR")
 
+            Log.d("apiFlows", "safeApiCall: - failure case to class: $errorResponse")
             val errorInfo = errorResponse.getErrorInfo()
+            Log.d("apiFlows", "safeApiCall: - failure case to errorInfo: $errorInfo")
             val errorType = errorInfo.getCommonErrorType()
-
-            // TODO: get errorMsg from localDB
 
             NetworkResult.Failure(errorType)
         }
     } catch (throwable: Exception) {
-        Log.i("apiFlows", "safeApiCall: - exception: $throwable")
         val errorException = when (throwable) {
             is JSONException, is SocketTimeoutException, is SSLException, is ConnectException, is UnknownHostException -> {
                 CommonErrorException.NetworkException(
@@ -70,7 +69,7 @@ suspend fun <T> safeApiCall(
                 throwable.message ?: "An unexpected error occurred"
             )
         }
-        Log.i("apiFlows", "safeApiCall: - exception: $errorException")
+        Log.e("apiFlows", "safeApiCall: - exception: $errorException")
         NetworkResult.Exception(errorException)
     }
 }

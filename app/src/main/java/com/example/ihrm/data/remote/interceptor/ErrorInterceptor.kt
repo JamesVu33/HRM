@@ -17,8 +17,8 @@ class ErrorInterceptor(
         if (!response.isSuccessful) {
             val errorKey = parseApiErrorMessage(response.body?.string())
             when(response.code) {
-                401 -> CommonErrorException.UnauthorizedException(errorKey ?: "GLOBAL_ERROR_UNAUTHORIZED") // invalid token
-                403 -> CommonErrorException.NotPermissionException(errorKey ?: "GLOBAL_ERROR_FORBIDDEN") // permission not allow
+                401 -> CommonErrorException.UnauthorizedException(errorKey ?: "GLOBAL_ERROR_UNAUTHORIZED", "") // invalid token
+                403 -> CommonErrorException.NotPermissionException(errorKey ?: "GLOBAL_ERROR_FORBIDDEN", "") // permission not allow
                 else -> null
             }?.let { GlobalErrorHandler.showError(it.errorKey) }
 

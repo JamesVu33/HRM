@@ -1,4 +1,4 @@
-package com.example.ihrm.domain.usecase
+package com.example.ihrm.domain.usecase.employees
 
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.repository.EmployeeRepository

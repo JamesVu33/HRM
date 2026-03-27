@@ -149,8 +149,15 @@ abstract class BaseViewmodel : ViewModel() {
             }
 
             is NetworkResult.Failure -> {
-                onCallbackWrapper.onFail(response.error)
-                _error.tryEmit(response.error)
+                when (response.error) {
+//                    is CommonErrorException.InvalidLogicException,
+                    is CommonErrorException.InvalidInputException -> {
+                        onCallbackWrapper.onFail(response.error)
+                    }
+                    else -> {
+                        _error.tryEmit(response.error)
+                    }
+                }
             }
 
             is NetworkResult.Exception -> {

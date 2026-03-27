@@ -15,6 +15,7 @@ interface LanguageDao {
     @Query("SELECT * FROM languages")
     fun getAllLanguages(): Flow<List<LanguageEntity>>
 
-    @Query("DELETE FROM languages")
-    suspend fun deleteAllLanguages()
+    @Query("SELECT * FROM languages Where `key` = :key")
+    fun getLanguageByKey(key: String): Flow<LanguageEntity?>
+
 }

@@ -14,4 +14,6 @@ interface LanguageRepository {
     suspend fun saveLanguages(languages: List<LanguageResponse>)
 
     fun getLanguages(): Flow<List<LanguageResponse>>
+
+    fun getLanguageByKey(key: String): Flow<LanguageResponse>
 }

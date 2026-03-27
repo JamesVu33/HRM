@@ -7,6 +7,7 @@ import com.example.ihrm.data.remote.base.NetworkResult
 import com.example.ihrm.data.remote.base.safeApiCall
 import com.example.ihrm.data.remote.language.LanguageRequest
 import com.example.ihrm.data.remote.language.LanguageResponse
+import com.example.ihrm.data.remote.language.LanguageStatus
 import com.example.ihrm.domain.repository.LanguageRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -55,4 +56,19 @@ class LanguageRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override fun getLanguageByKey(key: String): Flow<LanguageResponse> {
+        return languageDao.getLanguageByKey(key).map {
+            LanguageResponse(
+                id = it?.id ?: "",
+                key = it?.key ?: "",
+                namespace = it?.namespace ?: "",
+                valueVi = it?.valueVi ?: "",
+                valueEn = it?.valueEn ?: "",
+                valueKr = it?.valueKr ?: "",
+                status = it?.status ?: LanguageStatus.ACTIVE,
+            )
+        }
+    }
+
 }

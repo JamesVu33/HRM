@@ -1,4 +1,4 @@
-package com.example.ihrm.domain.usecase
+package com.example.ihrm.domain.usecase.employees
 
 import com.example.ihrm.data.remote.dto.MeEmployeeResponse
 import com.example.ihrm.data.remote.base.NetworkResult

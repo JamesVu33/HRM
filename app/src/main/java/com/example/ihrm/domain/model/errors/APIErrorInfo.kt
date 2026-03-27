@@ -27,16 +27,18 @@ data class APIErrorInfo(
     fun getCommonErrorType(): CommonErrorException {
         return when (errorType) {
             "VALIDATION_ERROR",
-            "DOMAIN_ERROR" -> CommonErrorException.InvalidInputException(
-                errorField = "", // base on request data class to detect which field is invalid
-                errorMsg = "error",
-                errorKey = errorType
-            )
+            "DOMAIN_ERROR" -> {
+                CommonErrorException.InvalidInputException(
+                    errorField = "", // base on request data class to detect which field is invalid
+                    errorMsg = "error",
+                    errorKey = errorMsg.firstOrNull()?.key ?: "Unknown"
+                )
+            }
             "_global" -> CommonErrorException.InvalidLogicException(
                 errorMsg = "error",
-                errorKey = errorType
+                errorKey = errorMsg.firstOrNull()?.key ?: "Unknown"
             )
-            else -> CommonErrorException.UnknownException(msg = "")
+            else -> CommonErrorException.UnknownException("")
 
         }
     }

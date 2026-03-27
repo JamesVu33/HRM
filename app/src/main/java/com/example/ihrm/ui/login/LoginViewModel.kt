@@ -8,6 +8,7 @@ import com.example.ihrm.core.viewmodel.CallbackWrapper
 import com.example.ihrm.data.remote.base.AppErrorResponse
 import com.example.ihrm.data.remote.login.LoginResponse
 import com.example.ihrm.domain.repository.AuthRepository
+import com.example.ihrm.domain.usecase.login.LoginUseCase
 import com.example.ihrm.util.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -40,8 +41,7 @@ sealed interface LoginFieldError {
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-//    @ApplicationContext private val context: Context,
-    private val authRepository: AuthRepository
+    private val loginUseCase: LoginUseCase
 ) : BaseViewmodel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -116,7 +116,7 @@ class LoginViewModel @Inject constructor(
             )
 
             fetchData(
-                fetching = { authRepository.login(employeeId, password) },
+                fetching = { loginUseCase.login(employeeId, password) },
                 callbackWrapper = object : CallbackWrapper<LoginResponse> {
                     override fun onSuccess(data: LoginResponse) {
                         Log.d("loginTest", "onSuccess: $data")
@@ -130,12 +130,7 @@ class LoginViewModel @Inject constructor(
 
                     override fun onFail(e: CommonErrorException) {
                         _uiState.value = _uiState.value.copy(isLoading = false)
-                        Log.d("loginTest", "onFail: ${e.message}")
-
-                        /*
-                         * error cases:
-                         * AUTH_ERROR_CREDENTIAL_INCORRECT
-                         */
+                        Log.d("loginTest", "onFail: ${e.errorMsg}")
                     }
                 }
             )

@@ -4,11 +4,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.ihrm.core.errorHandler.CommonErrorException
 import com.example.ihrm.core.viewmodel.BaseViewmodel
 import com.example.ihrm.core.viewmodel.CallbackWrapper
-import com.example.ihrm.data.remote.base.AppErrorResponse
 import com.example.ihrm.domain.model.Employee
-import com.example.ihrm.domain.usecase.AddEmployeeUseCase
-import com.example.ihrm.domain.usecase.GetEmployeeByIdUseCase
-import com.example.ihrm.domain.usecase.UpdateEmployeeUseCase
+import com.example.ihrm.domain.usecase.employees.AddEmployeeUseCase
+import com.example.ihrm.domain.usecase.employees.GetEmployeeByIdUseCase
+import com.example.ihrm.domain.usecase.employees.UpdateEmployeeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
