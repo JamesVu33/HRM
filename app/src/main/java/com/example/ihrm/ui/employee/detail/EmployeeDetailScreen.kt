@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -82,6 +84,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ihrm.R
 import com.example.ihrm.domain.model.Employee
+import com.example.ihrm.ui.common.header.BaseHeader
 import com.example.ihrm.ui.theme.IHRMTheme
 import com.example.ihrm.ui.theme.Neutral500
 import com.example.ihrm.ui.theme.Neutral700
@@ -90,6 +93,7 @@ import com.example.ihrm.ui.theme.Primary400
 import com.example.ihrm.ui.theme.Primary50
 import com.example.ihrm.ui.theme.Primary500
 import com.example.ihrm.ui.theme.SurfaceBorder
+import com.example.ihrm.util.DashboardBrush
 
 private val FormInputBg = Color(0xFFF9FAFB)
 private val Neutral200 = Color(0xFFe5e7eb)
@@ -122,12 +126,24 @@ fun EmployeeDetailScreen(
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        modifier = Modifier
+            .fillMaxSize()
+            .navigationBarsPadding(),
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        topBar = {
+            BaseHeader(
+                modifier = Modifier.statusBarsPadding(),
+                title = stringResource(R.string.employee_detail_title),
+                showNavigationIcon = true,
+                onNavigationClick = onBackClick,
+                containerColor = Color.Transparent
+            )
+        }
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(brush = DashboardBrush.BaseBackground)
                 .padding(paddingValues)
         ) {
             when {
@@ -197,131 +213,93 @@ private fun EmployeeDetailContent(
     )
 
     Column(modifier = Modifier.fillMaxSize()) {
-        Box(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(
-                    brush = Brush.linearGradient(
-                        colors = listOf(
-                            Primary500,
-                            Primary400,
-                            Primary200,
-                            Primary50,
-                            Primary50,
-                            Primary50
-                        )
-                    )
-                )
+                .padding(horizontal = 24.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
+            Box(
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = 0.3f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = employee.name.take(2).uppercase().filter { it.isLetter() }
+                        .ifEmpty { "?" },
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(
+                    text = employee.name,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                Text(
+                    text = stringResource(
+                        R.string.employee_detail_subtitle_format,
+                        employee.position ?: "",
+                        employee.id
+                    ),
+                    fontSize = 14.sp,
+                    color = Color.White.copy(alpha = 0.9f)
+                )
+            }
+        }
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp)
+                .padding(start = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            itemsIndexed(tabs) { index, label ->
+                val isSelected = selectedTabIndex == index
+                TextButton(
+                    onClick = { selectedTabIndex = index },
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.textButtonColors(
+                        containerColor = if (isSelected) Color.White else Primary500,
+                        contentColor = if (isSelected) Primary400 else Color.White
+                    )
                 ) {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null,
-                            tint = Color.White
-                        )
-                    }
                     Text(
-                        modifier = Modifier.align(Alignment.Center),
-                        text = stringResource(R.string.employee_detail_title),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color.White
+                        text = label,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
                     )
                 }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clip(CircleShape)
-                            .background(Color.White.copy(alpha = 0.3f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = employee.name.take(2).uppercase().filter { it.isLetter() }
-                                .ifEmpty { "?" },
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Column {
-                        Text(
-                            text = employee.name,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                        Text(
-                            text = stringResource(
-                                R.string.employee_detail_subtitle_format,
-                                employee.position ?: "",
-                                employee.id
-                            ),
-                            fontSize = 14.sp,
-                            color = Color.White.copy(alpha = 0.9f)
-                        )
-                    }
-                }
-                LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 12.dp)
-                        .padding(start = 24.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    itemsIndexed(tabs) { index, label ->
-                        val isSelected = selectedTabIndex == index
-                        TextButton(
-                            onClick = { selectedTabIndex = index },
-                            shape = RoundedCornerShape(20.dp),
-                            colors = ButtonDefaults.textButtonColors(
-                                containerColor = if (isSelected) Color.White else Primary500,
-                                contentColor = if (isSelected) Primary400 else Color.White
-                            )
-                        ) {
-                            Text(
-                                text = label,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-                    }
-                }
-                // Content card (phần còn lại màn hình)
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF9FAFB))
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(start = 24.dp, top = 24.dp, end = 24.dp)
-                            .verticalScroll(rememberScrollState())
-                    ) {
-                        when (selectedTabIndex) {
-                            0 -> BasicInfoSection(employee = employee, onSave = onSave)
-                            1 -> EmployeeInfoSection(employee = employee, onSave = onSave)
-                            else -> PlaceholderSection(tabName = tabs[selectedTabIndex])
-                        }
-                    }
+            }
+        }
+        // Content card (phần còn lại màn hình)
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFF9FAFB))
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(start = 24.dp, top = 24.dp, end = 24.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                when (selectedTabIndex) {
+                    0 -> BasicInfoSection(employee = employee, onSave = onSave)
+                    1 -> EmployeeInfoSection(employee = employee, onSave = onSave)
+                    else -> PlaceholderSection(tabName = tabs[selectedTabIndex])
                 }
             }
         }
     }
 }
+
 
 @Composable
 private fun BasicInfoSection(

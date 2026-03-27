@@ -12,12 +12,20 @@ import com.example.ihrm.ui.dashboard.DashboardScreen
 import com.example.ihrm.ui.employee.addedit.AddEditEmployeeScreen
 import com.example.ihrm.ui.employee.detail.EmployeeDetailScreen
 import com.example.ihrm.ui.employee.list.EmployeeListScreen
+import com.example.ihrm.ui.security.checks.CreateSecurityChecklistScreen
+import com.example.ihrm.ui.security.checks.MySecurityCheckScreen
+import com.example.ihrm.ui.security.checks.SecurityChecksAnalyticsScreen
+import com.example.ihrm.ui.security.checks.SecurityChecksLegendDetailScreen
+import com.example.ihrm.ui.security.checks.SecurityChecksScreen
+import com.example.ihrm.ui.stats.TeamStatisticsScreen
 import com.example.ihrm.ui.login.LoginScreen
+import com.example.ihrm.ui.myinfo.MyInfoScreen
 import com.example.ihrm.util.AuthManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 private const val EMPLOYEE_ID_PARAM = "employeeId"
+private const val LEGEND_KEY_PARAM = "legendKey"
 
 @Composable
 fun NavGraph(
@@ -70,6 +78,31 @@ fun NavGraph(
             )
         }
 
+        composable(Screen.MyInfo.route) {
+            MyInfoScreen(
+                onMenuClick = { scope.launch { drawerState?.open() } },
+                onCancelClick = { navController.popBackStack() },
+            )
+        }
+
+        composable(Screen.MySecurityCheck.route) {
+            MySecurityCheckScreen(
+                onMenuClick = { scope.launch { drawerState?.open() } },
+                onChecklistClick = { legendKey ->
+                    navController.navigate(Screen.SecurityChecksLegendDetail.createRoute(legendKey))
+                },
+                onCreateChecklistClick = {
+                    navController.navigate(Screen.CreateSecurityChecklist.route)
+                },
+            )
+        }
+
+        composable(Screen.CreateSecurityChecklist.route) {
+            CreateSecurityChecklistScreen(
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
         composable(Screen.CalendarManagement.route) {
             CalendarManagementScreen(
                 onBackClick = { navController.popBackStack() }
@@ -84,6 +117,40 @@ fun NavGraph(
                 onAddEmployeeClick = {
                     navController.navigate(Screen.AddEmployee.route)
                 },
+                onBackClick = { navController.popBackStack() },
+                onViewStats = { navController.navigate(Screen.TeamStatistics.route) }
+            )
+        }
+
+        composable(Screen.TeamStatistics.route) {
+            TeamStatisticsScreen(
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.SecurityChecks.route) {
+            SecurityChecksScreen(
+                onBackClick = { navController.popBackStack() },
+                onSeeChartClick = { navController.navigate(Screen.SecurityChecksAnalytics.route) },
+                onSecurityCheckClick = { legendKey ->
+                    navController.navigate(Screen.SecurityChecksLegendDetail.createRoute(legendKey))
+                }
+            )
+        }
+
+        composable(Screen.SecurityChecksAnalytics.route) {
+            SecurityChecksAnalyticsScreen(
+                onBackClick = { navController.popBackStack() },
+            )
+        }
+
+        composable(
+            route = Screen.SecurityChecksLegendDetail.route,
+            arguments = listOf(navArgument(LEGEND_KEY_PARAM) {})
+        ) { backStackEntry ->
+            val legendKey = backStackEntry.arguments?.getString(LEGEND_KEY_PARAM) ?: return@composable
+            SecurityChecksLegendDetailScreen(
+                legendKey = legendKey,
                 onBackClick = { navController.popBackStack() }
             )
         }

@@ -1,5 +1,6 @@
 package com.example.ihrm.util
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
@@ -52,6 +53,20 @@ val txtInterMedium14 = TextStyle(
     color = DashboardTabActiveBlue
 )
 
+val txtInterMedium14White90Percent = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.Medium,
+    fontSize = 14.sp,
+    color = Color.White.copy(0.9f)
+)
+
+val txtInterMedium15 = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.SemiBold,
+    fontSize = 15.sp,
+    color = DashboardFigmaInk
+)
+
 val txtInterBold16 = TextStyle(
     fontFamily = InterFontFamily,
     fontWeight = FontWeight.SemiBold,
@@ -59,9 +74,86 @@ val txtInterBold16 = TextStyle(
     color = DashboardFigmaInk
 )
 
+val txtInterBold22White = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.SemiBold,
+    fontSize = 22.sp,
+    color = Color.White
+)
+
 val txtInterBold24 = TextStyle(
     fontFamily = InterFontFamily,
     fontWeight = FontWeight.SemiBold,
     fontSize = 24.sp,
     color = ColorBgSuccessGradientBottom
+)
+
+val LabelTextStyle13RegularGrey = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.Normal,
+    fontSize = 13.sp,
+    color = DashboardFigmaMuted,
+)
+
+val LabelTextStyle13RegularWhite = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.Normal,
+    fontSize = 13.sp,
+    color = Color.White,
+)
+val LabelTextStyle13MediumGrey = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.Medium,
+    fontSize = 13.sp,
+    color = DashboardFigmaMuted,
+)
+
+val ValueTextStyle32BoldBlack = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.Bold,
+    fontSize = 32.sp,
+    color = DashboardFigmaInk,
+)
+
+val ValueTextStyle36BoldWhite = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.Bold,
+    fontSize = 36.sp,
+    color = Color.White,
+)
+
+val ValueTextStyle36BoldBlack = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.Bold,
+    fontSize = 36.sp,
+    color = DashboardFigmaInk,
+)
+
+/** Figma HRM analytics summary cards (node 871:40126). */
+val LabelTextStyle13Regular8E8E93 = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.Normal,
+    fontSize = 13.sp,
+    color = Color(0xFF8E8E93),
+)
+
+val CaptionTextStyle13Regular9C9CA1 = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.Normal,
+    fontSize = 13.sp,
+    color = Color(0xFF9C9CA1),
+)
+
+val AnalyticsTrendLabelTextStyle13 = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.Normal,
+    fontSize = 13.sp,
+    color = Color(0xFF34C759),
+)
+
+val CaptionTextStyle12NormalGrey = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.Normal,
+    fontSize = 12.sp,
+    color = DashboardFigmaMuted
 )

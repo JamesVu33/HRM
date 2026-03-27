@@ -121,7 +121,41 @@ private fun DrawerContent(
 
                         Screen.EmployeeList.route -> {
                             navController.navigate(route) {
-                                popUpTo(Screen.EmployeeList.route) { inclusive = true }
+                                popUpTo(Screen.Dashboard.route) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+
+                        Screen.SecurityChecks.route -> {
+                            navController.navigate(route) {
+                                popUpTo(Screen.Dashboard.route) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+
+                        Screen.MyInfo.route -> {
+                            navController.navigate(route) {
+                                popUpTo(Screen.Dashboard.route) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+
+                        Screen.MySecurityCheck.route -> {
+                            navController.navigate(route) {
+                                popUpTo(Screen.Dashboard.route) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
                             }
                         }
                     }

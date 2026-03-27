@@ -11,9 +11,9 @@ val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
-val Primary500 = Color(0xFF0747a6)
-val Primary400 = Color(0xFF155dfc)
-val Primary300 = Color(0xFF2684ff)
+val Primary500 = Color(0xFF0052CC)
+val Primary400 = Color(0xFF5A93E5)
+val Primary300 = Color(0xFF9CBFF2)
 val Primary50 = Color(0xFFdeebff)
 
 
@@ -94,4 +94,5 @@ val DashboardLeaveGreenStart = Color(0xFF05DF72)
 val DashboardLeaveGreenEnd = Color(0xFF00BC7D)
 val DashboardShieldCyan = Color(0xFF00D3F3)
 val DashboardProfileCellBg = Color(0x66EFF6FF)
+val CardBorder = Color(0xFFF0F0F0)
 
