@@ -46,6 +46,7 @@ suspend fun <T> safeApiCall(
             val errorInfo = errorResponse.getErrorInfo()
             Log.d("apiFlows", "safeApiCall: - failure case to errorInfo: $errorInfo")
             val errorType = errorInfo.getCommonErrorType()
+            Log.d("apiFlows", "safeApiCall: - failure case to errorType: $errorType")
 
             NetworkResult.Failure(errorType)
         }

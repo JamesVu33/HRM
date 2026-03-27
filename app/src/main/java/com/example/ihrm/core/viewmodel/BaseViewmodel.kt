@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ihrm.core.errorHandler.CommonErrorException
+import com.example.ihrm.core.errorHandler.GlobalErrorHandler
 import com.example.ihrm.data.remote.base.NetworkResult
 import com.example.ihrm.util.EmptyFunc
 import com.example.ihrm.util.ParamFunc
@@ -82,31 +83,13 @@ abstract class BaseViewmodel : ViewModel() {
 
             _loading.tryEmit(false)
             _error.tryEmit(errorException)
+
+            // these are 2 options right here
+            // 1. using global error handler to show error message via [GlobalErrorHandler]
+//            GlobalErrorHandler.showError(errorException.errorMsg)
+            // 2. using current page error handler via [CallbackWrapper]
             callbackWrapper.onFail(errorException)
         }
-
-    /**
-     * common fetch data function using CallbackWrapper
-     */
-    fun <R> fetchOriginData(
-        onLoading: EmptyFunc? = null,
-        fetching: SupEmptyFunc<R>,
-        callbackWrapper: CallbackWrapper<R>,
-    ) {
-        viewModelScope.launch(Dispatchers.IO + errorCatcher(callbackWrapper)) {
-            onLoading?.invoke() ?: _loading.tryEmit(true)
-
-            val response = fetching()
-
-            launch(Dispatchers.Default) {
-                callbackWrapper.doOnBackground(response)
-            }
-            launch(Dispatchers.Main) {
-                _loading.tryEmit(false)
-                callbackWrapper.onSuccess(response)
-            }
-        }
-    }
 
     /**
      * New fetchData overload specifically for NetworkResult with lambda callbacks.
@@ -161,12 +144,37 @@ abstract class BaseViewmodel : ViewModel() {
             }
 
             is NetworkResult.Exception -> {
-                onCallbackWrapper.onFail(CommonErrorException.UnknownException(response.e.message))
+//                onCallbackWrapper.onFail(CommonErrorException.UnknownException(response.e.message))
+                GlobalErrorHandler.showError(response.e.message)
                 _error.tryEmit(
                     CommonErrorException.NetworkException(
                         response.e.message ?: "Network error"
                     )
                 )
+            }
+        }
+    }
+
+
+    /**
+     * common fetch data function using CallbackWrapper
+     */
+    fun <R> fetchOriginData(
+        onLoading: EmptyFunc? = null,
+        fetching: SupEmptyFunc<R>,
+        callbackWrapper: CallbackWrapper<R>,
+    ) {
+        viewModelScope.launch(Dispatchers.IO + errorCatcher(callbackWrapper)) {
+            onLoading?.invoke() ?: _loading.tryEmit(true)
+
+            val response = fetching()
+
+            launch(Dispatchers.Default) {
+                callbackWrapper.doOnBackground(response)
+            }
+            launch(Dispatchers.Main) {
+                _loading.tryEmit(false)
+                callbackWrapper.onSuccess(response)
             }
         }
     }

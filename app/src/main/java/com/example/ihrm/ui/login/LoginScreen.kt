@@ -173,25 +173,11 @@ private fun LoginContent(
 
         val employeeIdError = uiState.employeeIdError
         if (employeeIdError != null) {
-            Text(
-                text = stringResource(employeeIdError.toEmployeeIdMessageResId()),
-                color = Error,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 6.dp)
-            )
-        }
-
-        if (uiState.loginError != null) {
-            Text(
-                text = uiState.loginError,
-                color = Error,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 6.dp)
-            )
+            val msg =
+                if (employeeIdError is LoginFieldError.ServerMsg) employeeIdError.msg else stringResource(
+                    employeeIdError.toEmployeeIdMessageResId()
+                )
+            ErrorFieldMsg(msg)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -218,14 +204,11 @@ private fun LoginContent(
 
         val passwordError = uiState.passwordError
         if (passwordError != null) {
-            Text(
-                text = stringResource(passwordError.toPasswordMessageResId()),
-                color = Error,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 6.dp)
-            )
+            val msg =
+                if (passwordError is LoginFieldError.ServerMsg) passwordError.msg else stringResource(
+                    passwordError.toPasswordMessageResId()
+                )
+            ErrorFieldMsg(msg)
         }
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -266,6 +249,18 @@ private fun LoginContent(
             )
         }
     }
+}
+
+@Composable
+private fun ErrorFieldMsg(msg: String) {
+    Text(
+        text = msg,
+        color = Error,
+        style = MaterialTheme.typography.bodySmall,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 6.dp)
+    )
 }
 
 @Composable
@@ -397,6 +392,7 @@ private fun LoginFieldError.toEmployeeIdMessageResId(): Int {
         LoginFieldError.TooShort -> R.string.login_test_error_employee_id_too_short
         LoginFieldError.InvalidLength -> R.string.login_test_error_employee_id_invalid_length
         LoginFieldError.InvalidRules -> R.string.login_test_error_password_rules
+        else -> R.string.login_test_error_api
     }
 }
 
@@ -406,6 +402,7 @@ private fun LoginFieldError.toPasswordMessageResId(): Int {
         LoginFieldError.TooShort -> R.string.login_test_error_employee_id_too_short
         LoginFieldError.InvalidLength -> R.string.login_test_error_employee_id_invalid_length
         LoginFieldError.InvalidRules -> R.string.login_test_error_password_rules
+        else -> R.string.login_test_error_api
     }
 }
 

@@ -5,9 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.ihrm.core.errorHandler.CommonErrorException
 import com.example.ihrm.core.viewmodel.BaseViewmodel
 import com.example.ihrm.core.viewmodel.CallbackWrapper
-import com.example.ihrm.data.remote.base.AppErrorResponse
 import com.example.ihrm.data.remote.login.LoginResponse
-import com.example.ihrm.domain.repository.AuthRepository
 import com.example.ihrm.domain.usecase.login.LoginUseCase
 import com.example.ihrm.util.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,7 +24,6 @@ data class LoginUiState(
     val passwordError: LoginFieldError? = null,
     val isLoginSuccess: Boolean = false,
     val isPasswordVisible: Boolean = false,
-    val loginError: String? = null
 )
 
 /** API requires employeeId exactly 8 characters. */
@@ -37,6 +34,7 @@ sealed interface LoginFieldError {
     data object TooShort : LoginFieldError
     data object InvalidLength : LoginFieldError  // not exactly 8 chars
     data object InvalidRules : LoginFieldError
+    data class ServerMsg(val msg: String) : LoginFieldError
 }
 
 @HiltViewModel
@@ -55,7 +53,6 @@ class LoginViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             employeeId = employeeId,
             employeeIdError = null,
-            loginError = null
         )
     }
 
@@ -67,7 +64,6 @@ class LoginViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             password = password,
             passwordError = null,
-            loginError = null
         )
     }
 
@@ -88,31 +84,30 @@ class LoginViewModel @Inject constructor(
             val employeeId = _uiState.value.employeeId.trim()
             val password = _uiState.value.password
 
-            val errorPwd = validatePassword(password)
-            val errorId = validateEmployeeId(employeeId)
-            if (errorPwd != null || errorId != null) {
-                _uiState.value = _uiState.value.copy(
-                    employeeIdError = errorId,
-                    passwordError = errorPwd
-                )
-                return@launch
-            }
+//            val errorPwd = validatePassword(password)
+//            val errorId = validateEmployeeId(employeeId)
+//            if (errorPwd != null || errorId != null) {
+//                _uiState.value = _uiState.value.copy(
+//                    employeeIdError = errorId,
+//                    passwordError = errorPwd
+//                )
+//                return@launch
+//            }
 
-            val employeeIdError = validateEmployeeId(employeeId)
-            val passwordError = validatePassword(password)
-            if (employeeIdError != null || passwordError != null) {
-                _uiState.value = _uiState.value.copy(
-                    employeeIdError = employeeIdError,
-                    passwordError = passwordError
-                )
-                return@launch
-            }
+//            val employeeIdError = validateEmployeeId(employeeId)
+//            val passwordError = validatePassword(password)
+//            if (employeeIdError != null || passwordError != null) {
+//                _uiState.value = _uiState.value.copy(
+//                    employeeIdError = employeeIdError,
+//                    passwordError = passwordError
+//                )
+//                return@launch
+//            }
 
             _uiState.value = _uiState.value.copy(
                 isLoading = true,
                 employeeIdError = null,
                 passwordError = null,
-                loginError = null
             )
 
             fetchData(
@@ -129,7 +124,9 @@ class LoginViewModel @Inject constructor(
                     }
 
                     override fun onFail(e: CommonErrorException) {
-                        _uiState.value = _uiState.value.copy(isLoading = false)
+//                        _uiState.value = _uiState.value.copy(isLoading = false,)
+                        _uiState.value =
+                            loginUseCase.getErrorField(_uiState.value, e).copy(isLoading = false)
                         Log.d("loginTest", "onFail: ${e.errorMsg}")
                     }
                 }
@@ -153,7 +150,7 @@ class LoginViewModel @Inject constructor(
      * Validate password
      */
     private fun validatePassword(password: String): LoginFieldError? {
-       return when {
+        return when {
             password.isEmpty() -> null
             password.length < 8 -> LoginFieldError.TooShort
             else -> null
