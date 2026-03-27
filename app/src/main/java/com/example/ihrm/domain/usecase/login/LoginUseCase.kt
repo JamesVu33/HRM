@@ -47,4 +47,23 @@ class LoginUseCase @Inject constructor(
         val permissionResult = authRepository.getPermission(employeeId)
         return translateResponse(permissionResult)
     }
+
+    fun getErrorField(uiState: LoginUiState, response: CommonErrorException): LoginUiState {
+        if (response !is CommonErrorException.InvalidInputException || response.errorField == null) return uiState
+        return when {
+            LoginRequest.isEmployeeIdField(response.errorField) -> uiState.copy(
+                employeeIdError = LoginFieldError.ServerMsg(
+                    response.errorMsg ?: ""
+                )
+            )
+
+            LoginRequest.isPasswordField(response.errorField) -> uiState.copy(
+                passwordError = LoginFieldError.ServerMsg(
+                    response.errorMsg ?: ""
+                )
+            )
+
+            else -> uiState
+        }
+    }
 }
