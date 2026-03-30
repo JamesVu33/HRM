@@ -1,16 +1,26 @@
 package com.example.ihrm.ui.common.header
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -20,6 +30,8 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -159,7 +171,7 @@ fun DashboardHomeTabSwitcher(
     onSelect: (DashboardHomeTab) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(
+    BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
@@ -167,70 +179,92 @@ fun DashboardHomeTabSwitcher(
             .clip(RoundedCornerShape(16.dp))
             .background(DashboardGlassFill)
             .border(1.dp, DashboardGlassStroke, RoundedCornerShape(16.dp))
-            .padding(4.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
+            .padding(4.dp)
     ) {
-        DashboardHomeTabChip(
-            label = stringResource(R.string.dashboard_tab_personal),
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = if (selected == DashboardHomeTab.Personal) DashboardTabActiveBlue else Color.White
-                )
-            },
-            selected = selected == DashboardHomeTab.Personal,
-            onClick = { onSelect(DashboardHomeTab.Personal) },
-            modifier = Modifier.weight(1f)
+        val totalWidth = maxWidth
+        val tabWidth = totalWidth / 2
+
+        val indicatorOffset by animateDpAsState(
+            targetValue = if (selected == DashboardHomeTab.Personal) 0.dp else tabWidth,
+            animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+            label = "TabIndicatorOffset"
         )
-        DashboardHomeTabChip(
-            label = stringResource(R.string.dashboard_tab_management),
-            icon = {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_list_person),
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = if (selected == DashboardHomeTab.Management) DashboardTabActiveBlue else Color.White
-                )
-            },
-            selected = selected == DashboardHomeTab.Management,
-            onClick = { onSelect(DashboardHomeTab.Management) },
-            modifier = Modifier.weight(1f)
+
+        // Sliding background indicator
+        Box(
+            modifier = Modifier
+                .offset(x = indicatorOffset)
+                .width(tabWidth)
+                .fillMaxHeight()
+                .shadow(4.dp, RoundedCornerShape(12.dp))
+                .background(Color.White, RoundedCornerShape(12.dp))
         )
+
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            DashboardHomeTabChip(
+                label = stringResource(R.string.dashboard_tab_personal),
+                icon = { color ->
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = color
+                    )
+                },
+                selected = selected == DashboardHomeTab.Personal,
+                onClick = { onSelect(DashboardHomeTab.Personal) },
+                modifier = Modifier.weight(1f)
+            )
+            DashboardHomeTabChip(
+                label = stringResource(R.string.dashboard_tab_management),
+                icon = { color ->
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_list_person),
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = color
+                    )
+                },
+                selected = selected == DashboardHomeTab.Management,
+                onClick = { onSelect(DashboardHomeTab.Management) },
+                modifier = Modifier.weight(1f)
+            )
+        }
     }
 }
 
 @Composable
 private fun DashboardHomeTabChip(
     label: String,
-    icon: @Composable () -> Unit,
+    icon: @Composable (Color) -> Unit,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val shape = RoundedCornerShape(12.dp)
+    val contentColor by animateColorAsState(
+        targetValue = if (selected) DashboardTabActiveBlue else Color.White,
+        label = "TabContentColor"
+    )
+
     Box(
         modifier = modifier
-            .height(44.dp)
-            .clip(shape)
-            .then(
-                if (selected) {
-                    Modifier
-                        .shadow(4.dp, shape)
-                        .background(Color.White, shape)
-                } else {
-                    Modifier
-                }
-            )
-            .clickable(onClick = onClick),
+            .fillMaxHeight()
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(
+                onClick = onClick,
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ),
         contentAlignment = Alignment.Center
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            icon()
+            icon(contentColor)
             Text(
                 text = label,
                 style = TextStyle(
@@ -238,7 +272,7 @@ private fun DashboardHomeTabChip(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp,
                     lineHeight = 21.sp,
-                    color = if (selected) DashboardTabActiveBlue else Color.White
+                    color = contentColor
                 )
             )
         }
