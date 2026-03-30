@@ -4,6 +4,7 @@ import com.example.ihrm.BuildConfig
 import com.example.ihrm.data.remote.api.AuthApiService
 import com.example.ihrm.data.remote.api.EmployeeApiService
 import com.example.ihrm.data.remote.api.LanguageApiService
+import com.example.ihrm.data.remote.api.MyInfoApiService
 import com.example.ihrm.data.remote.interceptor.AuthInterceptor
 import com.example.ihrm.data.remote.interceptor.ErrorInterceptor
 import com.google.gson.Gson
@@ -74,5 +75,11 @@ object NetworkModule {
     @Singleton
     fun provideLanguageApiService(retrofit: Retrofit): LanguageApiService {
         return retrofit.create(LanguageApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideMyInfoApiService(retrofit: Retrofit): MyInfoApiService {
+        return retrofit.create(MyInfoApiService::class.java)
     }
 }

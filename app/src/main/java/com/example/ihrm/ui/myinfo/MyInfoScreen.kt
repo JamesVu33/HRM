@@ -20,8 +20,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -32,10 +32,13 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,7 +47,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -60,13 +62,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ihrm.R
+import com.example.ihrm.domain.model.Gender
+import com.example.ihrm.domain.model.MaritalStatus
+import com.example.ihrm.domain.model.MyInfo
+import com.example.ihrm.ui.common.Avatar
+import com.example.ihrm.ui.common.BaseHRMCompose
 import com.example.ihrm.ui.common.PendingActionsRow
 import com.example.ihrm.ui.components.ButtonVariant
+import com.example.ihrm.ui.login.LoginScreenContent
 import com.example.ihrm.ui.theme.DashboardFigmaInk
 import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.util.DashboardBrush.MyInfoHeaderBrush
 import com.example.ihrm.util.dropShadow
+import com.example.ihrm.util.toDisplayDate
 import com.example.ihrm.util.txtInterMedium14White90Percent
 
 private val PageBg = Color(0xFFF9FAFB)
@@ -118,15 +128,98 @@ private val SectionSubtitleStyle = TextStyle(
 private enum class GenderOption { Male, Female }
 
 @Composable
+private fun textOrPlaceholder(value: String?): String {
+    if (value.isNullOrBlank()) return stringResource(R.string.my_info_not_available)
+    return value
+}
+
+private fun rolesDisplay(info: MyInfo?): String? {
+    if (info == null) return null
+    val joined = info.roles.map { it.name }.filter { it.isNotBlank() }.joinToString(", ")
+    return joined.ifBlank { null }
+}
+
+@Composable
+private fun maritalStatusLabel(status: MaritalStatus?): String {
+    if (status == null) return stringResource(R.string.my_info_not_available)
+    return when (status) {
+        MaritalStatus.SINGLE -> stringResource(R.string.marital_single)
+        MaritalStatus.MARRIED -> stringResource(R.string.marital_married)
+        MaritalStatus.DIVORCED -> stringResource(R.string.marital_divorced)
+        MaritalStatus.WIDOWED -> stringResource(R.string.marital_widowed)
+        MaritalStatus.UNKNOWN -> stringResource(R.string.my_info_not_available)
+    }
+}
+
+private fun domainGenderToUiOption(g: Gender?): GenderOption {
+    return when (g) {
+        Gender.MALE -> GenderOption.Male
+        Gender.FEMALE -> GenderOption.Female
+        Gender.OTHER, Gender.UNKNOWN, null -> GenderOption.Male
+    }
+}
+
+private fun initialsFromName(name: String?): String {
+    if (name.isNullOrBlank()) return "?"
+    val parts = name.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }
+    if (parts.isEmpty()) return "?"
+    return when (parts.size) {
+        1 -> parts[0].take(2).uppercase()
+        else -> "${parts[0].first()}${parts[1].first()}".uppercase()
+    }
+}
+
+@Composable
 fun MyInfoScreen(
     onMenuClick: () -> Unit,
     onCancelClick: () -> Unit,
     onChangeInfoClick: () -> Unit = {},
     onKeyClick: () -> Unit = {},
     onChangePhotoClick: () -> Unit = {},
+    viewModel: MyInfoViewModel = hiltViewModel()
 ) {
-    var gender by remember { mutableStateOf(GenderOption.Male) }
+    BaseHRMCompose(
+        content = { MyInfoScreenContent(viewModel = viewModel, onMenuClick = onMenuClick) },
+        viewmodel = viewModel,
+        onErrorAlertClose = {  }
+    )
+}
+
+@Composable
+fun MyInfoScreenContent(
+    onMenuClick: () -> Unit = {},
+    onCancelClick: () -> Unit = {},
+    onChangeInfoClick: () -> Unit = {},
+    onKeyClick: () -> Unit = {},
+    onChangePhotoClick: () -> Unit = {},
+    viewModel: MyInfoViewModel
+) {
+    val myInfo by viewModel.myInfo.collectAsState()
+    val profile = myInfo?.profile
+    val genderSelected = remember(profile?.gender) { domainGenderToUiOption(profile?.gender) }
     var showChangePasswordDialog by remember { mutableStateOf(false) }
+
+    var fullNameText by remember { mutableStateOf("") }
+    var englishNameText by remember { mutableStateOf("") }
+    var emailText by remember { mutableStateOf("") }
+    var phoneText by remember { mutableStateOf("") }
+    var dobText by remember { mutableStateOf("") }
+    var identityIdText by remember { mutableStateOf("") }
+    var identityIssueDayText by remember { mutableStateOf("") }
+    var identityIssuePlaceText by remember { mutableStateOf("") }
+
+    LaunchedEffect(myInfo) {
+        val info = myInfo ?: return@LaunchedEffect
+        val p = info.profile
+        fullNameText = info.fullName
+        englishNameText = p?.englishName.orEmpty()
+        emailText = info.email
+        phoneText = info.phoneNumber
+        dobText = p?.dateOfBirth.toDisplayDate()
+        identityIdText = p?.identityId.orEmpty()
+        identityIssueDayText = p?.identityIdIssueDate.toDisplayDate()
+        identityIssuePlaceText = p?.identityIdIssuePlace.orEmpty()
+    }
 
     if (showChangePasswordDialog) {
         ChangePasswordDialog(onDismiss = { showChangePasswordDialog = false })
@@ -140,6 +233,8 @@ fun MyInfoScreen(
             .verticalScroll(rememberScrollState())
     ) {
         MyInfoHeader(
+            fullName = fullNameText.takeIf { it.isNotBlank() } ?: myInfo?.fullName,
+            avatarUrl = profile?.avatarUrl,
             onMenuClick = onMenuClick,
             onKeyClick = {
                 showChangePasswordDialog = true
@@ -167,32 +262,57 @@ fun MyInfoScreen(
                         label = stringResource(R.string.my_info_label_full_name),
                         icon = ImageVector.vectorResource(R.drawable.ic_person),
                         content = {
-                            MyInfoValueBox(stringResource(R.string.my_info_demo_full_name))
+                            MyInfoValueBox(
+                                value = fullNameText,
+                                onValueChange = { fullNameText = it },
+                            )
                         },
                     )
                     MyInfoDivider()
                     MyInfoLabeledField(
                         label = stringResource(R.string.my_info_label_english_name),
                         icon = ImageVector.vectorResource(R.drawable.ic_person),
-                        content = { MyInfoValueBox(stringResource(R.string.my_info_demo_english_name)) },
+                        content = {
+                            MyInfoValueBox(
+                                value = englishNameText,
+                                onValueChange = { englishNameText = it },
+                            )
+                        },
                     )
                     MyInfoDivider()
                     MyInfoLabeledField(
                         label = stringResource(R.string.my_info_label_email),
                         icon = ImageVector.vectorResource(R.drawable.ic_email),
-                        content = { MyInfoValueBox(stringResource(R.string.my_info_demo_email)) },
+                        content = {
+                            MyInfoValueBox(
+                                value = emailText,
+                                onValueChange = { emailText = it },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                            )
+                        },
                     )
                     MyInfoDivider()
                     MyInfoLabeledField(
                         label = stringResource(R.string.my_info_label_phone),
                         icon = ImageVector.vectorResource(R.drawable.ic_cellphone),
-                        content = { MyInfoValueBox(stringResource(R.string.my_info_demo_phone)) },
+                        content = {
+                            MyInfoValueBox(
+                                value = phoneText,
+                                onValueChange = { phoneText = it },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                            )
+                        },
                     )
                     MyInfoDivider()
                     MyInfoLabeledField(
                         label = stringResource(R.string.my_info_label_dob),
                         icon = ImageVector.vectorResource(R.drawable.ic_calendar),
-                        content = { MyInfoValueBox(stringResource(R.string.my_info_demo_dob)) },
+                        content = {
+                            MyInfoValueBox(
+                                value = dobText,
+                                onValueChange = { dobText = it },
+                            )
+                        },
                     )
                     MyInfoDivider()
                     MyInfoLabeledField(
@@ -200,8 +320,9 @@ fun MyInfoScreen(
                         icon = ImageVector.vectorResource(R.drawable.ic_person),
                         content = {
                             MyInfoGenderRow(
-                                selected = gender,
-                                onSelect = { gender = it },
+                                selected = genderSelected,
+                                onSelect = {},
+                                readOnly = true,
                             )
                         },
                     )
@@ -209,26 +330,41 @@ fun MyInfoScreen(
                     MyInfoLabeledField(
                         label = stringResource(R.string.my_info_label_identity_id),
                         icon = ImageVector.vectorResource(R.drawable.ic_calendar),
-                        content = { MyInfoValueBox(stringResource(R.string.my_info_demo_identity_id)) },
+                        content = {
+                            MyInfoValueBox(
+                                value = identityIdText,
+                                onValueChange = { identityIdText = it },
+                            )
+                        },
                     )
                     MyInfoDivider()
                     MyInfoLabeledField(
                         label = stringResource(R.string.my_info_label_identity_issue_day),
                         icon = ImageVector.vectorResource(R.drawable.ic_calendar),
-                        content = { MyInfoValueBox(stringResource(R.string.my_info_demo_identity_issue)) },
+                        content = {
+                            MyInfoValueBox(
+                                value = identityIssueDayText,
+                                onValueChange = { identityIssueDayText = it },
+                            )
+                        },
                     )
                     MyInfoDivider()
                     MyInfoLabeledField(
                         label = stringResource(R.string.my_info_label_identity_issue_place),
                         icon = ImageVector.vectorResource(R.drawable.ic_location),
-                        content = { MyInfoValueBox(stringResource(R.string.my_info_demo_identity_place)) },
+                        content = {
+                            MyInfoValueBox(
+                                value = identityIssuePlaceText,
+                                onValueChange = { identityIssuePlaceText = it },
+                            )
+                        },
                     )
                     MyInfoDivider()
                     MyInfoLabeledField(
                         label = stringResource(R.string.my_info_label_nationality),
                         icon = ImageVector.vectorResource(R.drawable.ic_location),
                         content = {
-                            MyInfoDropdownRow(stringResource(R.string.my_info_demo_nationality))
+                            MyInfoDropdownRow(textOrPlaceholder(profile?.nationality))
                         },
                     )
                     MyInfoDivider()
@@ -236,7 +372,7 @@ fun MyInfoScreen(
                         label = stringResource(R.string.my_info_label_marital_status),
                         icon = ImageVector.vectorResource(R.drawable.ic_person),
                         content = {
-                            MyInfoDropdownRow(stringResource(R.string.marital_single))
+                            MyInfoDropdownRow(maritalStatusLabel(profile?.maritalStatus))
                         },
                     )
                     MyInfoDivider()
@@ -244,7 +380,7 @@ fun MyInfoScreen(
                         label = stringResource(R.string.my_info_label_address),
                         icon = ImageVector.vectorResource(R.drawable.ic_location),
                         content = {
-                            MyInfoAddressBox(stringResource(R.string.my_info_demo_address))
+                            MyInfoAddressBox(textOrPlaceholder(profile?.address))
                         },
                     )
                 }
@@ -255,27 +391,27 @@ fun MyInfoScreen(
                 ) {
                     MyInfoReadOnlyEmployeeField(
                         label = stringResource(R.string.my_info_label_role),
-                        value = stringResource(R.string.my_info_demo_role),
+                        value = textOrPlaceholder(rolesDisplay(myInfo)),
                     )
                     MyInfoDivider()
                     MyInfoReadOnlyEmployeeField(
                         label = stringResource(R.string.my_info_label_job_title),
-                        value = stringResource(R.string.my_info_demo_job_title),
+                        value = textOrPlaceholder(profile?.title?.name),
                     )
                     MyInfoDivider()
                     MyInfoReadOnlyEmployeeField(
                         label = stringResource(R.string.my_info_label_level),
-                        value = stringResource(R.string.my_info_demo_level),
+                        value = textOrPlaceholder(profile?.level?.name),
                     )
                     MyInfoDivider()
                     MyInfoReadOnlyEmployeeField(
                         label = stringResource(R.string.my_info_label_department),
-                        value = stringResource(R.string.my_info_demo_department),
+                        value = stringResource(R.string.my_info_not_available),
                     )
                     MyInfoDivider()
                     MyInfoReadOnlyEmployeeField(
                         label = stringResource(R.string.my_info_label_status),
-                        value = stringResource(R.string.my_info_demo_status),
+                        value = textOrPlaceholder(myInfo?.status),
                     )
                 }
 
@@ -352,6 +488,8 @@ fun MyInfoScreen(
 
 @Composable
 private fun MyInfoHeader(
+    fullName: String?,
+    avatarUrl: String?,
     onMenuClick: () -> Unit,
     onKeyClick: () -> Unit,
     onChangePhotoClick: () -> Unit,
@@ -414,21 +552,12 @@ private fun MyInfoHeader(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(modifier = Modifier.size(96.dp)) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.25f))
-                        .border(2.dp, Color.White.copy(alpha = 0.5f), CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(48.dp)
-                    )
-                }
+                Avatar(
+                    imageUrl = avatarUrl,
+                    initials = initialsFromName(fullName),
+                    size = 96.dp,
+                    showBorder = true,
+                )
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
@@ -447,6 +576,21 @@ private fun MyInfoHeader(
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
+            if (!fullName.isNullOrBlank()) {
+                Text(
+                    text = fullName,
+                    style = TextStyle(
+                        fontFamily = InterFontFamily,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 20.sp,
+                        lineHeight = 28.sp,
+                        color = Color.White,
+                        letterSpacing = (-0.5).sp,
+                    ),
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+            }
             Text(
                 text = stringResource(R.string.my_info_change_photo),
                 style = txtInterMedium14White90Percent,
@@ -540,19 +684,34 @@ private fun MyInfoLabeledField(
 }
 
 @Composable
-private fun MyInfoValueBox(value: String) {
-    Box(
+private fun MyInfoValueBox(
+    value: String,
+    onValueChange: (String) -> Unit,
+    singleLine: Boolean = true,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
         modifier = Modifier
             .fillMaxWidth()
-            .height(50.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .border(1.dp, FieldBorder, RoundedCornerShape(12.dp))
-            .background(Color.White)
-            .padding(horizontal = 16.dp),
-        contentAlignment = Alignment.CenterStart
-    ) {
-        Text(text = value, style = FieldValueStyle)
-    }
+            .height(56.dp),
+        textStyle = FieldValueStyle,
+        singleLine = singleLine,
+        keyboardOptions = keyboardOptions,
+        shape = RoundedCornerShape(12.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color.White,
+            disabledContainerColor = Color.White,
+            focusedBorderColor = FieldBorder,
+            unfocusedBorderColor = FieldBorder,
+            disabledBorderColor = FieldBorder,
+            focusedTextColor = DashboardFigmaInk,
+            unfocusedTextColor = DashboardFigmaInk,
+            cursorColor = PrimaryBar,
+        ),
+    )
 }
 
 @Composable
@@ -605,6 +764,7 @@ private fun MyInfoDropdownRow(value: String) {
 private fun MyInfoGenderRow(
     selected: GenderOption,
     onSelect: (GenderOption) -> Unit,
+    readOnly: Boolean = false,
 ) {
     val selectedBrush = Brush.verticalGradient(
         colors = listOf(Color(0xFF2B7FFF), Color(0xFF155DFC))
@@ -631,7 +791,7 @@ private fun MyInfoGenderRow(
                             Modifier.background(GenderUnselectedBg, RoundedCornerShape(14.dp))
                         }
                     )
-                    .clickable { onSelect(option) },
+                    .clickable(enabled = !readOnly) { onSelect(option) },
                 contentAlignment = Alignment.Center
             ) {
                 Text(

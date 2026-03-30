@@ -250,6 +250,7 @@
     <string name="my_info_gender_male">Male</string>
     <string name="my_info_gender_female">Female</string>
     <string name="my_info_gender_other">Other</string>
+    <string name="my_info_not_available">—</string>
     <string name="my_info_cancel">Cancel</string>
     <string name="my_info_change_info">Change Infor</string>
     <string name="my_info_demo_full_name">William Henry Perkin</string>
