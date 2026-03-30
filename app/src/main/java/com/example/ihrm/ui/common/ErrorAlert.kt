@@ -1,5 +1,6 @@
 package com.example.ihrm.ui.common
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,16 +26,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ihrm.core.errorHandler.GlobalErrorHandler
+import com.example.ihrm.core.viewmodel.BaseViewmodel
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.launch
 
 @Composable
 fun ErrorAlert(
+    viewmodel: BaseViewmodel,
     onErrorAlertClose: (() -> Unit)? = null,
 ) {
     val coroutineScope = rememberCoroutineScope()
 
+    val errorState by viewmodel.errorEvent.collectAsState()
+    Log.d("Vinh", "ErrorAlert: $errorState")
     var errorMsg by remember {
         mutableStateOf<String?>(null)
     }
@@ -42,12 +49,15 @@ fun ErrorAlert(
         mutableStateOf(false)
     }
 
+    if (errorState == null) return
+
     LaunchedEffect(Unit) {
         GlobalErrorHandler.globalError.conflate().collect {
             errorMsg = it
             errorVisibility = true
         }
     }
+
 
     val onClose: () -> Unit = remember(Unit) {
         {
@@ -57,6 +67,11 @@ fun ErrorAlert(
                 errorMsg = null
             }
         }
+    }
+
+    LaunchedEffect(key1 = errorState) {
+        errorVisibility = true
+        errorMsg = errorState?.errorMsg
     }
 
     if (errorMsg.isNullOrEmpty()) return
@@ -74,6 +89,7 @@ fun ErrorAlert(
                 .fillMaxSize(),
             contentAlignment = Alignment.BottomCenter
         ) {
+            Log.d("Vinh", "ErrorAlert: $errorVisibility")
             AnimatedVisibility(
                 visible = errorVisibility,
             ) {

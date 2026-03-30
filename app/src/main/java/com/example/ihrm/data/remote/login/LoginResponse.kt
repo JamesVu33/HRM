@@ -19,5 +19,16 @@ data class LoginResponse(
     @SerializedName("user")
     val user: UserShortDto,
     @SerializedName("roles")
-    val roles: List<RoleShortDto>
+    val roles: List<RoleShortDto>,
+    /**
+     * `"BASIC"` | `"EXTRA"` — when null, [com.example.ihrm.domain.session.LoginSessionResolver]
+     * uses roles + [com.example.ihrm.data.mock.LoginMockSession].
+     */
+    @SerializedName("accountType")
+    val accountType: String? = null,
+    /**
+     * Feature codes (e.g. `USER`, `ROLE`) the user may **modify**; when null, resolver uses mock defaults.
+     */
+    @SerializedName("modifiableFeatures")
+    val modifiableFeatures: List<String>? = null,
 )

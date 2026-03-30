@@ -1,6 +1,7 @@
 package com.example.ihrm.util
 
 import android.graphics.BlurMaskFilter
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Size
@@ -18,9 +19,9 @@ import com.example.ihrm.ui.theme.Neutral100
  */
 fun Modifier.dropShadow(
     shape: Shape,
-    color: Color = Neutral100,
+    color: Color = Color.Black.copy(0.25f),
     blur: Dp = 4.dp,
-    offsetY: Dp = 5.dp,
+    offsetY: Dp = 4.dp,
     offsetX: Dp = 0.dp,
     spread: Dp = 0.dp
 ) = this.drawBehind {

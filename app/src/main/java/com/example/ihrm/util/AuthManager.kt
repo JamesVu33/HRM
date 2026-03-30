@@ -2,7 +2,11 @@ package com.example.ihrm.util
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import com.example.ihrm.data.remote.login.LoginResponse
+import com.example.ihrm.domain.model.AccountType
+import com.example.ihrm.domain.model.AppFeature
+import com.example.ihrm.domain.session.LoginSessionResolver
 
 /**
  * Holds auth state and tokens. Call [init] from [android.app.Application.onCreate].
@@ -36,15 +40,20 @@ object AuthManager {
     }
 
     /**
-     * Saves tokens and user session (including fullName, email) after successful login.
+     * Saves tokens and user session (including fullName, email, account tier, modifiable features)
+     * after successful login. [LoginSessionResolver] merges API fields with mock fallbacks.
      */
     fun saveTokens(response: LoginResponse) {
+        val session = LoginSessionResolver.resolve(response)
+        val featuresCsv = session.modifiableFeatures.joinToString(",") { it.apiCode }
         prefs?.edit()
             ?.putString(Constants.PREF_ACCESS_TOKEN, response.accessToken)
             ?.putString(Constants.PREF_REFRESH_TOKEN, response.refreshToken)
             ?.putBoolean(Constants.PREF_IS_LOGGED_IN, true)
             ?.putString(Constants.PREF_USER_FULL_NAME, response.user.fullName)
             ?.putString(Constants.PREF_USER_EMAIL, response.user.email)
+            ?.putString(Constants.PREF_ACCOUNT_TYPE, session.accountType.toApiValue())
+            ?.putString(Constants.PREF_MODIFIABLE_FEATURES, featuresCsv)
             ?.apply()
     }
 
@@ -58,6 +67,25 @@ object AuthManager {
     fun getUserEmail(): String? = prefs?.getString(Constants.PREF_USER_EMAIL, null)
 
     /**
+     * Account tier from last login ([LoginSessionResolver]); defaults to [AccountType.Basic] if missing.
+     */
+    fun getAccountType(): AccountType {
+        val raw = prefs?.getString(Constants.PREF_ACCOUNT_TYPE, null)
+        return AccountType.fromApiValue(raw) ?: AccountType.Basic
+    }
+
+    /**
+     * Features the current user may **modify** (from login response + mock); empty if none.
+     */
+    fun getModifiableFeatures(): Set<AppFeature> {
+        val raw = prefs?.getString(Constants.PREF_MODIFIABLE_FEATURES, null) ?: return emptySet()
+        if (raw.isBlank()) return emptySet()
+        return raw.split(',').mapNotNull { AppFeature.fromApiCode(it.trim()) }.toSet()
+    }
+
+    fun canModify(feature: AppFeature): Boolean = feature in getModifiableFeatures()
+
+    /**
      * Clears tokens and logged-in state (e.g. on logout).
      */
     fun clearTokens() {
@@ -66,6 +94,8 @@ object AuthManager {
             ?.remove(Constants.PREF_REFRESH_TOKEN)
             ?.remove(Constants.PREF_USER_FULL_NAME)
             ?.remove(Constants.PREF_USER_EMAIL)
+            ?.remove(Constants.PREF_ACCOUNT_TYPE)
+            ?.remove(Constants.PREF_MODIFIABLE_FEATURES)
             ?.putBoolean(Constants.PREF_IS_LOGGED_IN, false)
             ?.apply()
     }

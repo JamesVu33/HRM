@@ -1,5 +1,7 @@
 package com.example.ihrm.ui.dashboard
 
+import com.example.ihrm.domain.model.AccountType
+
 enum class DashboardRole {
     Personal,
     Extra
@@ -39,30 +41,10 @@ internal fun securityRejectedShare(
     return if (total > 0) rejected.toFloat() / total else 0f
 }
 
-/**
- * Simple role resolver for Dashboard right after login.
- * `Extra` users are those likely to have management permissions.
- */
-internal fun resolveDashboardRoleAfterLogin(
-    email: String?,
-    fullName: String?
-): DashboardRole {
-    val key = buildString {
-        append(email.orEmpty())
-        append(" ")
-        append(fullName.orEmpty())
-    }.lowercase()
-
-    val extraHints = listOf(
-        "admin",
-        "manager",
-        "lead",
-        "hr",
-        "s1",
-        "s2",
-        "extra"
-    )
-    return if (extraHints.any { key.contains(it) }) DashboardRole.Extra else DashboardRole.Personal
+/** Maps login [AccountType] to dashboard shell (tabs / drawer grouping). */
+fun AccountType.toDashboardRole(): DashboardRole = when (this) {
+    AccountType.Basic -> DashboardRole.Personal
+    AccountType.Extra -> DashboardRole.Extra
 }
 
 internal fun buildPersonalRoleUi(source: DashboardHomeMockModel): DashboardPersonalRoleUi {

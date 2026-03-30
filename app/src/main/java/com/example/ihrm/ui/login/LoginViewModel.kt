@@ -6,6 +6,8 @@ import com.example.ihrm.core.errorHandler.CommonErrorException
 import com.example.ihrm.core.viewmodel.BaseViewmodel
 import com.example.ihrm.core.viewmodel.CallbackWrapper
 import com.example.ihrm.data.remote.login.LoginResponse
+import com.example.ihrm.data.remote.login.PermissionResponse
+import com.example.ihrm.domain.repository.AuthRepository
 import com.example.ihrm.domain.usecase.login.LoginUseCase
 import com.example.ihrm.util.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -116,12 +118,55 @@ class LoginViewModel @Inject constructor(
                     override fun onSuccess(data: LoginResponse) {
                         Log.d("loginTest", "onSuccess: $data")
                         AuthManager.saveTokens(data)
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            isLoginSuccess = true
+                        getPermission(
+                            employeeId = data.roles.get(0).id,
+                            onSuccess = onSuccess
                         )
-                        onSuccess()
                     }
+
+                    override fun onFail(e: CommonErrorException) {
+                        _uiState.value = _uiState.value.copy(isLoading = false)
+                        Log.d("loginTest", "onFail: ${e.errorMsg}")
+                    }
+                }
+            )
+        }
+    }
+
+    fun getPermission(
+        employeeId: Int,
+        onSuccess: () -> Unit
+    ) {
+        ///** GET /permissions/roles/{id} */
+        /*fetchData(
+            fetching = { loginUseCase.getPermission(employeeId) },
+            callbackWrapper = object : CallbackWrapper<PermissionResponse> {
+                override fun onSuccess(data: PermissionResponse) {
+                    Log.d("loginTest", "onSuccess: $data")
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        isLoginSuccess = true
+                    )
+                    onSuccess()
+                }
+
+                override fun onFail(e: CommonErrorException) {
+                    _uiState.value = _uiState.value.copy(isLoading = false)
+                    Log.d("loginTest", "onFail: ${e.errorMsg}")
+                }
+}
+        )*/
+        fetchData(
+            fetching = { loginUseCase.getPermission(employeeId) },
+            callbackWrapper = object : CallbackWrapper<List<PermissionResponse>> {
+                override fun onSuccess(data: List<PermissionResponse>) {
+                    Log.d("loginTest", "onSuccess: $data")
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        isLoginSuccess = true
+                    )
+                    onSuccess()
+                }
 
                     override fun onFail(e: CommonErrorException) {
 //                        _uiState.value = _uiState.value.copy(isLoading = false,)
@@ -133,6 +178,7 @@ class LoginViewModel @Inject constructor(
             )
         }
     }
+
 
     /**
      * Validate employeeId

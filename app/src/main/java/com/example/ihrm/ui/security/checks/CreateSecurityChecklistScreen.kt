@@ -2,7 +2,7 @@ package com.example.ihrm.ui.security.checks
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,24 +26,30 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ihrm.R
+import com.example.ihrm.ui.common.header.BaseHeader
+import com.example.ihrm.ui.components.ButtonSize
+import com.example.ihrm.ui.components.CustomButton
+import com.example.ihrm.util.DashboardBrush
 
 private data class CreateChecklistQuestionUi(
     val content: String,
@@ -52,22 +58,27 @@ private data class CreateChecklistQuestionUi(
     val expanded: Boolean = false
 )
 
-private val createChecklistQuestions = listOf(
+private fun initialCreateChecklistQuestions(): List<CreateChecklistQuestionUi> = listOf(
     CreateChecklistQuestionUi(
-        content = "There are no information (ID, PW, etc.) leakage written on post-it notes and attached to open places (like monitors, desks)?"
+        content = "There are no information (ID, PW, etc.) leakage written on post-it notes and attached to open places (like monitors, desks)?",
+        translation = "Các thông tin (ID, PW, v.v.) có nguy cơ rò rỉ không được viết trên các ghi chú và dán ở những nơi mở (màn hình, bàn làm việc) đúng không?"
     ),
     CreateChecklistQuestionUi(
         content = "Are information (ID, PW, etc.) leakage safely managed without being stored on the PC or department's web hard?",
         translation = "Thong tin (ID, PW, v.v.) co nguy co ro ri co duoc quan ly an toan ma khong can luu tru tren PC hoac web cua bo phan khong?",
-        selected = true,
-        expanded = true
     ),
     CreateChecklistQuestionUi(
         content = "Are confidential documents (including personal information) or print-outs containing work-related information stored in lockable drawers or cabinets?",
-        selected = true
+        translation = "Các tài liệu bảo mật (bao gồm thông tin cá nhân) hoặc bản in chứa thông tin liên quan đến công việc có được lưu trữ trong ngăn kéo hoặc tủ có khóa không?",
     ),
-    CreateChecklistQuestionUi(content = "Are confidential information prohibited to print-outs?"),
-    CreateChecklistQuestionUi(content = "Is the screen locked when leaving the seat?")
+    CreateChecklistQuestionUi(
+        content = "Are confidential information prohibited to print-outs?",
+        translation = "Thông tin bảo mật có bị cấm in ra không?"
+    ),
+    CreateChecklistQuestionUi(
+        content = "Is the screen locked when leaving the seat?",
+        translation = "Màn hình có được khóa khi rời khỏi chỗ ngồi không?"
+    )
 )
 
 @Composable
@@ -83,42 +94,20 @@ fun CreateSecurityChecklistScreen(
         containerColor = Color.Transparent,
         contentWindowInsets = WindowInsets(top = 0),
         bottomBar = {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 14.dp, vertical = 12.dp)
-            ) {
-                Button(
-                    onClick = onSubmitClick,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0747A6))
-                ) {
-                    Text(
-                        text = stringResource(R.string.create_security_checklist_submit),
-                        color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-            }
+            CustomButton(
+                modifier = Modifier.padding(horizontal = 14.dp).padding(top = 30.dp, bottom = 8.dp),
+                text = stringResource(R.string.create_security_checklist_submit),
+                size = ButtonSize.Large,
+                fullWidth = true,
+                enabled = true,
+                onClick = onSubmitClick
+            )
         }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colorStops = arrayOf(
-                            0.0f to Color(0xFF0A53BE),
-                            0.50f to Color(0xFF5A93E5),
-                            0.75f to Color(0xFF9CBFF2),
-                            1.0f to Color(0xFFF3F4F6)
-                        )
-                    )
-                )
+                .background(brush = DashboardBrush.BaseBackground)
                 .padding(paddingValues)
                 .padding(horizontal = 14.dp)
         ) {
@@ -139,24 +128,19 @@ private fun HeaderSection(
     onBackClick: () -> Unit
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onBackClick) {
+        BaseHeader(
+            title = stringResource(R.string.create_security_checklist_title),
+            showNavigationIcon = true,
+            onNavigationClick = onBackClick,
+            navigationIcon = {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = null,
                     tint = Color.White
                 )
-            }
-            Text(
-                text = stringResource(R.string.create_security_checklist_title),
-                color = Color.White,
-                fontSize = 36.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
+            },
+            containerColor = Color.Transparent
+        )
         Text(
             text = stringResource(R.string.create_security_checklist_subtitle),
             color = Color.White,
@@ -168,6 +152,8 @@ private fun HeaderSection(
 
 @Composable
 private fun QuestionsCard() {
+    var questions by remember { mutableStateOf(initialCreateChecklistQuestions()) }
+
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -196,10 +182,20 @@ private fun QuestionsCard() {
                 )
             }
             LazyColumn(contentPadding = PaddingValues(bottom = 4.dp)) {
-                itemsIndexed(createChecklistQuestions) { index, question ->
+                itemsIndexed(questions, key = { _, q -> q.content }) { index, question ->
                     QuestionRow(
                         item = question,
-                        isLast = index == createChecklistQuestions.lastIndex
+                        isLast = index == questions.lastIndex,
+                        onExpandedToggle = {
+                            questions = questions.mapIndexed { i, q ->
+                                if (i == index) q.copy(expanded = !q.expanded) else q
+                            }
+                        },
+                        onSelectedToggle = {
+                            questions = questions.mapIndexed { i, q ->
+                                if (i == index) q.copy(selected = !q.selected) else q
+                            }
+                        },
                     )
                 }
             }
@@ -208,8 +204,14 @@ private fun QuestionsCard() {
 }
 
 @Composable
-private fun QuestionRow(item: CreateChecklistQuestionUi, isLast: Boolean) {
+private fun QuestionRow(
+    item: CreateChecklistQuestionUi,
+    isLast: Boolean,
+    onExpandedToggle: () -> Unit,
+    onSelectedToggle: () -> Unit,
+) {
     val bg = if (item.selected) Color(0xFFD3DDFF) else Color.White
+    val hasTranslation = !item.translation.isNullOrBlank()
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -222,19 +224,32 @@ private fun QuestionRow(item: CreateChecklistQuestionUi, isLast: Boolean) {
         Row(verticalAlignment = Alignment.Top) {
             Box(
                 modifier = Modifier
-                    .padding(top = 2.dp)
-                    .size(20.dp)
-                    .clip(CircleShape)
-                    .border(2.dp, if (item.selected) Color(0xFF12B76A) else Color(0xFFD1D5DB), CircleShape),
+                    .size(40.dp)
+                    .clickable(
+                        onClick = onSelectedToggle,
+                        role = Role.RadioButton,
+                    ),
                 contentAlignment = Alignment.Center
             ) {
-                if (item.selected) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = null,
-                        tint = Color(0xFF12B76A),
-                        modifier = Modifier.size(14.dp)
-                    )
+                Box(
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clip(CircleShape)
+                        .border(
+                            2.dp,
+                            if (item.selected) Color(0xFF12B76A) else Color(0xFFD1D5DB),
+                            CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (item.selected) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = stringResource(R.string.create_security_checklist_select_item_cd),
+                            tint = Color(0xFF12B76A),
+                            modifier = Modifier.size(14.dp)
+                        )
+                    }
                 }
             }
             Spacer(modifier = Modifier.size(12.dp))
@@ -246,21 +261,25 @@ private fun QuestionRow(item: CreateChecklistQuestionUi, isLast: Boolean) {
                     lineHeight = 23.sp,
                     fontWeight = FontWeight.Medium
                 )
-                if (item.expanded && item.translation != null) {
+                if (item.expanded && hasTranslation) {
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = item.translation,
+                        text = item.translation.orEmpty(),
                         color = Color(0xFF6A7282),
                         fontSize = 12.sp,
                         lineHeight = 20.sp
                     )
                 }
             }
-            Icon(
-                imageVector = if (item.expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                contentDescription = null,
-                tint = Color(0xFF6A7282)
-            )
+            if (hasTranslation) {
+                IconButton(onClick = onExpandedToggle) {
+                    Icon(
+                        imageVector = if (item.expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = stringResource(R.string.create_security_checklist_expand_translation_cd),
+                        tint = Color(0xFF6A7282),
+                    )
+                }
+            }
         }
     }
 }

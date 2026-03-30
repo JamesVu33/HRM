@@ -61,6 +61,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.ihrm.R
+import com.example.ihrm.ui.common.PendingActionsRow
+import com.example.ihrm.ui.components.ButtonVariant
 import com.example.ihrm.ui.theme.DashboardFigmaInk
 import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.util.DashboardBrush.MyInfoHeaderBrush
@@ -113,7 +115,7 @@ private val SectionSubtitleStyle = TextStyle(
     letterSpacing = (-0.15).sp,
 )
 
-private enum class GenderOption { Male, Female, Other }
+private enum class GenderOption { Male, Female }
 
 @Composable
 fun MyInfoScreen(
@@ -616,7 +618,6 @@ private fun MyInfoGenderRow(
             val label = when (option) {
                 GenderOption.Male -> stringResource(R.string.my_info_gender_male)
                 GenderOption.Female -> stringResource(R.string.my_info_gender_female)
-                GenderOption.Other -> stringResource(R.string.my_info_gender_other)
             }
             Box(
                 modifier = Modifier
@@ -808,6 +809,17 @@ private fun ChangePasswordDialog(
                         placeholder = stringResource(R.string.my_info_change_password_confirm_placeholder),
                         visible = confirmVisible,
                         onToggleVisible = { confirmVisible = !confirmVisible },
+                    )
+                    PendingActionsRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 6.dp),
+                        textButtonLeft = stringResource(R.string.my_info_cancel),
+                        textButtonRight = stringResource(R.string.employee_detail_save),
+                        variantButtonLeft =  ButtonVariant.Neutral,
+                        variantButtonRight = ButtonVariant.Primary,
+                        onLeftClick = onDismiss,
+                        onRightClick = onDismiss
                     )
                 }
             }

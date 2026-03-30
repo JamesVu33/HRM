@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -59,8 +60,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.example.ihrm.ui.common.ChecklistActionType
 import com.example.ihrm.ui.common.ChecklistConfirmDialog
 import com.example.ihrm.ui.common.PendingActionsRow
-import com.example.ihrm.ui.dashboard.DashboardRole
-import com.example.ihrm.ui.dashboard.resolveDashboardRoleAfterLogin
+import com.example.ihrm.domain.model.AppFeature
 import com.example.ihrm.util.AuthManager
 
 private data class SecurityLegendMeta(
@@ -88,11 +88,7 @@ fun SecurityChecksLegendDetailScreen(
 ) {
     val legend = remember(legendKey) { legendByKey(legendKey) }
     val questions = remember(legendKey) { securityQuestionsByLegend(legend.label) }
-    val userRole = resolveDashboardRoleAfterLogin(
-        email = AuthManager.getUserEmail(),
-        fullName = AuthManager.getUserFullName()
-    )
-    val canReviewChecklist = userRole == DashboardRole.Extra
+    val canReviewChecklist = AuthManager.canModify(AppFeature.SECURITY_CHECK)
     var activeDialogType by remember { mutableStateOf<ChecklistActionType?>(null) }
     Scaffold(
         modifier = Modifier
@@ -101,42 +97,33 @@ fun SecurityChecksLegendDetailScreen(
         containerColor = Color.Transparent,
         contentWindowInsets = WindowInsets(top = 0),
     ) { paddingValues ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(brush = DashboardBrush.BaseBackground)
         ) {
+            BaseHeader(
+                modifier = Modifier.padding(horizontal = 16.dp).padding(paddingValues).statusBarsPadding(),
+                title = stringResource(R.string.security_checks_title),
+                showNavigationIcon = true,
+                onNavigationClick = onBackClick,
+                navigationIcon = {
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                },
+                containerColor = Color.Transparent
+            )
+            CardSecurityDetail(legend)
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
+                modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(
-                    top = paddingValues.calculateTopPadding() + WindowInsets.statusBars
-                        .asPaddingValues()
-                        .calculateTopPadding(),
                     bottom = paddingValues.calculateBottomPadding()
                 ),
             ) {
-                item {
-                    BaseHeader(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        title = stringResource(R.string.security_checks_title),
-                        showNavigationIcon = true,
-                        onNavigationClick = onBackClick,
-                        navigationIcon = {
-                            Icon(
-                                modifier = Modifier.size(24.dp),
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = null,
-                                tint = Color.White
-                            )
-                        },
-                        containerColor = Color.Transparent
-                    )
-                }
-                item {
-                    CardSecurityDetail(legend)
-                }
                 item {
                     Box(
                         modifier = Modifier
@@ -182,6 +169,7 @@ fun SecurityChecksLegendDetailScreen(
                         )
                     }
                 }
+                item {  Spacer(modifier = Modifier.height(8.dp)) }
             }
         }
     }
