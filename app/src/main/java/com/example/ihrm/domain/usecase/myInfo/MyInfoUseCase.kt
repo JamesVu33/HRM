@@ -31,8 +31,8 @@ class MyInfoUseCase @Inject constructor(
             meResult is NetworkResult.Exception -> meResult
             profileResult is NetworkResult.Exception -> profileResult
             else -> {
-                val base = (meResult as NetworkResult.Success).data.fromResponseToInfo()
-                val detail = (profileResult as NetworkResult.Success).data.fromResponseToInfo()
+                val base = (meResult as NetworkResult.Success).data
+                val detail = (profileResult as NetworkResult.Success).data
                 NetworkResult.Success(base.withMergedProfile(detail))
             }
         }
