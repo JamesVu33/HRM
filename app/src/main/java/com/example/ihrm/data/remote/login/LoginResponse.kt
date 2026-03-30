@@ -2,6 +2,7 @@ package com.example.ihrm.data.remote.login
 
 import com.example.ihrm.data.remote.dto.RoleShortDto
 import com.example.ihrm.data.remote.dto.UserShortDto
+import com.example.ihrm.domain.model.LoginInfo
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -31,4 +32,13 @@ data class LoginResponse(
      */
     @SerializedName("modifiableFeatures")
     val modifiableFeatures: List<String>? = null,
-)
+) {
+    fun toLoginInfo(): LoginInfo = LoginInfo(
+        id = user.id,
+        employeeId = user.employeeId,
+        fullName = user.fullName,
+        email = user.email,
+        phoneNumber = user.phoneNumber,
+        roles = roles,
+    )
+}
