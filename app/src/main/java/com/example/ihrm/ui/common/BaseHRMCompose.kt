@@ -17,9 +17,11 @@ fun BaseHRMCompose(
     val currentContent by rememberUpdatedState(newValue = content)
     Box(modifier = Modifier.fillMaxSize()) {
         currentContent()
+        //loading
         ErrorAlert(
             viewmodel = viewmodel,
             onErrorAlertClose = onErrorAlertClose
         )
+
     }
 }

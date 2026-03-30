@@ -7,7 +7,6 @@ import com.example.ihrm.core.viewmodel.BaseViewmodel
 import com.example.ihrm.core.viewmodel.CallbackWrapper
 import com.example.ihrm.data.remote.login.LoginResponse
 import com.example.ihrm.data.remote.login.PermissionResponse
-import com.example.ihrm.domain.repository.AuthRepository
 import com.example.ihrm.domain.usecase.login.LoginUseCase
 import com.example.ihrm.util.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -86,25 +85,25 @@ class LoginViewModel @Inject constructor(
             val employeeId = _uiState.value.employeeId.trim()
             val password = _uiState.value.password
 
-//            val errorPwd = validatePassword(password)
-//            val errorId = validateEmployeeId(employeeId)
-//            if (errorPwd != null || errorId != null) {
-//                _uiState.value = _uiState.value.copy(
-//                    employeeIdError = errorId,
-//                    passwordError = errorPwd
-//                )
-//                return@launch
-//            }
+            val errorPwd = loginUseCase.validatePassword(password)
+            val errorId = loginUseCase.validateEmployeeId(employeeId)
+            if (errorPwd != null || errorId != null) {
+                _uiState.value = _uiState.value.copy(
+                    employeeIdError = errorId,
+                    passwordError = errorPwd
+                )
+                return@launch
+            }
 
-//            val employeeIdError = validateEmployeeId(employeeId)
-//            val passwordError = validatePassword(password)
-//            if (employeeIdError != null || passwordError != null) {
-//                _uiState.value = _uiState.value.copy(
-//                    employeeIdError = employeeIdError,
-//                    passwordError = passwordError
-//                )
-//                return@launch
-//            }
+            val employeeIdError = loginUseCase.validateEmployeeId(employeeId)
+            val passwordError = loginUseCase.validatePassword(password)
+            if (employeeIdError != null || passwordError != null) {
+                _uiState.value = _uiState.value.copy(
+                    employeeIdError = employeeIdError,
+                    passwordError = passwordError
+                )
+                return@launch
+            }
 
             _uiState.value = _uiState.value.copy(
                 isLoading = true,
@@ -117,11 +116,15 @@ class LoginViewModel @Inject constructor(
                 callbackWrapper = object : CallbackWrapper<LoginResponse> {
                     override fun onSuccess(data: LoginResponse) {
                         Log.d("loginTest", "onSuccess: $data")
-                        AuthManager.saveTokens(data)
                         getPermission(
-                            employeeId = data.roles.get(0).id,
+                            employeeId = data.roles.first().id,
                             onSuccess = onSuccess
                         )
+                    }
+
+                    override suspend fun doOnBackground(data: LoginResponse) {
+                        loginUseCase.storeUserInfo(data)
+                        AuthManager.saveTokens(data)
                     }
 
                     override fun onFail(e: CommonErrorException) {
@@ -165,42 +168,20 @@ class LoginViewModel @Inject constructor(
                         isLoading = false,
                         isLoginSuccess = true
                     )
+                    if (data.isNotEmpty()) {
+                        loginUseCase.updateUserInfoFrom(data.first())
+                    }
                     onSuccess()
                 }
 
-                    override fun onFail(e: CommonErrorException) {
+                override fun onFail(e: CommonErrorException) {
 //                        _uiState.value = _uiState.value.copy(isLoading = false,)
-                        _uiState.value =
-                            loginUseCase.getErrorField(_uiState.value, e).copy(isLoading = false)
-                        Log.d("loginTest", "onFail: ${e.errorMsg}")
-                    }
+                    _uiState.value =
+                        loginUseCase.getErrorField(_uiState.value, e).copy(isLoading = false)
+                    Log.d("loginTest", "onFail: ${e.errorMsg}")
                 }
-            )
-        }
-//    }
-
-
-    /**
-     * Validate employeeId
-     */
-    private fun validateEmployeeId(employeeId: String): LoginFieldError? {
-        if (employeeId.isBlank()) return null
-        val len = employeeId.trim().length
-        return when {
-            len != EMPLOYEE_ID_EXACT_LENGTH -> LoginFieldError.InvalidLength
-            else -> null
-        }
-    }
-
-    /**
-     * Validate password
-     */
-    private fun validatePassword(password: String): LoginFieldError? {
-        return when {
-            password.isEmpty() -> null
-            password.length < 8 -> LoginFieldError.TooShort
-            else -> null
-        }
+            }
+        )
     }
 
     fun reset() {
