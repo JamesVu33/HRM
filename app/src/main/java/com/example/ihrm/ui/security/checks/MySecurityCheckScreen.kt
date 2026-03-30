@@ -49,6 +49,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -58,6 +59,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ihrm.R
+import com.example.ihrm.ui.common.header.BaseHeader
 import com.example.ihrm.util.DashboardBrush
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -84,11 +86,58 @@ private fun MySecurityStatus.toLegendKey(): String = when (this) {
 }
 
 private val mySecurityItems = listOf(
-    MySecurityChecklistUi("#3", "GCD", "Nguyen Van A", "temp-v5", "2503001", MySecurityStatus.PENDING, R.string.my_security_check_submitted, "03/01/2025"),
-    MySecurityChecklistUi("#4", "GCD", "Nguyen Van A", "temp-v5", "2503001", MySecurityStatus.PENDING, R.string.my_security_check_submitted, "03/01/2025"),
-    MySecurityChecklistUi("#5", "GCD", "Nguyen Van A", "temp-v5", "2503001", MySecurityStatus.PENDING, R.string.my_security_check_submitted, "03/01/2025"),
-    MySecurityChecklistUi("#1", "GCD", "Nguyen Van A", "temp-v5", "2503001", MySecurityStatus.APPROVED, R.string.my_security_check_updated, "12/01/2024", "Nguyen Van A"),
-    MySecurityChecklistUi("#2", "GCD", "Nguyen Van A", "temp-v5", "2503001", MySecurityStatus.REJECT, R.string.my_security_check_updated, "12/01/2024", "Nguyen Van A")
+    MySecurityChecklistUi(
+        "#3",
+        "GCD",
+        "Nguyen Van A",
+        "temp-v5",
+        "2503001",
+        MySecurityStatus.PENDING,
+        R.string.my_security_check_submitted,
+        "03/01/2025"
+    ),
+    MySecurityChecklistUi(
+        "#4",
+        "GCD",
+        "Nguyen Van A",
+        "temp-v5",
+        "2503001",
+        MySecurityStatus.PENDING,
+        R.string.my_security_check_submitted,
+        "03/01/2025"
+    ),
+    MySecurityChecklistUi(
+        "#5",
+        "GCD",
+        "Nguyen Van A",
+        "temp-v5",
+        "2503001",
+        MySecurityStatus.PENDING,
+        R.string.my_security_check_submitted,
+        "03/01/2025"
+    ),
+    MySecurityChecklistUi(
+        "#1",
+        "GCD",
+        "Nguyen Van A",
+        "temp-v5",
+        "2503001",
+        MySecurityStatus.APPROVED,
+        R.string.my_security_check_updated,
+        "12/01/2024",
+        "Nguyen Van A"
+    ),
+    MySecurityChecklistUi(
+        "#2",
+        "GCD",
+        "Nguyen Van A",
+        "temp-v5",
+        "2503001",
+        MySecurityStatus.REJECT,
+        R.string.my_security_check_updated,
+        "12/01/2024",
+        "Nguyen Van A"
+    )
 )
 
 @Composable
@@ -106,9 +155,9 @@ fun MySecurityCheckScreen(
             val q = keyword.trim().lowercase()
             mySecurityItems.filter { item ->
                 item.title.lowercase().contains(q) ||
-                    item.name.lowercase().contains(q) ||
-                    item.category.lowercase().contains(q) ||
-                    item.template.lowercase().contains(q)
+                        item.name.lowercase().contains(q) ||
+                        item.category.lowercase().contains(q) ||
+                        item.template.lowercase().contains(q)
             }
         }
     }
@@ -149,9 +198,28 @@ fun MySecurityCheckScreen(
                 .padding(paddingValues)
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth().statusBarsPadding()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .statusBarsPadding()
             ) {
-                Header(onMenuClick = onMenuClick)
+
+                Spacer(modifier = Modifier.height(12.dp))
+                BaseHeader(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .statusBarsPadding(),
+                    title = stringResource(R.string.drawer_item_security_check),
+                    showNavigationIcon = true,
+                    onNavigationClick = onMenuClick,
+                    containerColor = Color.Transparent,
+                    navigationIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = stringResource(R.string.dashboard_cd_open_menu),
+                            tint = White
+                        )
+                    }
+                )
                 Spacer(modifier = Modifier.height(12.dp))
                 SearchBar(
                     keyword = keyword,
@@ -160,7 +228,10 @@ fun MySecurityCheckScreen(
                 Spacer(modifier = Modifier.height(6.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     Text(
-                        text = stringResource(R.string.my_security_check_items_count, filtered.size),
+                        text = stringResource(
+                            R.string.my_security_check_items_count,
+                            filtered.size
+                        ),
                         color = Color.White,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
@@ -174,14 +245,14 @@ fun MySecurityCheckScreen(
                     bottom = paddingValues.calculateBottomPadding()
                 ),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
-            ){
+            ) {
                 items(filtered) { item ->
                     ChecklistCard(
                         item = item,
                         onClick = { onChecklistClick(item.status.toLegendKey()) }
                     )
                 }
-                item {  Spacer(modifier = Modifier.height(8.dp)) }
+                item { Spacer(modifier = Modifier.height(8.dp)) }
             }
         }
     }
@@ -212,29 +283,9 @@ private fun hasChecklistInCurrentMonth(): Boolean {
         runCatching { formatter.parse(item.date) }.getOrNull()?.let { parsed ->
             Calendar.getInstance().apply { time = parsed }.let { created ->
                 created.get(Calendar.MONTH) == currentMonth &&
-                    created.get(Calendar.YEAR) == currentYear
+                        created.get(Calendar.YEAR) == currentYear
             }
         } == true
-    }
-}
-
-@Composable
-private fun Header(onMenuClick: () -> Unit) {
-    Box(modifier = Modifier.fillMaxWidth()) {
-        IconButton(onClick = onMenuClick, modifier = Modifier.align(Alignment.CenterStart)) {
-            Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = stringResource(R.string.dashboard_cd_open_menu),
-                tint = Color.White
-            )
-        }
-        Text(
-            text = stringResource(R.string.drawer_item_security_check),
-            color = Color.White,
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(Alignment.Center)
-        )
     }
 }
 
@@ -303,7 +354,10 @@ private fun ChecklistCard(item: MySecurityChecklistUi, onClick: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
-                Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = item.title,
@@ -338,7 +392,12 @@ private fun ChecklistCard(item: MySecurityChecklistUi, onClick: () -> Unit) {
                         .background(Color(0xFFEFF6FF))
                         .padding(horizontal = 10.dp, vertical = 6.dp)
                 ) {
-                    Text(text = item.template, color = Color(0xFF155DFC), fontSize = 12.sp, fontWeight = FontWeight.Medium)
+                    Text(
+                        text = item.template,
+                        color = Color(0xFF155DFC),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium
+                    )
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
@@ -348,7 +407,10 @@ private fun ChecklistCard(item: MySecurityChecklistUi, onClick: () -> Unit) {
                 )
             }
 
-            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 StatusChip(status = item.status)
                 Spacer(modifier = Modifier.weight(1f))
                 Column(horizontalAlignment = Alignment.End) {
@@ -391,7 +453,9 @@ private fun ChecklistCard(item: MySecurityChecklistUi, onClick: () -> Unit) {
                     Spacer(modifier = Modifier.width(8.dp))
                     Column {
                         Text(
-                            text = if(item.status == MySecurityStatus.REJECT) stringResource(R.string.my_security_check_rejecter) else stringResource(R.string.my_security_check_approver),
+                            text = if (item.status == MySecurityStatus.REJECT) stringResource(R.string.my_security_check_rejecter) else stringResource(
+                                R.string.my_security_check_approver
+                            ),
                             color = Color(0xFF6A7282),
                             fontSize = 11.sp
                         )
@@ -419,11 +483,13 @@ private fun StatusChip(status: MySecurityStatus) {
             textColor = Color(0xFFCA8000)
             bgColor = Color(0xFFFFEDD4)
         }
+
         MySecurityStatus.APPROVED -> {
             text = "APPROVED"
             textColor = Color(0xFF008236)
             bgColor = Color(0xFFDCFCE7)
         }
+
         MySecurityStatus.REJECT -> {
             text = "REJECT"
             textColor = Color(0xFFF10C00)
