@@ -6,11 +6,14 @@ import com.example.ihrm.data.remote.dto.LevelResponseDto
 import com.example.ihrm.data.remote.dto.MeEmployeeResponse
 import com.example.ihrm.data.remote.dto.UserMetaResponseDto
 import com.example.ihrm.data.remote.dto.UserResponseDto
+import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.PUT
 import retrofit2.http.Path
 
@@ -50,4 +53,11 @@ interface EmployeeApiService {
 
     @DELETE("employees/{id}")
     suspend fun deleteEmployee(@Path("id") id: String): Response<ApiSuccessResponse<Unit>>
+
+    /** POST /me/change-avatar - upload avatar image for current user. */
+    @Multipart
+    @POST("me/change-avatar")
+    suspend fun changeAvatar(@Part avatar: MultipartBody.Part): Response<Unit>
+
+
 }

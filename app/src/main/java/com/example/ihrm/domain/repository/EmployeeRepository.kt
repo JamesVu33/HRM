@@ -6,6 +6,7 @@ import com.example.ihrm.data.remote.dto.UserMetaResponseDto
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.model.Level
 import kotlinx.coroutines.flow.Flow
+import okhttp3.MultipartBody
 
 interface EmployeeRepository {
     fun getAllEmployees(): Flow<List<Employee>>
@@ -23,4 +24,5 @@ interface EmployeeRepository {
     suspend fun getLevelByEmployeeId(employeeId: String): NetworkResult<Level?>
     suspend fun getMeEmployeeInfo(): NetworkResult<MeEmployeeResponse>
     suspend fun getEmployeesMeta(): NetworkResult<UserMetaResponseDto>
+    suspend fun changeAvatar(avatar: MultipartBody.Part): NetworkResult<Unit>
 }

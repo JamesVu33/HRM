@@ -1,5 +1,7 @@
 package com.example.ihrm.ui.myinfo
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -69,6 +71,8 @@ import com.example.ihrm.domain.model.MaritalStatus
 import com.example.ihrm.domain.model.MyInfo
 import com.example.ihrm.ui.common.Avatar
 import com.example.ihrm.ui.common.BaseHRMCompose
+import com.example.ihrm.ui.common.CountryPickerBottomSheet
+import com.example.ihrm.ui.common.MaritalStatusBottomSheet
 import com.example.ihrm.ui.common.PendingActionsRow
 import com.example.ihrm.ui.components.ButtonVariant
 import com.example.ihrm.ui.login.LoginScreenContent
@@ -195,9 +199,19 @@ fun MyInfoScreenContent(
     viewModel: MyInfoViewModel
 ) {
     val myInfo by viewModel.myInfo.collectAsState()
+    val countries by viewModel.countries.collectAsState()
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            viewModel.changeAvatar(uri)
+        }
+    }
     val profile = myInfo?.profile
     val genderSelected = remember(profile?.gender) { domainGenderToUiOption(profile?.gender) }
     var showChangePasswordDialog by remember { mutableStateOf(false) }
+    var showCountryPicker by remember { mutableStateOf(false) }
+    var showMaritalStatusPicker by remember { mutableStateOf(false) }
 
     var fullNameText by remember { mutableStateOf("") }
     var englishNameText by remember { mutableStateOf("") }
@@ -207,6 +221,8 @@ fun MyInfoScreenContent(
     var identityIdText by remember { mutableStateOf("") }
     var identityIssueDayText by remember { mutableStateOf("") }
     var identityIssuePlaceText by remember { mutableStateOf("") }
+    var countryCodeText by remember { mutableStateOf("") }
+    var selectedMaritalStatus by remember { mutableStateOf<MaritalStatus?>(null) }
 
     LaunchedEffect(myInfo) {
         val info = myInfo ?: return@LaunchedEffect
@@ -219,11 +235,36 @@ fun MyInfoScreenContent(
         identityIdText = p?.identityId.orEmpty()
         identityIssueDayText = p?.identityIdIssueDate.toDisplayDate()
         identityIssuePlaceText = p?.identityIdIssuePlace.orEmpty()
+        countryCodeText = p?.nationality.orEmpty()
+        selectedMaritalStatus = p?.maritalStatus?.takeIf { it != MaritalStatus.UNKNOWN }
     }
 
     if (showChangePasswordDialog) {
         ChangePasswordDialog(onDismiss = { showChangePasswordDialog = false })
     }
+
+    CountryPickerBottomSheet(
+        isVisible = showCountryPicker,
+        countries = countries.orEmpty(),
+        onDismiss = { showCountryPicker = false },
+        onCountrySelected = { selectedCountry ->
+            countryCodeText = selectedCountry.code
+        },
+    )
+
+    MaritalStatusBottomSheet(
+        isVisible = showMaritalStatusPicker,
+        statuses = listOf(
+            MaritalStatus.SINGLE to stringResource(R.string.marital_single),
+            MaritalStatus.MARRIED to stringResource(R.string.marital_married),
+            MaritalStatus.DIVORCED to stringResource(R.string.marital_divorced),
+            MaritalStatus.WIDOWED to stringResource(R.string.marital_widowed),
+        ),
+        onDismiss = { showMaritalStatusPicker = false },
+        onStatusSelected = { selectedStatus ->
+            selectedMaritalStatus = selectedStatus
+        },
+    )
 
     Column(
         modifier = Modifier
@@ -240,7 +281,10 @@ fun MyInfoScreenContent(
                 showChangePasswordDialog = true
                 onKeyClick()
             },
-            onChangePhotoClick = onChangePhotoClick,
+            onChangePhotoClick = {
+                imagePickerLauncher.launch("image/*")
+                onChangePhotoClick()
+            },
         )
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -364,7 +408,18 @@ fun MyInfoScreenContent(
                         label = stringResource(R.string.my_info_label_nationality),
                         icon = ImageVector.vectorResource(R.drawable.ic_location),
                         content = {
-                            MyInfoDropdownRow(textOrPlaceholder(profile?.nationality))
+                            MyInfoDropdownRow(
+                                value = if (countryCodeText.isNotBlank()) {
+                                    countryCodeText
+                                } else {
+                                    textOrPlaceholder(profile?.nationality)
+                                },
+                                onClick = {
+                                    if (!countries.isNullOrEmpty()) {
+                                        showCountryPicker = true
+                                    }
+                                }
+                            )
                         },
                     )
                     MyInfoDivider()
@@ -372,7 +427,16 @@ fun MyInfoScreenContent(
                         label = stringResource(R.string.my_info_label_marital_status),
                         icon = ImageVector.vectorResource(R.drawable.ic_person),
                         content = {
-                            MyInfoDropdownRow(maritalStatusLabel(profile?.maritalStatus))
+                            MyInfoDropdownRow(
+                                value = if (selectedMaritalStatus != null) {
+                                    maritalStatusLabel(selectedMaritalStatus)
+                                } else {
+                                    maritalStatusLabel(profile?.maritalStatus)
+                                },
+                                onClick = {
+                                    showMaritalStatusPicker = true
+                                }
+                            )
                         },
                     )
                     MyInfoDivider()
@@ -737,7 +801,10 @@ private fun MyInfoAddressBox(value: String) {
 }
 
 @Composable
-private fun MyInfoDropdownRow(value: String) {
+private fun MyInfoDropdownRow(
+    value: String,
+    onClick: (() -> Unit)? = null,
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -745,6 +812,13 @@ private fun MyInfoDropdownRow(value: String) {
             .clip(RoundedCornerShape(14.dp))
             .border(1.dp, FieldBorder, RoundedCornerShape(14.dp))
             .background(Color.White)
+            .then(
+                if (onClick != null) {
+                    Modifier.clickable(onClick = onClick)
+                } else {
+                    Modifier
+                }
+            )
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.CenterStart
     ) {

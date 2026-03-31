@@ -74,3 +74,44 @@ suspend fun <T> safeApiCall(
         NetworkResult.Exception(errorException)
     }
 }
+
+suspend fun <T> safeApiCallRaw(
+    execute: suspend () -> Response<T>
+): NetworkResult<T> = withContext(Dispatchers.IO) {
+    return@withContext try {
+        val response = execute()
+        val body = response.body()
+
+        if (response.isSuccessful && body != null) {
+            NetworkResult.Success(body)
+        } else {
+            NetworkResult.Exception(
+                CommonErrorException.ServerException(
+                    "HTTP ${response.code()} ${response.message()}"
+                )
+            )
+        }
+    } catch (throwable: Exception) {
+        val errorException = when (throwable) {
+            is JSONException, is SocketTimeoutException, is SSLException, is ConnectException, is UnknownHostException -> {
+                CommonErrorException.NetworkException(
+                    throwable.message ?: "An unexpected error occurred"
+                )
+            }
+
+            is IOException -> CommonErrorException.NetworkException(
+                throwable.message ?: "An unexpected error occurred"
+            )
+
+            is HttpException -> CommonErrorException.ServerException(
+                throwable.message ?: "Server exception"
+            )
+
+            else -> CommonErrorException.UnknownException(
+                throwable.message ?: "An unexpected error occurred"
+            )
+        }
+        Log.e("apiFlows", "safeApiCallRaw: - exception: $errorException")
+        NetworkResult.Exception(errorException)
+    }
+}

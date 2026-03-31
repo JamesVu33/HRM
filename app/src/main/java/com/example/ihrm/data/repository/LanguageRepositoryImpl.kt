@@ -8,6 +8,7 @@ import com.example.ihrm.data.remote.base.safeApiCall
 import com.example.ihrm.data.remote.language.LanguageRequest
 import com.example.ihrm.data.remote.language.LanguageResponse
 import com.example.ihrm.data.remote.language.LanguageStatus
+import com.example.ihrm.di.NetworkModule
 import com.example.ihrm.domain.repository.LanguageRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -18,7 +19,7 @@ import javax.inject.Inject
 class LanguageRepositoryImpl @Inject constructor(
     private val apiService: LanguageApiService,
     private val languageDao: LanguageDao,
-    private val retrofit: Retrofit
+    @param:NetworkModule.InternalApi private val retrofit: Retrofit
 ) : LanguageRepository {
 
     override suspend fun language(): NetworkResult<List<LanguageResponse>> =

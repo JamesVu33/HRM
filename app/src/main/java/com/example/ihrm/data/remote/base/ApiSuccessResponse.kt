@@ -8,11 +8,11 @@ import com.google.gson.annotations.SerializedName
  */
 data class ApiSuccessResponse<T>(
     @SerializedName("statusCode")
-    val statusCode: Int,
+    val statusCode: Int? = null,
     @SerializedName("message")
     val message: String? = null,
     @SerializedName("data")
-    val data: T?,
+    val data: T? = null,
     @SerializedName("meta")
     val meta: MetaDto? = null
 )

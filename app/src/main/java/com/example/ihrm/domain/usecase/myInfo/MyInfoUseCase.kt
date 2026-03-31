@@ -2,16 +2,23 @@ package com.example.ihrm.domain.usecase.myInfo
 
 import com.example.ihrm.core.usecase.BaseUseCase
 import com.example.ihrm.data.remote.base.NetworkResult
+import com.example.ihrm.data.remote.myinfo.UpdateProfileRequest
+import com.example.ihrm.domain.model.Country
 import com.example.ihrm.domain.model.MyInfo
+import com.example.ihrm.domain.model.MyProfile
 import com.example.ihrm.domain.model.withMergedProfile
+import com.example.ihrm.domain.repository.EmployeeRepository
 import com.example.ihrm.domain.repository.LanguageRepository
 import com.example.ihrm.domain.repository.MyInfoRepository
+import com.example.ihrm.util.combineResult
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import okhttp3.MultipartBody
 import javax.inject.Inject
 
 class MyInfoUseCase @Inject constructor(
     private val myInfoRepository: MyInfoRepository,
+    private val employeeRepository: EmployeeRepository,
 ) : BaseUseCase() {
     @Inject
     override lateinit var languageRepository: LanguageRepository
@@ -25,16 +32,18 @@ class MyInfoUseCase @Inject constructor(
         val meResult = meDeferred.await()
         val profileResult = profileDeferred.await()
 
-        when {
-            meResult is NetworkResult.Failure -> meResult
-            profileResult is NetworkResult.Failure -> profileResult
-            meResult is NetworkResult.Exception -> meResult
-            profileResult is NetworkResult.Exception -> profileResult
-            else -> {
-                val base = (meResult as NetworkResult.Success).data
-                val detail = (profileResult as NetworkResult.Success).data
-                NetworkResult.Success(base.withMergedProfile(detail))
-            }
-        }
+        combineResult(meResult, profileResult) { base, detail -> base.withMergedProfile(detail) }
+    }
+
+    suspend fun loadCountries(): NetworkResult<List<Country>> = coroutineScope {
+        translateResponse(myInfoRepository.getCountries())
+    }
+
+    suspend fun changeAvatar(avatar: MultipartBody.Part): NetworkResult<Unit> = coroutineScope {
+        translateResponse(employeeRepository.changeAvatar(avatar))
+    }
+
+    suspend fun updateMeProfile(request: UpdateProfileRequest): NetworkResult<MyProfile> = coroutineScope {
+        translateResponse(myInfoRepository.updateMeProfile(request))
     }
 }

@@ -221,6 +221,8 @@
     <string name="coming_soon_message">The \"%1$s\" feature is currently under development and will be available soon.</string>
     <string name="coming_soon_got_it">Got it</string>
     <string name="coming_soon_close">Close</string>
+    <string name="error_alert_close">Close</string>
+    <string name="error_alert_close_cd">Dismiss error</string>
 
     <!-- My Info (Figma 871:37416) -->
     <string name="my_info_screen_title">My Information</string>
@@ -481,4 +483,6 @@
     <string name="status_on_leave">On Leave</string>
     <string name="status_probation">Probation</string>
     <string name="status_notice_period">Notice Period</string>
+    <string name="my_info_country_picker_title">Select country</string>
+    <string name="my_info_marital_status_picker_title">Select marital status</string>
 </resources>
