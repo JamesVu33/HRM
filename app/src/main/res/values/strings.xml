@@ -350,7 +350,7 @@
     <string name="team_statistics_status_probation">Probation</string>
     <string name="team_statistics_status_intern">Intern</string>
     <string name="security_checks_title">Security check</string>
-    <string name="security_checks_year">2026</string>
+    <string name="security_checks_year">Search checklists...</string>
     <string name="security_checks_filter_cd">Open security check filters</string>
     <string name="security_checks_total">Total</string>
     <string name="security_checks_approved">Approved</string>

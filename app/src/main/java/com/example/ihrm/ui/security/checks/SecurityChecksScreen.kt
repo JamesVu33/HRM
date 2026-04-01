@@ -24,7 +24,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -32,7 +34,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,16 +50,20 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ihrm.R
 import com.example.ihrm.ui.common.header.BaseHeader
+import com.example.ihrm.ui.theme.DashboardFigmaMuted
+import com.example.ihrm.ui.theme.DashboardProfileCellBg
 import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.util.DashboardBrush
 import com.example.ihrm.util.LabelTextStyle13RegularGrey
 import com.example.ihrm.util.LabelTextStyle13RegularWhite
+import com.example.ihrm.util.singleClick
 import com.example.ihrm.util.txtInterBold22White
 import com.example.ihrm.util.txtInterMedium15
 
@@ -79,7 +90,7 @@ fun SecurityChecksScreen(
                 modifier = Modifier.padding(paddingValues).statusBarsPadding(),
                 title = stringResource(R.string.drawer_item_security_checks),
                 showNavigationIcon = true,
-                onNavigationClick = onBackClick,
+                onNavigationClick = onBackClick.singleClick(),
                 containerColor = Color.Transparent,
                 navigationIcon = {
                     Icon(
@@ -97,12 +108,6 @@ fun SecurityChecksScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 16.dp),
-                contentPadding = PaddingValues(
-                    top = paddingValues.calculateTopPadding() + WindowInsets.statusBars
-                        .asPaddingValues()
-                        .calculateTopPadding(),
-                    bottom = paddingValues.calculateBottomPadding()
-                ),
             ) {
                 item {
                     Spacer(modifier = Modifier.height(20.dp))
@@ -110,7 +115,7 @@ fun SecurityChecksScreen(
                 }
                 item {
                     Spacer(modifier = Modifier.height(12.dp))
-                    SeeChartButton(onClick = onSeeChartClick)
+                    SeeChartButton(onClick = onSeeChartClick.singleClick())
                 }
                 item {
                     Spacer(modifier = Modifier.height(32.dp))
@@ -120,7 +125,7 @@ fun SecurityChecksScreen(
                 items(demoChecks) { check ->
                     SecurityCheckCard(
                         item = check,
-                        onClick = { onSecurityCheckClick(check.statusUseApprovedChip.toLegendKey()) }
+                        onClick = { onSecurityCheckClick(check.statusUseApprovedChip.toLegendKey()) }.singleClick()
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                 }
@@ -132,61 +137,81 @@ fun SecurityChecksScreen(
 
 @Composable
 private fun SecurityFiltersRow() {
+    var searchQuery by remember { mutableStateOf("") }
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 14.dp),
+            .padding(horizontal = 16.dp)
+            .padding(top = 14.dp)
+            .height(44.dp)
+            .clip(RoundedCornerShape(14.dp))
+            .background(Color(0xFFF2F2F7))
+            .padding(horizontal = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Surface(
-            modifier = Modifier
-                .weight(1f)
-                .height(44.dp),
-            color = Color(0xFFF2F2F7),
-            shape = RoundedCornerShape(14.dp)
-        ) {
-            Row(
+        Icon(
+            imageVector = ImageVector.vectorResource(R.drawable.ic_search),
+            contentDescription = null,
+            tint = Color(0xFF6B7280),
+            modifier = Modifier.size(16.dp)
+        )
+        BasicTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            modifier = Modifier.weight(1f),
+            singleLine = true,
+            textStyle = TextStyle(
+                color = Color.Black,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Normal
+            ),
+            decorationBox = { innerTextField ->
+                Box {
+                    if (searchQuery.isEmpty()) {
+                        Text(
+                            text = stringResource(R.string.security_checks_year),
+                            color = Color(0xFF9CA3AF),
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Normal
+                        )
+                    }
+                    innerTextField()
+                }
+            }
+        )
+        if (searchQuery.isNotEmpty()) {
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 14.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .size(20.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFF969BA4))
+                    .clickable { searchQuery = "" },
+                contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_my_leave),
+                    imageVector = Icons.Default.Close,
                     contentDescription = null,
-                    tint = Color(0xFF6B7280),
-                    modifier = Modifier.size(16.dp)
-                )
-                Text(
-                    text = stringResource(R.string.security_checks_year),
-                    color = Color.Black,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
-                Box(modifier = Modifier.weight(1f))
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_down),
-                    contentDescription = null,
-                    tint = Color(0xFF9CA3AF),
-                    modifier = Modifier.size(16.dp)
+                    tint = White,
+                    modifier = Modifier.size(10.dp)
                 )
             }
         }
-
-        Surface(
-            modifier = Modifier.size(44.dp),
-            color = Color(0xFFF2F2F7),
-            shape = RoundedCornerShape(14.dp)
+        VerticalDivider(
+            modifier = Modifier.height(20.dp),
+            thickness = 1.dp,
+            color = Color(0xFFE5E7EB)
+        )
+        IconButton(
+            onClick = { },
+            modifier = Modifier.size(24.dp)
         ) {
-            IconButton(onClick = { }) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_filter),
-                    contentDescription = stringResource(R.string.security_checks_filter_cd),
-                    tint = Color(0xFF6B7280),
-                    modifier = Modifier.size(16.dp)
-                )
-            }
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_filter),
+                contentDescription = stringResource(R.string.security_checks_filter_cd),
+                tint = Color(0xFF6B7280),
+                modifier = Modifier.size(16.dp)
+            )
         }
     }
 }
@@ -257,7 +282,7 @@ private fun SeeChartButton(onClick: () -> Unit) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick.singleClick()),
         color = Color(0xFFF9FAFB),
         shape = RoundedCornerShape(16.dp)
     ) {

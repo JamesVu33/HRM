@@ -47,6 +47,7 @@ import com.example.ihrm.ui.theme.Primary300
 import com.example.ihrm.ui.theme.Primary400
 import com.example.ihrm.ui.theme.Primary50
 import com.example.ihrm.ui.theme.Primary500
+import com.example.ihrm.util.singleClick
 
 /**
  * Button size variants
@@ -180,7 +181,7 @@ fun CustomButton(
     when (variant) {
         ButtonVariant.Outline -> {
             OutlinedButton(
-                onClick = onClick,
+                onClick = onClick.singleClick(),
                 enabled = enabled,
                 modifier = buttonModifier,
                 colors = getOutlinedButtonColors(enabled),
@@ -201,7 +202,7 @@ fun CustomButton(
 
         ButtonVariant.Ghost -> {
             TextButton(
-                onClick = onClick,
+                onClick = onClick.singleClick(),
                 enabled = enabled,
                 modifier = buttonModifier,
                 colors = getTextButtonColors(enabled),
@@ -218,7 +219,7 @@ fun CustomButton(
         else -> {
             val buttonColors = getButtonColors(variant, enabled)
             Button(
-                onClick = onClick,
+                onClick = onClick.singleClick(),
                 enabled = enabled,
                 modifier = buttonModifier,
                 colors = buttonColors,
@@ -343,7 +344,7 @@ fun PillButton(
     val pillElevation = if (enabled && selected) 2.dp else 0.dp
 
     Button(
-        onClick = onClick,
+        onClick = onClick.singleClick(),
         enabled = enabled,
         modifier = modifier.shadow(
             elevation = 2.dp,

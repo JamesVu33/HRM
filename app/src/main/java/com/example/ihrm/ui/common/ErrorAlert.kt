@@ -75,11 +75,16 @@ fun ErrorAlert(
 
     val onClose: () -> Unit = {
         onErrorAlertClose?.invoke()
+        viewmodel.clearErrorEvent()
         errorMsg = null
     }
+    val onCloseThrottled = rememberThrottledClick(onClick = onClose)
 
     LaunchedEffect(key1 = errorState) {
-        errorMsg = errorState?.errorMsg
+        val state = errorState ?: return@LaunchedEffect
+        errorMsg = state.errorMsg?.takeIf { it.isNotBlank() }
+            ?: state.message?.takeIf { it.isNotBlank() }
+            ?: state.errorKey.takeIf { it.isNotBlank() }
     }
 
     if (errorMsg.isNullOrEmpty()) return
@@ -137,7 +142,7 @@ fun ErrorAlert(
                             .size(32.dp)
                             .clip(CircleShape)
                             .background(CloseCircleBg)
-                            .clickable(onClick = onClose),
+                            .clickable(onClick = onCloseThrottled),
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
@@ -169,7 +174,7 @@ fun ErrorAlert(
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     Button(
-                        onClick = onClose,
+                        onClick = onCloseThrottled,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(52.dp),

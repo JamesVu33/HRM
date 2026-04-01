@@ -48,6 +48,7 @@ import com.example.ihrm.ui.theme.Primary400
 import com.example.ihrm.ui.theme.PrimaryTint
 import com.example.ihrm.ui.theme.SurfaceBorder
 import com.example.ihrm.ui.theme.TextSecondary
+import com.example.ihrm.util.singleClick
 
 /**
  * Employee card matching [Figma HRM EmployeeCard](https://www.figma.com/design/Q9qmml4Qj4FD73VnYshBsO/HRM-Mobile-App-Ver?node-id=255-11482).
@@ -176,14 +177,14 @@ fun EmployeeCard(
                     text = stringResource(R.string.dashboard_view_details),
                     textColor = Primary400,
                     backgroundColor = PrimaryTint,
-                    onClick = onViewDetails,
+                    onClick = onViewDetails.singleClick(),
                     modifier = Modifier.weight(1f)
                 )
                 FlatButton(
                     text = stringResource(R.string.dashboard_delete),
                     textColor = Error,
                     backgroundColor = ErrorLight,
-                    onClick = onDelete,
+                    onClick = onDelete.singleClick(),
                     modifier = Modifier.weight(1f)
                 )
             }

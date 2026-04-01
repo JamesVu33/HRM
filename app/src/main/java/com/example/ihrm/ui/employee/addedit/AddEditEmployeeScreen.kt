@@ -96,6 +96,7 @@ import com.example.ihrm.ui.theme.Primary200
 import com.example.ihrm.ui.theme.Primary400
 import com.example.ihrm.ui.theme.Primary50
 import com.example.ihrm.ui.theme.Primary500
+import com.example.ihrm.util.singleClick
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -243,7 +244,7 @@ fun AddEditEmployeeScreen(
                         .fillMaxWidth()
                         .padding(16.dp)
                 ) {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = onBack.singleClick()) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = null,
@@ -329,7 +330,7 @@ fun AddEditEmployeeScreen(
                             onClick = {
                                 launchTakePhoto()
                                 showPhotoPicker = false
-                            }
+                            }.singleClick()
                         ) {
                             Text(stringResource(R.string.add_employee_take_photo))
                         }
@@ -337,7 +338,7 @@ fun AddEditEmployeeScreen(
                             onClick = {
                                 pickImageLauncher.launch("image/*")
                                 showPhotoPicker = false
-                            }
+                            }.singleClick()
                         ) {
                             Text(stringResource(R.string.add_employee_choose_from_library))
                         }
@@ -345,7 +346,7 @@ fun AddEditEmployeeScreen(
                 },
                 confirmButton = {},
                 dismissButton = {
-                    TextButton(onClick = { showPhotoPicker = false }) {
+                    TextButton(onClick = { showPhotoPicker = false }.singleClick()) {
                         Text(stringResource(R.string.add_employee_photo_cancel))
                     }
                 }
@@ -585,7 +586,7 @@ fun AddEditEmployeeScreen(
         ) {
             CustomButton(
                 text = stringResource(R.string.add_employee_cancel),
-                onClick = onBack,
+                onClick = onBack.singleClick(),
                 variant = ButtonVariant.Outline,
                 modifier = Modifier.weight(1f)
             )
@@ -609,7 +610,7 @@ fun AddEditEmployeeScreen(
                         idIssueDate = idIssueDate?.let { dateFormat.format(it) },
                         onSuccess = onSaveSuccess
                     )
-                },
+                }.singleClick(),
                 variant = ButtonVariant.Primary,
                 icon = Icons.Default.Add
             )
@@ -794,7 +795,7 @@ private fun AddEditGenderDropdown(
                     onClick = {
                         onValueChange(g)
                         onExpandedChange(false)
-                    }
+                    }.singleClick()
                 )
             }
         }
@@ -891,7 +892,7 @@ private fun AddEditDropdownField(
                         onClick = {
                             onValueChange(option)
                             expanded = false
-                        }
+                        }.singleClick()
                     )
                 }
             }
@@ -930,7 +931,7 @@ private fun AddEmployeeDatePickerDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    TextButton(onClick = onDismiss) {
+                    TextButton(onClick = onDismiss.singleClick()) {
                         Text(stringResource(android.R.string.cancel), color = Neutral500)
                     }
                     TextButton(onClick = {

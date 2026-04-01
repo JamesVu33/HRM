@@ -82,7 +82,7 @@ fun NavGraph(
         composable(Screen.MyInfo.route) {
             MyInfoScreen(
                 onMenuClick = { scope.launch { drawerState?.open() } },
-                onCancelClick = { navController.popBackStack() },
+                onCancelClick = { navController.popBackStackIfPossible() },
             )
         }
 
@@ -100,13 +100,13 @@ fun NavGraph(
 
         composable(Screen.CreateSecurityChecklist.route) {
             CreateSecurityChecklistScreen(
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.popBackStackIfPossible() }
             )
         }
 
         composable(Screen.CalendarManagement.route) {
             CalendarManagementScreen(
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.popBackStackIfPossible() }
             )
         }
 
@@ -118,20 +118,20 @@ fun NavGraph(
                 onAddEmployeeClick = {
                     navController.navigate(Screen.AddEmployee.route)
                 },
-                onBackClick = { navController.popBackStack() },
+                onBackClick = { navController.popBackStackIfPossible() },
                 onViewStats = { navController.navigate(Screen.TeamStatistics.route) }
             )
         }
 
         composable(Screen.TeamStatistics.route) {
             TeamStatisticsScreen(
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.popBackStackIfPossible() }
             )
         }
 
         composable(Screen.SecurityChecks.route) {
             SecurityChecksScreen(
-                onBackClick = { navController.popBackStack() },
+                onBackClick = { navController.popBackStackIfPossible() },
                 onSeeChartClick = { navController.navigate(Screen.SecurityChecksAnalytics.route) },
                 onSecurityCheckClick = { legendKey ->
                     navController.navigate(Screen.SecurityChecksLegendDetail.createRoute(legendKey))
@@ -141,7 +141,7 @@ fun NavGraph(
 
         composable(Screen.SecurityChecksAnalytics.route) {
             SecurityChecksAnalyticsScreen(
-                onBackClick = { navController.popBackStack() },
+                onBackClick = { navController.popBackStackIfPossible() },
             )
         }
 
@@ -152,7 +152,7 @@ fun NavGraph(
             val legendKey = backStackEntry.arguments?.getString(LEGEND_KEY_PARAM) ?: return@composable
             SecurityChecksLegendDetailScreen(
                 legendKey = legendKey,
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.popBackStackIfPossible() }
             )
         }
 
@@ -168,17 +168,17 @@ fun NavGraph(
                     navController.navigate(Screen.EditEmployee.createRoute(id))
                 },
                 onDeleteClick = {
-                    navController.popBackStack()
+                    navController.popBackStackIfPossible()
                 },
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.popBackStackIfPossible() }
             )
         }
 
         composable(Screen.AddEmployee.route) {
             AddEditEmployeeScreen(
                 employeeId = null,
-                onSaveSuccess = { navController.popBackStack() },
-                onBack = { navController.popBackStack() }
+                onSaveSuccess = { navController.popBackStackIfPossible() },
+                onBack = { navController.popBackStackIfPossible() }
             )
         }
 
@@ -190,8 +190,8 @@ fun NavGraph(
                 backStackEntry.arguments?.getString(EMPLOYEE_ID_PARAM) ?: return@composable
             AddEditEmployeeScreen(
                 employeeId = employeeId,
-                onSaveSuccess = { navController.popBackStack() },
-                onBack = { navController.popBackStack() }
+                onSaveSuccess = { navController.popBackStackIfPossible() },
+                onBack = { navController.popBackStackIfPossible() }
             )
         }
     }
