@@ -3,24 +3,27 @@ package com.example.ihrm.data.repository
 import com.example.ihrm.data.local.dao.EmployeeDao
 import com.example.ihrm.data.remote.api.EmployeeApiService
 import com.example.ihrm.data.remote.base.safeApiCall
+import com.example.ihrm.data.remote.base.safeApiCallRaw
 import com.example.ihrm.data.remote.dto.MeEmployeeResponse
 import com.example.ihrm.data.remote.base.NetworkResult
 import com.example.ihrm.data.remote.dto.UserMetaResponseDto
 import com.example.ihrm.data.remote.mapper.toEmployee
 import com.example.ihrm.data.remote.mapper.toEmployeeEntity
 import com.example.ihrm.data.remote.mapper.toLevel
+import com.example.ihrm.di.NetworkModule
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.model.Level
 import com.example.ihrm.domain.repository.EmployeeRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import okhttp3.MultipartBody
 import retrofit2.Retrofit
 import javax.inject.Inject
 
 class EmployeeRepositoryImpl @Inject constructor(
     private val employeeDao: EmployeeDao,
     private val apiService: EmployeeApiService,
-    private val retrofit: Retrofit,
+    @param:NetworkModule.InternalApi private val retrofit: Retrofit,
 ) : EmployeeRepository {
 
     override fun getAllEmployees(): Flow<List<Employee>> {
@@ -147,6 +150,11 @@ class EmployeeRepositoryImpl @Inject constructor(
 
     override suspend fun getEmployeesMeta(): NetworkResult<UserMetaResponseDto> =
         safeApiCall(retrofit) { apiService.getEmployeesMeta() }
+
+    override suspend fun changeAvatar(avatar: MultipartBody.Part): NetworkResult<Unit> {
+        val result = safeApiCallRaw { apiService.changeAvatar(avatar) }
+        return result.map { Unit }
+    }
 
     private fun <T, R> NetworkResult<T>.map(transform: (T) -> R): NetworkResult<R> {
         return when (this) {

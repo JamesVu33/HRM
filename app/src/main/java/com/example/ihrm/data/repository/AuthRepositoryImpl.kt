@@ -7,6 +7,7 @@ import com.example.ihrm.data.remote.login.LoginResponse
 import com.example.ihrm.data.remote.base.NetworkResult
 import com.example.ihrm.data.remote.login.PermissionRequest
 import com.example.ihrm.data.remote.login.PermissionResponse
+import com.example.ihrm.di.NetworkModule
 import com.example.ihrm.domain.repository.AuthRepository
 import retrofit2.Retrofit
 import javax.inject.Inject
@@ -14,7 +15,7 @@ import javax.inject.Inject
 /** Gọi API auth be-nest-hrm: POST /auth/login (base URL từ Constants.BASE_URL). */
 class AuthRepositoryImpl @Inject constructor(
     private val authApiService: AuthApiService,
-    private val retrofit: Retrofit
+    @param:NetworkModule.InternalApi private val retrofit: Retrofit
 ) : AuthRepository {
 
     override suspend fun login(employeeId: String, password: String): NetworkResult<LoginResponse> =

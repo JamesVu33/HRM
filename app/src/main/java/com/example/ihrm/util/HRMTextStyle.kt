@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.example.ihrm.ui.theme.ApprovedText
 import com.example.ihrm.ui.theme.ColorBgSuccessGradientBottom
 import com.example.ihrm.ui.theme.ColorBgSuccessGradientBottom80Percent
 import com.example.ihrm.ui.theme.DashboardFigmaInk
@@ -156,4 +157,16 @@ val CaptionTextStyle12NormalGrey = TextStyle(
     fontWeight = FontWeight.Normal,
     fontSize = 12.sp,
     color = DashboardFigmaMuted
+)
+
+val ToastSuccessTextStyle13Normal = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.Normal,
+    fontSize = 13.sp,
+)
+
+val ToastErrorTextStyle13Normal = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.Normal,
+    fontSize = 13.sp,
 )
