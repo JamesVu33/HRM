@@ -270,6 +270,12 @@
     <string name="my_info_demo_level">J1</string>
     <string name="my_info_demo_department">GDC</string>
     <string name="my_info_demo_status">Working</string>
+    <string name="change_password_success">Password updated successfully.</string>
+    <string name="change_password_fail">Failed to update new password. Please try again.</string>
+    <string name="my_information_update_success">My information updated successfully.</string>
+    <string name="my_information_update_failed">Failed to update my information. Please try again.</string>
+    <string name="my_information_update_avatar_success">Ava updated successfully.</string>
+    <string name="my_information_update_avatar_failed">Failed to update my information. Please try again.</string>
 
     <!-- Change password dialog (Figma 871:37357) -->
     <string name="my_info_change_password_title">Change Password</string>

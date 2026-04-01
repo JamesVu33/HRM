@@ -2,6 +2,7 @@ package com.example.ihrm.domain.usecase.myInfo
 
 import com.example.ihrm.core.usecase.BaseUseCase
 import com.example.ihrm.data.remote.base.NetworkResult
+import com.example.ihrm.data.remote.myinfo.ChangePasswordRequest
 import com.example.ihrm.data.remote.myinfo.UpdateProfileRequest
 import com.example.ihrm.domain.model.Country
 import com.example.ihrm.domain.model.MyInfo
@@ -45,5 +46,13 @@ class MyInfoUseCase @Inject constructor(
 
     suspend fun updateMeProfile(request: UpdateProfileRequest): NetworkResult<MyProfile> = coroutineScope {
         translateResponse(myInfoRepository.updateMeProfile(request))
+    }
+
+    suspend fun updateInfoMeProfile(request: UpdateProfileRequest): NetworkResult<MyProfile> = coroutineScope {
+        translateResponse(myInfoRepository.updateInfoMeProfile(request))
+    }
+
+    suspend fun changePassword(request: ChangePasswordRequest): NetworkResult<Unit> = coroutineScope {
+        translateResponse(myInfoRepository.changePassword(request))
     }
 }

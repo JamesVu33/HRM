@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.example.ihrm.core.viewmodel.BaseViewmodel
+import com.example.ihrm.ui.common.toast.Toast
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
@@ -31,7 +32,7 @@ fun BaseHRMCompose(
             viewmodel = viewmodel,
             onErrorAlertClose = onErrorAlertClose
         )
-
+        ToastCompose(viewmodel)
     }
 }
 @Composable
@@ -50,6 +51,24 @@ private fun Loading(state: StateFlow<Boolean>) {
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator()
+        }
+    }
+}
+
+@Composable
+private fun ToastCompose(
+    viewModel: BaseViewmodel
+) {
+    val toast by viewModel.showToast.collectAsState()
+
+    toast?.let {
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+            Toast(
+                text = it.message,
+                timeout = it.timeout,
+                position = it.position,
+                type = it.type
+            )
         }
     }
 }

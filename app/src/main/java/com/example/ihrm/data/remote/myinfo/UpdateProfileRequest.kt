@@ -10,5 +10,8 @@ data class UpdateProfileRequest(
     val identityIdIssuePlace: String? = null,
     val englishName: String? = null,
     val address: String? = null,
-    val maritalStatus: String? = null
+    val maritalStatus: String? = null,
+    val fullName: String? = null,
+    val email: String? = null,
+    val phoneNumber: String? = null,
 )

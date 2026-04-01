@@ -3,20 +3,30 @@ package com.example.ihrm.ui.myinfo
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewModelScope
+import com.example.ihrm.R
 import com.example.ihrm.core.errorHandler.CommonErrorException
 import com.example.ihrm.core.viewmodel.BaseViewmodel
 import com.example.ihrm.core.viewmodel.CallbackWrapper
 import com.example.ihrm.data.remote.base.NetworkResult
+import com.example.ihrm.data.remote.myinfo.ChangePasswordRequest
 import com.example.ihrm.data.remote.myinfo.UpdateProfileRequest
 import com.example.ihrm.domain.model.Country
 import com.example.ihrm.domain.model.MyInfo
 import com.example.ihrm.domain.model.MyProfile
 import com.example.ihrm.domain.usecase.myInfo.MyInfoUseCase
+import com.example.ihrm.ui.common.toast.ToastPosition
+import com.example.ihrm.ui.common.toast.ToastState
+import com.example.ihrm.ui.common.toast.ToastType
+import com.example.ihrm.ui.login.LoginFieldError
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -85,11 +95,19 @@ class MyInfoViewModel @Inject constructor(
             },
             callbackWrapper = object : CallbackWrapper<Unit> {
                 override fun onSuccess(data: Unit) {
+                    showToastMessage(
+                        message = appContext.getString(R.string.my_information_update_avatar_success),
+                        type = ToastType.SUCCESS,
+                    )
                     loadMyInfo()
                 }
 
                 override fun onFail(e: CommonErrorException) {
                     super.onFail(e)
+                    showToastMessage(
+                        message = appContext.getString(R.string.my_information_update_avatar_failed),
+                        type = ToastType.ERROR,
+                    )
                 }
             }
         )
@@ -100,11 +118,42 @@ class MyInfoViewModel @Inject constructor(
             fetching = { myInfoUseCase.updateMeProfile(request) },
             callbackWrapper = object : CallbackWrapper<MyProfile> {
                 override fun onSuccess(data: MyProfile) {
+                    showToastMessage(
+                        message = appContext.getString(R.string.my_information_update_success),
+                        type = ToastType.SUCCESS,
+                    )
                     loadMyInfo()
                 }
 
                 override fun onFail(e: CommonErrorException) {
                     super.onFail(e)
+                    showToastMessage(
+                        message = appContext.getString(R.string.my_information_update_failed),
+                        type = ToastType.ERROR,
+                    )
+                }
+            }
+        )
+    }
+
+    fun updateInfoMe(request: UpdateProfileRequest) {
+        fetchData(
+            fetching = { myInfoUseCase.updateInfoMeProfile(request) },
+            callbackWrapper = object : CallbackWrapper<MyProfile> {
+                override fun onSuccess(data: MyProfile) {
+                    showToastMessage(
+                        message = appContext.getString(R.string.my_information_update_success),
+                        type = ToastType.SUCCESS,
+                    )
+                    loadMyInfo()
+                }
+
+                override fun onFail(e: CommonErrorException) {
+                    super.onFail(e)
+                    showToastMessage(
+                        message = appContext.getString(R.string.my_information_update_failed),
+                        type = ToastType.ERROR,
+                    )
                 }
             }
         )
@@ -120,6 +169,47 @@ class MyInfoViewModel @Inject constructor(
             name = "avatar",
             filename = filename,
             body = requestBody
+        )
+    }
+
+    fun changePassword(currentPassword: String, newPassword: String, confirmPassword: String) {
+        fetchData(
+            fetching = {
+                myInfoUseCase.changePassword(
+                    request = ChangePasswordRequest(
+                        currentPassword = currentPassword,
+                        newPassword = newPassword,
+                        confirmPassword = confirmPassword
+                    )
+                )
+            },
+            callbackWrapper = object : CallbackWrapper<Unit> {
+                override fun onSuccess(data: Unit) {
+                    showToastMessage(
+                        message = appContext.getString(R.string.change_password_success),
+                        type = ToastType.SUCCESS,
+                    )
+                    loadMyInfo()
+                }
+
+                override fun onFail(e: CommonErrorException) {
+                    super.onFail(e)
+                    showToastMessage(
+                        message = e.errorMsg?: appContext.getString(R.string.change_password_fail),
+                        type = ToastType.ERROR,
+                    )
+                }
+            }
+        )
+    }
+
+    private fun showToastMessage(message: String, type: ToastType) {
+        showToast(
+            ToastState(
+                message = message,
+                type = type,
+                position = ToastPosition.BOTTOM
+            )
         )
     }
 }

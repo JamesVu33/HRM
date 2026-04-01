@@ -27,14 +27,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -66,16 +63,17 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ihrm.R
-import com.example.ihrm.domain.model.Gender
+import com.example.ihrm.data.remote.myinfo.UpdateProfileRequest
 import com.example.ihrm.domain.model.MaritalStatus
 import com.example.ihrm.domain.model.MyInfo
+import com.example.ihrm.domain.model.MyProfile
 import com.example.ihrm.ui.common.Avatar
 import com.example.ihrm.ui.common.BaseHRMCompose
 import com.example.ihrm.ui.common.CountryPickerBottomSheet
 import com.example.ihrm.ui.common.MaritalStatusBottomSheet
-import com.example.ihrm.ui.common.PendingActionsRow
+import com.example.ihrm.ui.components.ButtonSize
 import com.example.ihrm.ui.components.ButtonVariant
-import com.example.ihrm.ui.login.LoginScreenContent
+import com.example.ihrm.ui.components.CustomButton
 import com.example.ihrm.ui.theme.DashboardFigmaInk
 import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.util.DashboardBrush.MyInfoHeaderBrush
@@ -129,8 +127,6 @@ private val SectionSubtitleStyle = TextStyle(
     letterSpacing = (-0.15).sp,
 )
 
-private enum class GenderOption { Male, Female }
-
 @Composable
 private fun textOrPlaceholder(value: String?): String {
     if (value.isNullOrBlank()) return stringResource(R.string.my_info_not_available)
@@ -155,14 +151,6 @@ private fun maritalStatusLabel(status: MaritalStatus?): String {
     }
 }
 
-private fun domainGenderToUiOption(g: Gender?): GenderOption {
-    return when (g) {
-        Gender.MALE -> GenderOption.Male
-        Gender.FEMALE -> GenderOption.Female
-        Gender.OTHER, Gender.UNKNOWN, null -> GenderOption.Male
-    }
-}
-
 private fun initialsFromName(name: String?): String {
     if (name.isNullOrBlank()) return "?"
     val parts = name.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }
@@ -171,6 +159,83 @@ private fun initialsFromName(name: String?): String {
         1 -> parts[0].take(2).uppercase()
         else -> "${parts[0].first()}${parts[1].first()}".uppercase()
     }
+}
+
+private fun changedOrNull(newValue: String?, oldValue: String?): String? {
+    return if (newValue?.trim() == oldValue?.trim()) null else newValue
+}
+
+private data class MyInfoFormSaveDelta(
+    val request: UpdateProfileRequest,
+    val hasChangesProfile: Boolean,
+    val hasChangesInfoMe: Boolean,
+) {
+    val hasAnyChanges: Boolean get() = hasChangesProfile || hasChangesInfoMe
+}
+
+/**
+ * So sánh form với [myInfo]/[profile] đã load; null khi chưa đủ dữ liệu để PATCH (không có profile).
+ */
+private fun computeMyInfoFormSaveDelta(
+    myInfo: MyInfo?,
+    profile: MyProfile?,
+    genderSelected: GenderOption,
+    selectedMaritalStatus: MaritalStatus?,
+    fullNameText: String,
+    englishNameText: String,
+    emailText: String,
+    phoneText: String,
+    dobText: String,
+    identityIdText: String,
+    identityIssueDayText: String,
+    identityIssuePlaceText: String,
+    addressText: String,
+    countryCodeText: String,
+): MyInfoFormSaveDelta? {
+    val info = myInfo ?: return null
+    val p = profile ?: return null
+
+    val oldDob = p.dateOfBirth.toDisplayDate()
+    val oldIdentityIssueDate = p.identityIdIssueDate.toDisplayDate()
+    val oldGender = p.gender.name
+    val oldMaritalStatus = p.maritalStatus.takeIf { it != MaritalStatus.UNKNOWN }?.name
+
+    val request = UpdateProfileRequest(
+        gender = changedOrNull(uiGenderToRequestValue(genderSelected), oldGender),
+        avatarUrl = null,
+        dateOfBirth = changedOrNull(dobText, oldDob),
+        nationality = changedOrNull(countryCodeText, p.nationality),
+        identityId = changedOrNull(identityIdText, p.identityId),
+        identityIdIssueDate = changedOrNull(identityIssueDayText, oldIdentityIssueDate),
+        identityIdIssuePlace = changedOrNull(identityIssuePlaceText, p.identityIdIssuePlace),
+        englishName = changedOrNull(englishNameText, p.englishName),
+        address = changedOrNull(addressText, p.address),
+        maritalStatus = changedOrNull(selectedMaritalStatus?.name, oldMaritalStatus),
+        fullName = changedOrNull(fullNameText, info.fullName),
+        email = changedOrNull(emailText, info.email),
+        phoneNumber = changedOrNull(phoneText, info.phoneNumber),
+    )
+
+    val hasChangesProfile = listOf(
+        request.gender,
+        request.avatarUrl,
+        request.dateOfBirth,
+        request.nationality,
+        request.identityId,
+        request.identityIdIssueDate,
+        request.identityIdIssuePlace,
+        request.englishName,
+        request.address,
+        request.maritalStatus,
+    ).any { it != null }
+
+    val hasChangesInfoMe = listOf(
+        request.fullName,
+        request.email,
+        request.phoneNumber,
+    ).any { it != null }
+
+    return MyInfoFormSaveDelta(request, hasChangesProfile, hasChangesInfoMe)
 }
 
 @Composable
@@ -183,9 +248,18 @@ fun MyInfoScreen(
     viewModel: MyInfoViewModel = hiltViewModel()
 ) {
     BaseHRMCompose(
-        content = { MyInfoScreenContent(viewModel = viewModel, onMenuClick = onMenuClick) },
+        content = {
+            MyInfoScreenContent(
+                viewModel = viewModel,
+                onMenuClick = onMenuClick,
+                onCancelClick = onCancelClick,
+                onChangeInfoClick = onChangeInfoClick,
+                onKeyClick = onKeyClick,
+                onChangePhotoClick = onChangePhotoClick,
+            )
+        },
         viewmodel = viewModel,
-        onErrorAlertClose = {  }
+        onErrorAlertClose = onCancelClick
     )
 }
 
@@ -208,7 +282,6 @@ fun MyInfoScreenContent(
         }
     }
     val profile = myInfo?.profile
-    val genderSelected = remember(profile?.gender) { domainGenderToUiOption(profile?.gender) }
     var showChangePasswordDialog by remember { mutableStateOf(false) }
     var showCountryPicker by remember { mutableStateOf(false) }
     var showMaritalStatusPicker by remember { mutableStateOf(false) }
@@ -221,8 +294,11 @@ fun MyInfoScreenContent(
     var identityIdText by remember { mutableStateOf("") }
     var identityIssueDayText by remember { mutableStateOf("") }
     var identityIssuePlaceText by remember { mutableStateOf("") }
+    var addressText by remember { mutableStateOf("") }
     var countryCodeText by remember { mutableStateOf("") }
+    var genderSelected by remember { mutableStateOf(GenderOption.Male) }
     var selectedMaritalStatus by remember { mutableStateOf<MaritalStatus?>(null) }
+    var formBaseline by remember { mutableStateOf<MyInfoFormBaseline?>(null) }
 
     LaunchedEffect(myInfo) {
         val info = myInfo ?: return@LaunchedEffect
@@ -235,12 +311,34 @@ fun MyInfoScreenContent(
         identityIdText = p?.identityId.orEmpty()
         identityIssueDayText = p?.identityIdIssueDate.toDisplayDate()
         identityIssuePlaceText = p?.identityIdIssuePlace.orEmpty()
+        addressText = p?.address.orEmpty()
         countryCodeText = p?.nationality.orEmpty()
         selectedMaritalStatus = p?.maritalStatus?.takeIf { it != MaritalStatus.UNKNOWN }
+        genderSelected = domainGenderToUiOption(p?.gender)
+        formBaseline = MyInfoFormBaseline(
+            fullName = fullNameText,
+            englishName = englishNameText,
+            email = emailText,
+            phone = phoneText,
+            dob = dobText,
+            identityId = identityIdText,
+            identityIssueDay = identityIssueDayText,
+            identityIssuePlace = identityIssuePlaceText,
+            address = addressText,
+            countryCode = countryCodeText,
+            gender = genderSelected,
+            marital = selectedMaritalStatus,
+        )
     }
 
     if (showChangePasswordDialog) {
-        ChangePasswordDialog(onDismiss = { showChangePasswordDialog = false })
+        ChangePasswordDialog(
+            onSave = { currentPassword, newPassword, confirmPassword ->
+                viewModel.changePassword(currentPassword, newPassword, confirmPassword)
+                showChangePasswordDialog = false
+            },
+            onDismiss = { showChangePasswordDialog = false }
+        )
     }
 
     CountryPickerBottomSheet(
@@ -271,278 +369,351 @@ fun MyInfoScreenContent(
             .fillMaxSize()
             .background(MyInfoHeaderBrush)
             .navigationBarsPadding()
-            .verticalScroll(rememberScrollState())
     ) {
         MyInfoHeader(
-            fullName = fullNameText.takeIf { it.isNotBlank() } ?: myInfo?.fullName,
-            avatarUrl = profile?.avatarUrl,
             onMenuClick = onMenuClick,
             onKeyClick = {
                 showChangePasswordDialog = true
                 onKeyClick()
             },
-            onChangePhotoClick = {
-                imagePickerLauncher.launch("image/*")
-                onChangePhotoClick()
-            },
         )
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFF9FAFB))
-        ){
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+        ) {
+            val fullName = fullNameText.takeIf { it.isNotBlank() } ?: myInfo?.fullName
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 20.dp)
-                    .padding(top = 16.dp, bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                MyInfoFormCard(
-                    title = stringResource(R.string.my_info_section_basic_title),
-                    subtitle = stringResource(R.string.my_info_section_basic_subtitle),
-                ) {
-                    MyInfoLabeledField(
-                        label = stringResource(R.string.my_info_label_full_name),
-                        icon = ImageVector.vectorResource(R.drawable.ic_person),
-                        content = {
-                            MyInfoValueBox(
-                                value = fullNameText,
-                                onValueChange = { fullNameText = it },
-                            )
-                        },
+                Box(modifier = Modifier.size(96.dp)) {
+                    Avatar(
+                        imageUrl = profile?.avatarUrl,
+                        initials = initialsFromName(fullName),
+                        size = 96.dp,
+                        showBorder = true,
                     )
-                    MyInfoDivider()
-                    MyInfoLabeledField(
-                        label = stringResource(R.string.my_info_label_english_name),
-                        icon = ImageVector.vectorResource(R.drawable.ic_person),
-                        content = {
-                            MyInfoValueBox(
-                                value = englishNameText,
-                                onValueChange = { englishNameText = it },
-                            )
-                        },
-                    )
-                    MyInfoDivider()
-                    MyInfoLabeledField(
-                        label = stringResource(R.string.my_info_label_email),
-                        icon = ImageVector.vectorResource(R.drawable.ic_email),
-                        content = {
-                            MyInfoValueBox(
-                                value = emailText,
-                                onValueChange = { emailText = it },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                            )
-                        },
-                    )
-                    MyInfoDivider()
-                    MyInfoLabeledField(
-                        label = stringResource(R.string.my_info_label_phone),
-                        icon = ImageVector.vectorResource(R.drawable.ic_cellphone),
-                        content = {
-                            MyInfoValueBox(
-                                value = phoneText,
-                                onValueChange = { phoneText = it },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                            )
-                        },
-                    )
-                    MyInfoDivider()
-                    MyInfoLabeledField(
-                        label = stringResource(R.string.my_info_label_dob),
-                        icon = ImageVector.vectorResource(R.drawable.ic_calendar),
-                        content = {
-                            MyInfoValueBox(
-                                value = dobText,
-                                onValueChange = { dobText = it },
-                            )
-                        },
-                    )
-                    MyInfoDivider()
-                    MyInfoLabeledField(
-                        label = stringResource(R.string.my_info_label_gender),
-                        icon = ImageVector.vectorResource(R.drawable.ic_person),
-                        content = {
-                            MyInfoGenderRow(
-                                selected = genderSelected,
-                                onSelect = {},
-                                readOnly = true,
-                            )
-                        },
-                    )
-                    MyInfoDivider()
-                    MyInfoLabeledField(
-                        label = stringResource(R.string.my_info_label_identity_id),
-                        icon = ImageVector.vectorResource(R.drawable.ic_calendar),
-                        content = {
-                            MyInfoValueBox(
-                                value = identityIdText,
-                                onValueChange = { identityIdText = it },
-                            )
-                        },
-                    )
-                    MyInfoDivider()
-                    MyInfoLabeledField(
-                        label = stringResource(R.string.my_info_label_identity_issue_day),
-                        icon = ImageVector.vectorResource(R.drawable.ic_calendar),
-                        content = {
-                            MyInfoValueBox(
-                                value = identityIssueDayText,
-                                onValueChange = { identityIssueDayText = it },
-                            )
-                        },
-                    )
-                    MyInfoDivider()
-                    MyInfoLabeledField(
-                        label = stringResource(R.string.my_info_label_identity_issue_place),
-                        icon = ImageVector.vectorResource(R.drawable.ic_location),
-                        content = {
-                            MyInfoValueBox(
-                                value = identityIssuePlaceText,
-                                onValueChange = { identityIssuePlaceText = it },
-                            )
-                        },
-                    )
-                    MyInfoDivider()
-                    MyInfoLabeledField(
-                        label = stringResource(R.string.my_info_label_nationality),
-                        icon = ImageVector.vectorResource(R.drawable.ic_location),
-                        content = {
-                            MyInfoDropdownRow(
-                                value = if (countryCodeText.isNotBlank()) {
-                                    countryCodeText
-                                } else {
-                                    textOrPlaceholder(profile?.nationality)
-                                },
-                                onClick = {
-                                    if (!countries.isNullOrEmpty()) {
-                                        showCountryPicker = true
-                                    }
-                                }
-                            )
-                        },
-                    )
-                    MyInfoDivider()
-                    MyInfoLabeledField(
-                        label = stringResource(R.string.my_info_label_marital_status),
-                        icon = ImageVector.vectorResource(R.drawable.ic_person),
-                        content = {
-                            MyInfoDropdownRow(
-                                value = if (selectedMaritalStatus != null) {
-                                    maritalStatusLabel(selectedMaritalStatus)
-                                } else {
-                                    maritalStatusLabel(profile?.maritalStatus)
-                                },
-                                onClick = {
-                                    showMaritalStatusPicker = true
-                                }
-                            )
-                        },
-                    )
-                    MyInfoDivider()
-                    MyInfoLabeledField(
-                        label = stringResource(R.string.my_info_label_address),
-                        icon = ImageVector.vectorResource(R.drawable.ic_location),
-                        content = {
-                            MyInfoAddressBox(textOrPlaceholder(profile?.address))
-                        },
-                    )
-                }
-
-                MyInfoFormCard(
-                    title = stringResource(R.string.my_info_section_employee_title),
-                    subtitle = null,
-                ) {
-                    MyInfoReadOnlyEmployeeField(
-                        label = stringResource(R.string.my_info_label_role),
-                        value = textOrPlaceholder(rolesDisplay(myInfo)),
-                    )
-                    MyInfoDivider()
-                    MyInfoReadOnlyEmployeeField(
-                        label = stringResource(R.string.my_info_label_job_title),
-                        value = textOrPlaceholder(profile?.title?.name),
-                    )
-                    MyInfoDivider()
-                    MyInfoReadOnlyEmployeeField(
-                        label = stringResource(R.string.my_info_label_level),
-                        value = textOrPlaceholder(profile?.level?.name),
-                    )
-                    MyInfoDivider()
-                    MyInfoReadOnlyEmployeeField(
-                        label = stringResource(R.string.my_info_label_department),
-                        value = stringResource(R.string.my_info_not_available),
-                    )
-                    MyInfoDivider()
-                    MyInfoReadOnlyEmployeeField(
-                        label = stringResource(R.string.my_info_label_status),
-                        value = textOrPlaceholder(myInfo?.status),
-                    )
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
                     Box(
                         modifier = Modifier
-                            .weight(1f)
-                            .dropShadow(
-                                shape = RoundedCornerShape(20.dp),
-                                color = Color.Black.copy(alpha = 0.1f),
-                                blur = 6.dp,
-                                offsetY = 4.dp,
-                                spread = (-1).dp
-                            )
-                            .height(60.dp)
-                            .clip(RoundedCornerShape(20.dp))
+                            .align(Alignment.BottomEnd)
+                            .size(40.dp)
+                            .clip(CircleShape)
                             .background(Color.White)
-                            .border(1.dp, FieldBorder, RoundedCornerShape(20.dp))
-                            .clickable(onClick = onCancelClick),
+                            .clickable(onClick = {
+                                imagePickerLauncher.launch("image/*")
+                                onChangePhotoClick()
+                            }),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = stringResource(R.string.my_info_cancel),
-                            style = TextStyle(
-                                fontFamily = InterFontFamily,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 16.sp,
-                                color = CancelText,
-                            ),
+                        Icon(
+                            imageVector = ImageVector.vectorResource(R.drawable.ic_upload),
+                            contentDescription = stringResource(R.string.my_info_change_photo),
+                            tint = Color(0xFF155DFC),
+                            modifier = Modifier.size(20.dp)
                         )
                     }
-                    Row(
-                        modifier = Modifier
-                            .weight(1f)
-                            .dropShadow(
-                                shape = RoundedCornerShape(20.dp),
-                                color = Color.Black.copy(alpha = 0.1f),
-                                blur = 6.dp,
-                                offsetY = 4.dp,
-                                spread = (-1).dp
-                            )
-                            .height(60.dp)
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(ChangeInfoBlue)
-                            .clickable(onClick = onChangeInfoClick),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center,
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = stringResource(R.string.my_info_change_photo),
+                    style = txtInterMedium14White90Percent,
+                )
+            }
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF9FAFB))
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 20.dp)
+                        .padding(top = 16.dp, bottom = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    MyInfoFormCard(
+                        title = stringResource(R.string.my_info_section_basic_title),
+                        subtitle = stringResource(R.string.my_info_section_basic_subtitle),
                     ) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.ic_edit),
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(18.dp)
+                        MyInfoLabeledField(
+                            label = stringResource(R.string.my_info_label_full_name),
+                            icon = ImageVector.vectorResource(R.drawable.ic_person),
+                            content = {
+                                MyInfoValueBox(
+                                    value = fullNameText,
+                                    onValueChange = { fullNameText = it },
+                                )
+                            },
                         )
-                        Spacer(modifier = Modifier.size(8.dp))
-                        Text(
-                            text = stringResource(R.string.my_info_change_info),
-                            style = TextStyle(
-                                fontFamily = InterFontFamily,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 16.sp,
-                                color = Color.White,
-                            ),
+                        MyInfoDivider()
+                        MyInfoLabeledField(
+                            label = stringResource(R.string.my_info_label_english_name),
+                            icon = ImageVector.vectorResource(R.drawable.ic_person),
+                            content = {
+                                MyInfoValueBox(
+                                    value = englishNameText,
+                                    onValueChange = { englishNameText = it },
+                                )
+                            },
                         )
+                        MyInfoDivider()
+                        MyInfoLabeledField(
+                            label = stringResource(R.string.my_info_label_email),
+                            icon = ImageVector.vectorResource(R.drawable.ic_email),
+                            content = {
+                                MyInfoValueBox(
+                                    value = emailText,
+                                    onValueChange = { emailText = it },
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                                )
+                            },
+                        )
+                        MyInfoDivider()
+                        MyInfoLabeledField(
+                            label = stringResource(R.string.my_info_label_phone),
+                            icon = ImageVector.vectorResource(R.drawable.ic_cellphone),
+                            content = {
+                                MyInfoValueBox(
+                                    value = phoneText,
+                                    onValueChange = { phoneText = it },
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                                )
+                            },
+                        )
+                        MyInfoDivider()
+                        MyInfoLabeledField(
+                            label = stringResource(R.string.my_info_label_dob),
+                            icon = ImageVector.vectorResource(R.drawable.ic_calendar),
+                            content = {
+                                MyInfoValueBox(
+                                    value = dobText,
+                                    onValueChange = { dobText = it },
+                                )
+                            },
+                        )
+                        MyInfoDivider()
+                        MyInfoLabeledField(
+                            label = stringResource(R.string.my_info_label_gender),
+                            icon = ImageVector.vectorResource(R.drawable.ic_person),
+                            content = {
+                                MyInfoGenderRow(
+                                    selected = genderSelected,
+                                    onSelect = { genderSelected = it },
+                                )
+                            },
+                        )
+                        MyInfoDivider()
+                        MyInfoLabeledField(
+                            label = stringResource(R.string.my_info_label_identity_id),
+                            icon = ImageVector.vectorResource(R.drawable.ic_calendar),
+                            content = {
+                                MyInfoValueBox(
+                                    value = identityIdText,
+                                    onValueChange = { identityIdText = it },
+                                )
+                            },
+                        )
+                        MyInfoDivider()
+                        MyInfoLabeledField(
+                            label = stringResource(R.string.my_info_label_identity_issue_day),
+                            icon = ImageVector.vectorResource(R.drawable.ic_calendar),
+                            content = {
+                                MyInfoValueBox(
+                                    value = identityIssueDayText,
+                                    onValueChange = { identityIssueDayText = it },
+                                )
+                            },
+                        )
+                        MyInfoDivider()
+                        MyInfoLabeledField(
+                            label = stringResource(R.string.my_info_label_identity_issue_place),
+                            icon = ImageVector.vectorResource(R.drawable.ic_location),
+                            content = {
+                                MyInfoValueBox(
+                                    value = identityIssuePlaceText,
+                                    onValueChange = { identityIssuePlaceText = it },
+                                )
+                            },
+                        )
+                        MyInfoDivider()
+                        MyInfoLabeledField(
+                            label = stringResource(R.string.my_info_label_nationality),
+                            icon = ImageVector.vectorResource(R.drawable.ic_location),
+                            content = {
+                                MyInfoDropdownRow(
+                                    value = countryCodeText.ifBlank {
+                                        textOrPlaceholder(profile?.nationality)
+                                    },
+                                    onClick = {
+                                        if (!countries.isNullOrEmpty()) {
+                                            showCountryPicker = true
+                                        }
+                                    }
+                                )
+                            },
+                        )
+                        MyInfoDivider()
+                        MyInfoLabeledField(
+                            label = stringResource(R.string.my_info_label_marital_status),
+                            icon = ImageVector.vectorResource(R.drawable.ic_person),
+                            content = {
+                                MyInfoDropdownRow(
+                                    value = if (selectedMaritalStatus != null) {
+                                        maritalStatusLabel(selectedMaritalStatus)
+                                    } else {
+                                        maritalStatusLabel(profile?.maritalStatus)
+                                    },
+                                    onClick = {
+                                        showMaritalStatusPicker = true
+                                    }
+                                )
+                            },
+                        )
+                        MyInfoDivider()
+                        MyInfoLabeledField(
+                            label = stringResource(R.string.my_info_label_address),
+                            icon = ImageVector.vectorResource(R.drawable.ic_location),
+                            content = {
+                                MyInfoAddressBox(
+                                    value = addressText,
+                                    onValueChange = { addressText = it },
+                                )
+                            },
+                        )
+                    }
+
+                    MyInfoFormCard(
+                        title = stringResource(R.string.my_info_section_employee_title),
+                        subtitle = null,
+                    ) {
+                        MyInfoReadOnlyEmployeeField(
+                            label = stringResource(R.string.my_info_label_role),
+                            value = textOrPlaceholder(rolesDisplay(myInfo)),
+                        )
+                        MyInfoDivider()
+                        MyInfoReadOnlyEmployeeField(
+                            label = stringResource(R.string.my_info_label_job_title),
+                            value = textOrPlaceholder(profile?.title?.name),
+                        )
+                        MyInfoDivider()
+                        MyInfoReadOnlyEmployeeField(
+                            label = stringResource(R.string.my_info_label_level),
+                            value = textOrPlaceholder(profile?.level?.name),
+                        )
+                        MyInfoDivider()
+                        MyInfoReadOnlyEmployeeField(
+                            label = stringResource(R.string.my_info_label_department),
+                            value = stringResource(R.string.my_info_not_available),
+                        )
+                        MyInfoDivider()
+                        MyInfoReadOnlyEmployeeField(
+                            label = stringResource(R.string.my_info_label_status),
+                            value = textOrPlaceholder(myInfo?.status),
+                        )
+                    }
+
+                    val changeInfoEnabled = remember(
+                        formBaseline,
+                        fullNameText,
+                        englishNameText,
+                        emailText,
+                        phoneText,
+                        dobText,
+                        identityIdText,
+                        identityIssueDayText,
+                        identityIssuePlaceText,
+                        addressText,
+                        countryCodeText,
+                        genderSelected,
+                        selectedMaritalStatus,
+                    ) {
+                        formBaseline?.let { base ->
+                            base.differsFrom(
+                                fullNameText = fullNameText,
+                                englishNameText = englishNameText,
+                                emailText = emailText,
+                                phoneText = phoneText,
+                                dobText = dobText,
+                                identityIdText = identityIdText,
+                                identityIssueDayText = identityIssueDayText,
+                                identityIssuePlaceText = identityIssuePlaceText,
+                                addressText = addressText,
+                                countryCodeText = countryCodeText,
+                                genderSelected = genderSelected,
+                                selectedMaritalStatus = selectedMaritalStatus,
+                            )
+                        } == true
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .weight(1f)
+                                .dropShadow(
+                                    shape = RoundedCornerShape(20.dp),
+                                    color = Color.Black.copy(alpha = 0.1f),
+                                    blur = 6.dp,
+                                    offsetY = 4.dp,
+                                    spread = (-1).dp
+                                )
+                                .height(60.dp)
+                                .clip(RoundedCornerShape(14.dp))
+                                .alpha(if (changeInfoEnabled) 1f else 0.45f)
+                                .background(ChangeInfoBlue)
+                                .clickable(enabled = changeInfoEnabled) {
+                                    val delta = computeMyInfoFormSaveDelta(
+                                        myInfo = myInfo,
+                                        profile = profile,
+                                        genderSelected = genderSelected,
+                                        selectedMaritalStatus = selectedMaritalStatus,
+                                        fullNameText = fullNameText,
+                                        englishNameText = englishNameText,
+                                        emailText = emailText,
+                                        phoneText = phoneText,
+                                        dobText = dobText,
+                                        identityIdText = identityIdText,
+                                        identityIssueDayText = identityIssueDayText,
+                                        identityIssuePlaceText = identityIssuePlaceText,
+                                        addressText = addressText,
+                                        countryCodeText = countryCodeText,
+                                    ) ?: run {
+                                        onChangeInfoClick()
+                                        return@clickable
+                                    }
+                                    if (delta.hasChangesProfile) {
+                                        viewModel.updateProfile(delta.request)
+                                    }
+                                    if (delta.hasChangesInfoMe) {
+                                        viewModel.updateInfoMe(delta.request)
+                                    }
+                                    onChangeInfoClick()
+                                },
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                        ) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(R.drawable.ic_edit),
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.size(8.dp))
+                            Text(
+                                text = stringResource(R.string.my_info_change_info),
+                                style = TextStyle(
+                                    fontFamily = InterFontFamily,
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 16.sp,
+                                    color = Color.White,
+                                ),
+                            )
+                        }
                     }
                 }
             }
@@ -552,17 +723,13 @@ fun MyInfoScreenContent(
 
 @Composable
 private fun MyInfoHeader(
-    fullName: String?,
-    avatarUrl: String?,
     onMenuClick: () -> Unit,
     onKeyClick: () -> Unit,
-    onChangePhotoClick: () -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .statusBarsPadding()
-            .padding(bottom = 24.dp)
     ) {
         Row(
             modifier = Modifier
@@ -610,55 +777,6 @@ private fun MyInfoHeader(
                     modifier = Modifier.size(22.dp)
                 )
             }
-        }
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box(modifier = Modifier.size(96.dp)) {
-                Avatar(
-                    imageUrl = avatarUrl,
-                    initials = initialsFromName(fullName),
-                    size = 96.dp,
-                    showBorder = true,
-                )
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .background(Color.White)
-                        .clickable(onClick = onChangePhotoClick),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.ic_upload),
-                        contentDescription = stringResource(R.string.my_info_change_photo),
-                        tint = Color(0xFF155DFC),
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            if (!fullName.isNullOrBlank()) {
-                Text(
-                    text = fullName,
-                    style = TextStyle(
-                        fontFamily = InterFontFamily,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 20.sp,
-                        lineHeight = 28.sp,
-                        color = Color.White,
-                        letterSpacing = (-0.5).sp,
-                    ),
-                    textAlign = TextAlign.Center,
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-            }
-            Text(
-                text = stringResource(R.string.my_info_change_photo),
-                style = txtInterMedium14White90Percent,
-            )
         }
     }
 }
@@ -779,25 +897,34 @@ private fun MyInfoValueBox(
 }
 
 @Composable
-private fun MyInfoAddressBox(value: String) {
-    Box(
+private fun MyInfoAddressBox(
+    value: String,
+    onValueChange: (String) -> Unit,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        singleLine = false,
         modifier = Modifier
             .fillMaxWidth()
-            .height(88.dp)
-            .clip(RoundedCornerShape(14.dp))
-            .border(1.dp, FieldBorder, RoundedCornerShape(14.dp))
-            .background(PageBg)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        contentAlignment = Alignment.TopStart
-    ) {
-        Text(
-            text = value,
-            style = FieldValueStyle.copy(
-                color = MutedValue,
-                lineHeight = 24.sp,
-            ),
-        )
-    }
+            .height(88.dp),
+        textStyle = FieldValueStyle.copy(
+            color = MutedValue,
+            lineHeight = 24.sp,
+        ),
+        shape = RoundedCornerShape(14.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color.White,
+            disabledContainerColor = Color.White,
+            focusedBorderColor = FieldBorder,
+            unfocusedBorderColor = FieldBorder,
+            disabledBorderColor = FieldBorder,
+            focusedTextColor = DashboardFigmaInk,
+            unfocusedTextColor = DashboardFigmaInk,
+            cursorColor = PrimaryBar,
+        ),
+    )
 }
 
 @Composable
@@ -930,6 +1057,7 @@ private val ChangePasswordPlaceholderColor = Color(0xFF101828).copy(alpha = 0.5f
 
 @Composable
 private fun ChangePasswordDialog(
+    onSave: (currentPassword: String, newPassword: String, confirmPassword: String) -> Unit,
     onDismiss: () -> Unit,
 ) {
     var currentPassword by remember { mutableStateOf("") }
@@ -1044,16 +1172,22 @@ private fun ChangePasswordDialog(
                         visible = confirmVisible,
                         onToggleVisible = { confirmVisible = !confirmVisible },
                     )
-                    PendingActionsRow(
+                    CustomButton(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 6.dp),
-                        textButtonLeft = stringResource(R.string.my_info_cancel),
-                        textButtonRight = stringResource(R.string.employee_detail_save),
-                        variantButtonLeft =  ButtonVariant.Neutral,
-                        variantButtonRight = ButtonVariant.Primary,
-                        onLeftClick = onDismiss,
-                        onRightClick = onDismiss
+                            .dropShadow(
+                                offsetX = 0.dp,
+                                offsetY = 4.dp,
+                                blur = 6.dp,
+                                shape = RoundedCornerShape(14.dp),
+                                color = Color(0x00000000).copy(0.1f),
+                                spread = (-1).dp
+                            ),
+                        size = ButtonSize.Large,
+                        variant = ButtonVariant.Primary,
+                        text = stringResource(R.string.employee_detail_save),
+                        onClick = { onSave(currentPassword, newPassword, confirmPassword) },
+                        enabled = currentPassword.isNotEmpty() && newPassword.isNotEmpty() && confirmPassword.isNotEmpty(),
+                        fullWidth = true,
                     )
                 }
             }
@@ -1079,9 +1213,9 @@ private fun ChangePasswordField(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Icon(
-                imageVector = Icons.Default.Lock,
+                imageVector = ImageVector.vectorResource(R.drawable.ic_permission),
                 contentDescription = null,
-                tint = LabelGray,
+                tint = PrimaryBar,
                 modifier = Modifier.size(16.dp),
             )
             Text(

@@ -95,4 +95,8 @@ val DashboardLeaveGreenEnd = Color(0xFF00BC7D)
 val DashboardShieldCyan = Color(0xFF00D3F3)
 val DashboardProfileCellBg = Color(0x66EFF6FF)
 val CardBorder = Color(0xFFF0F0F0)
+val ApprovedText = Color(0xFF008236)
+val BgErrorMessage = Color(0xFFFFC1C2)
+val ErrorText = Color(0xFFF10C00)
+
 

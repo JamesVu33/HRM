@@ -5,6 +5,7 @@ import com.example.ihrm.data.remote.api.MyInfoApiService
 import com.example.ihrm.data.remote.base.NetworkResult
 import com.example.ihrm.data.remote.base.safeApiCall
 import com.example.ihrm.data.remote.base.safeApiCallRaw
+import com.example.ihrm.data.remote.myinfo.ChangePasswordRequest
 import com.example.ihrm.data.remote.myinfo.UpdateProfileRequest
 import com.example.ihrm.di.NetworkModule
 import com.example.ihrm.domain.model.Country
@@ -41,4 +42,21 @@ class MyInfoRepositoryImpl @Inject constructor(
         safeApiCall(retrofit) {
             myInfoApiService.updateMeProfile(request)
         }.map { it.fromResponseToInfo() }
+
+    override suspend fun updateInfoMeProfile(request: UpdateProfileRequest): NetworkResult<MyProfile> =
+        safeApiCall(retrofit) {
+            myInfoApiService.updateInfoMeProfile(request)
+        }.map { it.fromResponseToInfo() }
+
+    override suspend fun changePassword(request: ChangePasswordRequest): NetworkResult<Unit> =
+        when (
+            val r = safeApiCall(retrofit) {
+                myInfoApiService.changePassword(request)
+            }
+        ) {
+            // BE often omits `data` for void responses; Gson leaves it null. Success<Unit> must not carry null.
+            is NetworkResult.Success -> NetworkResult.Success(Unit)
+            is NetworkResult.Failure -> r
+            is NetworkResult.Exception -> r
+        }
 }

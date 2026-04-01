@@ -8,11 +8,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.ihrm.core.errorHandler.CommonErrorException
 import com.example.ihrm.core.errorHandler.GlobalErrorHandler
 import com.example.ihrm.data.remote.base.NetworkResult
+import com.example.ihrm.ui.common.toast.ToastState
 import com.example.ihrm.util.EmptyFunc
 import com.example.ihrm.util.ParamFunc
 import com.example.ihrm.util.SupEmptyFunc
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -50,6 +52,18 @@ abstract class BaseViewmodel : ViewModel() {
     // for API calling indicator
     private val _loading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _loading.asStateFlow()
+
+    private val _showToast = MutableStateFlow<ToastState?>(null)
+    val showToast: StateFlow<ToastState?>
+        get() = _showToast.asStateFlow()
+
+    fun showToast(toast: ToastState) {
+        viewModelScope.launch {
+            _showToast.emit(toast)
+            delay(toast.timeout)
+            _showToast.emit(null)
+        }
+    }
 
     // a common way to wrap all thing in one UI class
     open val commonUIState = mutableStateOf<CommonUIState<*>?>(null)
