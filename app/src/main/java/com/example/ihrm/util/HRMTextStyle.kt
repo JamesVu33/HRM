@@ -89,6 +89,12 @@ val txtInterBold24 = TextStyle(
     color = ColorBgSuccessGradientBottom
 )
 
+val LabelTextStyle13Regular = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.Normal,
+    fontSize = 13.sp,
+)
+
 val LabelTextStyle13RegularGrey = TextStyle(
     fontFamily = InterFontFamily,
     fontWeight = FontWeight.Normal,

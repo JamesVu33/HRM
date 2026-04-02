@@ -1,5 +1,6 @@
 package com.example.ihrm.domain.model.errors
 
+import android.util.Log
 import com.example.ihrm.core.errorHandler.CommonErrorException
 import com.example.ihrm.data.remote.base.ErrorFieldResponse
 
@@ -26,6 +27,7 @@ data class APIErrorInfo(
      * the error message will be gained by local DB or translate API endpoint
      */
     fun getCommonErrorType(): CommonErrorException {
+        Log.d("apiFlows", "getCommonErrorType: errorType $errorType")
         return when (errorType) {
             "VALIDATION_ERROR",
             "DOMAIN_ERROR" -> {
@@ -40,6 +42,11 @@ data class APIErrorInfo(
                     )
                 }
             }
+            "GUARD_ERROR" -> CommonErrorException.UnauthorizedException(
+                errorMsg = "error",
+                errorKey = errorMsg.firstOrNull()?.key ?: "Unknown"
+            )
+
             "_global" -> invalidLogicType()
             else -> CommonErrorException.UnknownException("")
 

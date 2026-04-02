@@ -1,5 +1,6 @@
 package com.example.ihrm.ui.common
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -64,7 +65,7 @@ fun ErrorAlert(
 ) {
     val errorState by viewmodel.errorEvent.collectAsState()
     var errorMsg by remember { mutableStateOf<String?>(null) }
-
+    Log.d("apiFlows", "ErrorAlert: $errorState")
     if (errorState == null) return
 
     LaunchedEffect(Unit) {

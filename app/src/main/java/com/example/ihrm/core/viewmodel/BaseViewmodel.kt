@@ -145,6 +145,7 @@ abstract class BaseViewmodel : ViewModel() {
         onCallbackWrapper: CallbackWrapper<T>,
         onSuccess: ParamFunc<T>
     ) {
+        Log.d("apiFlows", "handleApiResponse: response.error = $response")
         when (response) {
             is NetworkResult.Success -> {
                 onSuccess(response.data)
@@ -154,9 +155,12 @@ abstract class BaseViewmodel : ViewModel() {
                 when (response.error) {
 //                    is CommonErrorException.InvalidLogicException,
                     is CommonErrorException.InvalidInputException -> {
+                        Log.d("apiFlows", "handleApiResponse: response.error =  onCallbackWrapper.onFail(response.error)")
                         onCallbackWrapper.onFail(response.error)
                     }
                     else -> {
+                        Log.d("apiFlows", "handleApiResponse: response.error =  _error.tryEmit(response.error)")
+                        Log.d("apiFlows", "handleApiResponse: response.error =  ${response.error}")
                         _error.tryEmit(response.error)
                     }
                 }
