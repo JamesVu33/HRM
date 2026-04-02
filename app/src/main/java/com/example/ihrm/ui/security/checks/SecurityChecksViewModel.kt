@@ -35,7 +35,8 @@ class SecurityChecksViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(SecurityChecksUiState())
     val uiState: StateFlow<SecurityChecksUiState> = _uiState.asStateFlow()
     private val _uiStateSecurityGroups = MutableStateFlow(SecurityGroupsUiState())
-    val uiStateSecurityGroups: StateFlow<SecurityGroupsUiState> = _uiStateSecurityGroups.asStateFlow()
+    val uiStateSecurityGroups: StateFlow<SecurityGroupsUiState> =
+        _uiStateSecurityGroups.asStateFlow()
 
     init {
         loadSubmissions()
@@ -48,9 +49,38 @@ class SecurityChecksViewModel @Inject constructor(
     fun loadSubmissions(
         page: Int = DEFAULT_PAGE,
         limit: Int = DEFAULT_LIMIT,
+        fromDate: String? = null,
+        toDate: String? = null,
+        query: String? = null,
+        orderBy: String? = null,
+        sortBy: String? = null,
+        status: String? = null,
+        type: String? = null,
+        monthCode: String? = null,
+        groupId: String? = null,
     ) {
+        _uiState.value = _uiState.value.copy(
+            submissions = emptyList(),
+            pagination = null,
+            isLoading = true,
+            errorMessage = null,
+        )
         fetchData(
-            fetching = { securitiesUseCase.getSubmissions(page = page, limit = limit) },
+            fetching = {
+                securitiesUseCase.getSubmissions(
+                    fromDate = fromDate,
+                    toDate = toDate,
+                    query = query,
+                    page = page,
+                    limit = limit,
+                    orderBy = orderBy,
+                    sortBy = sortBy,
+                    status = status,
+                    type = type,
+                    monthCode = monthCode,
+                    groupId = groupId,
+                )
+            },
             callbackWrapper = object : CallbackWrapper<SecurityCheckSubmissionsPage> {
                 override fun onSuccess(data: SecurityCheckSubmissionsPage) {
                     Log.d("apiFlows", "success get submissions: $data")

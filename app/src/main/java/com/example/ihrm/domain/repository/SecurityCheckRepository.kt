@@ -7,8 +7,17 @@ import com.example.ihrm.domain.model.SecurityGroups
 interface SecurityCheckRepository {
 
     suspend fun getSubmissions(
-        page: Int = 1,
-        limit: Int = 100,
+        fromDate: String?,
+        toDate: String?,
+        query: String?,
+        page: Int?,
+        limit: Int?,
+        orderBy: String?,
+        sortBy: String?,
+        status: String?,
+        type: String?,
+        monthCode: String?,
+        groupId: String?,
     ): NetworkResult<SecurityCheckSubmissionsPage>
 
     suspend fun getGroups(): NetworkResult<List<SecurityGroups>>

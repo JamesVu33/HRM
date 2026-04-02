@@ -1,4 +1,4 @@
-package com.example.ihrm.ui.common
+package com.example.ihrm.ui.common.bottomsheet
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,10 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,8 +37,6 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,10 +45,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -65,19 +61,20 @@ import com.example.ihrm.domain.model.SecurityGroups
 import com.example.ihrm.ui.security.checks.SecurityChecksActiveFilters
 import com.example.ihrm.ui.security.checks.SecurityChecksSearchByMode
 import com.example.ihrm.ui.theme.DashboardFigmaInk
+import com.example.ihrm.ui.theme.GenderUnselectedBg
+import com.example.ihrm.ui.theme.GenderUnselectedText
 import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.util.singleClick
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.Calendar
 import java.util.Locale
 
 private val FilterSheetInk = DashboardFigmaInk
-private val FilterSheetMuted = Color(0xFF6B7280)
+val FilterSheetMuted = Color(0xFF6B7280)
 private val FilterSheetBorder = Color(0xFFE5E7EB)
 private val FilterSheetFieldBg = Color(0xFFF9FAFB)
-private val FilterPrimaryBlue = Color(0xFF2563EB)
+val FilterPrimaryBlue = Color(0xFF2563EB)
 
 private fun formatMillisToDisplay(millis: Long?): String {
     if (millis == null) return ""
@@ -218,40 +215,13 @@ fun SecurityChecksFilterBottomSheet(
                     Spacer(modifier = Modifier.height(24.dp))
                     FilterSectionLabel(stringResource(R.string.security_checks_filters_search_by))
                     Spacer(modifier = Modifier.height(8.dp))
-                    SecurityChecksSearchByMode.entries.forEach { mode ->
-                        val label = when (mode) {
-                            SecurityChecksSearchByMode.ALL ->
-                                stringResource(R.string.security_checks_filters_search_all)
-                            SecurityChecksSearchByMode.EMPLOYEE_ID ->
-                                stringResource(R.string.security_checks_filters_search_employee_id)
-                            SecurityChecksSearchByMode.NAME ->
-                                stringResource(R.string.security_checks_filters_search_name)
+
+                    SecurityChecksSearchByRow(
+                        selectedMode = draft.searchBy,
+                        onModeSelect = { newMode ->
+                            onDraftChange(draft.copy(searchBy = newMode))
                         }
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(8.dp))
-                                .clickable {
-                                    onDraftChange(draft.copy(searchBy = mode))
-                                }
-                                .padding(vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            RadioButton(
-                                selected = draft.searchBy == mode,
-                                onClick = { onDraftChange(draft.copy(searchBy = mode)) },
-                                colors = RadioButtonDefaults.colors(selectedColor = FilterPrimaryBlue),
-                            )
-                            Text(
-                                text = label,
-                                style = TextStyle(
-                                    fontFamily = InterFontFamily,
-                                    fontSize = 16.sp,
-                                    color = FilterSheetInk,
-                                ),
-                            )
-                        }
-                    }
+                    )
 
                     Spacer(modifier = Modifier.height(20.dp))
                     FilterSectionLabel(stringResource(R.string.security_checks_filters_group))
@@ -268,52 +238,84 @@ fun SecurityChecksFilterBottomSheet(
                             placeholder = {
                                 Text(
                                     text = selectGroupHint,
-                                    color = FilterSheetMuted,
-                                    fontSize = 15.sp,
+                                    style = TextStyle(
+                                        fontFamily = InterFontFamily,
+                                        fontSize = 15.sp,
+                                        color = FilterSheetMuted
+                                    )
                                 )
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .menuAnchor(),
+                                .menuAnchor(), // Quan trọng để menu bám đúng vị trí
                             shape = RoundedCornerShape(14.dp),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedContainerColor = FilterSheetFieldBg,
                                 unfocusedContainerColor = FilterSheetFieldBg,
-                                focusedBorderColor = FilterSheetBorder,
+                                focusedBorderColor = FilterPrimaryBlue, // Đổi màu khi focus để người dùng biết đang chọn
                                 unfocusedBorderColor = FilterSheetBorder,
-                                unfocusedPlaceholderColor = FilterSheetMuted,
+                                cursorColor = Color.Transparent // Vì là readOnly
                             ),
                             trailingIcon = {
+                                // Sử dụng icon xoay mặc định của Material 3
                                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = groupMenuExpanded)
                             },
+                            textStyle = TextStyle(
+                                fontFamily = InterFontFamily,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Medium
+                            )
                         )
-                        DropdownMenu(
+
+                        // Sử dụng ExposedDropdownMenu để tự động khớp Width
+                        ExposedDropdownMenu(
                             expanded = groupMenuExpanded,
                             onDismissRequest = { groupMenuExpanded = false },
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color.White, RoundedCornerShape(14.dp)),
+                                .background(Color.White, RoundedCornerShape(14.dp))
+                                .border(1.dp, Color(0xFFEEEEEE), RoundedCornerShape(14.dp)) // Thêm viền nhẹ cho menu
                         ) {
+                            // Option: Tất cả
                             DropdownMenuItem(
-                                text = { Text(allGroupsLabel) },
+                                text = {
+                                    Text(
+                                        text = allGroupsLabel,
+                                        style = TextStyle(fontFamily = InterFontFamily, fontSize = 14.sp)
+                                    )
+                                },
                                 onClick = {
                                     onDraftChange(draft.copy(groupId = null))
                                     groupMenuExpanded = false
                                 },
+                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
                             )
+
                             groupOptions.forEach { option ->
-                                val rowLabel = option.name?.takeIf { it.isNotBlank() }
-                                    ?: option.code
-                                    ?: ""
+                                val rowLabel = option.name?.takeIf { it.isNotBlank() } ?: option.code ?: ""
                                 if (rowLabel.isNotBlank()) {
+                                    val isSelected = draft.groupId == (option.code ?: option.name)
+
                                     DropdownMenuItem(
-                                        text = { Text(rowLabel) },
+                                        text = {
+                                            Text(
+                                                text = rowLabel,
+                                                style = TextStyle(
+                                                    fontFamily = InterFontFamily,
+                                                    fontSize = 14.sp,
+                                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                                    color = if (isSelected) FilterPrimaryBlue else Color.Unspecified
+                                                )
+                                            )
+                                        },
                                         onClick = {
-                                            val key = option.code?.takeIf { it.isNotBlank() }
-                                                ?: option.name?.takeIf { it.isNotBlank() }
+                                            val key = option.code?.takeIf { it.isNotBlank() } ?: option.name
                                             onDraftChange(draft.copy(groupId = key))
                                             groupMenuExpanded = false
                                         },
+                                        modifier = Modifier.background(
+                                            if (isSelected) FilterPrimaryBlue.copy(alpha = 0.05f) else Color.Transparent
+                                        ),
+                                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
                                     )
                                 }
                             }
@@ -434,49 +436,60 @@ private fun DateFieldChip(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SecurityChecksDatePickerDialog(
-    initialMillis: Long?,
-    onDateSelected: (Long) -> Unit,
-    onDismiss: () -> Unit,
+fun SecurityChecksSearchByRow(
+    selectedMode: SecurityChecksSearchByMode,
+    onModeSelect: (SecurityChecksSearchByMode) -> Unit,
 ) {
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = initialMillis ?: System.currentTimeMillis(),
-        yearRange = (Calendar.getInstance().get(Calendar.YEAR) - 10)..(Calendar.getInstance()
-            .get(Calendar.YEAR) + 1),
+    val selectedBrush = Brush.verticalGradient(
+        colors = listOf(Color(0xFF2B7FFF), Color(0xFF155DFC))
     )
-    Dialog(onDismissRequest = onDismiss) {
-        Card(
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-        ) {
-            Column(modifier = Modifier.padding(24.dp)) {
-                DatePicker(
-                    state = datePickerState,
-                    colors = DatePickerDefaults.colors(
-                        selectedDayContainerColor = FilterPrimaryBlue,
-                        selectedDayContentColor = Color.White,
-                        todayContentColor = FilterPrimaryBlue,
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        SecurityChecksSearchByMode.entries.forEach { mode ->
+            val isSelected = mode == selectedMode
+
+            val label = when (mode) {
+                SecurityChecksSearchByMode.ALL ->
+                    stringResource(R.string.security_checks_filters_search_all)
+                SecurityChecksSearchByMode.EMPLOYEE_ID ->
+                    stringResource(R.string.security_checks_filters_search_employee_id)
+                SecurityChecksSearchByMode.NAME ->
+                    stringResource(R.string.security_checks_filters_search_name)
+            }
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(44.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .then(
+                        if (isSelected) {
+                            Modifier.background(brush = selectedBrush)
+                        } else {
+                            Modifier.background(color = GenderUnselectedBg)
+                        }
+                    )
+                    .clickable { onModeSelect(mode) },
+                contentAlignment = Alignment.Center
+            ){
+                Text(
+                    text = label,
+                    style = TextStyle(
+                        fontFamily = InterFontFamily,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 13.sp,
+                        color = if (isSelected) Color.White else GenderUnselectedText,
+                        textAlign = TextAlign.Center
                     ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End,
-                ) {
-                    TextButton(onClick = onDismiss.singleClick()) {
-                        Text(stringResource(android.R.string.cancel), color = FilterSheetMuted)
-                    }
-                    TextButton(
-                        onClick = {
-                            datePickerState.selectedDateMillis?.let { ms ->
-                                onDateSelected(ms)
-                            } ?: onDismiss()
-                        }.singleClick(),
-                    ) {
-                        Text(stringResource(android.R.string.ok), color = FilterPrimaryBlue)
-                    }
-                }
             }
         }
     }

@@ -12,8 +12,17 @@ interface SecurityCheckApiService {
     /** GET /security-check/submissions — danh sách bài nộp security check (có meta phân trang). */
     @GET("security-check/submissions")
     suspend fun getSubmissions(
-        @Query("page") page: Int,
-        @Query("limit") limit: Int,
+        @Query("fromDate") fromDate: String? = null,
+        @Query("toDate") toDate: String? = null,
+        @Query("query") query: String? = null,
+        @Query("page") page: Int? = null,
+        @Query("limit") limit: Int? = null,
+        @Query("orderBy") orderBy: String? = null,
+        @Query("sortBy") sortBy: String? = null,
+        @Query("status") status: String? = null,
+        @Query("type") type: String? = null,
+        @Query("monthCode") monthCode: String? = null,
+        @Query("groupId") groupId: String? = null,
     ): Response<ApiSuccessResponse<List<SecurityCheckSubmissionDto>>>
 
     @GET("/security-check/groups")

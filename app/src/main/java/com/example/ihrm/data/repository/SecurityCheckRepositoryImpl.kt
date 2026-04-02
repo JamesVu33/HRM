@@ -20,9 +20,33 @@ class SecurityCheckRepositoryImpl @Inject constructor(
     @param:NetworkModule.InternalApi private val retrofit: Retrofit,
 ) : SecurityCheckRepository {
 
-    override suspend fun getSubmissions(page: Int, limit: Int): NetworkResult<SecurityCheckSubmissionsPage> {
+    override suspend fun getSubmissions(
+        fromDate: String?,
+        toDate: String?,
+        query: String?,
+        page: Int?,
+        limit: Int?,
+        orderBy: String?,
+        sortBy: String?,
+        status: String?,
+        type: String?,
+        monthCode: String?,
+        groupId: String?,
+    ): NetworkResult<SecurityCheckSubmissionsPage> {
         return safeApiCallPaginated(retrofit) {
-            apiService.getSubmissions(page = page, limit = limit)
+            apiService.getSubmissions(
+                fromDate = fromDate,
+                toDate = toDate,
+                query = query,
+                page = page,
+                limit = limit,
+                orderBy = orderBy,
+                sortBy = sortBy,
+                status = status,
+                type = type,
+                monthCode = monthCode,
+                groupId = groupId,
+            )
         }.map { paginated ->
             SecurityCheckSubmissionsPage(
                 items = paginated.data.orEmpty().map { it.toDomain() },
@@ -31,8 +55,8 @@ class SecurityCheckRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getGroups(): NetworkResult<List<SecurityGroups>>  {
-        val test =  safeApiCall(retrofit) {
+    override suspend fun getGroups(): NetworkResult<List<SecurityGroups>> {
+        val test = safeApiCall(retrofit) {
             Log.d("apiFlows", "apiService.getGroups(): ${apiService.getGroups()}")
             return@safeApiCall apiService.getGroups()
         }.map { data ->

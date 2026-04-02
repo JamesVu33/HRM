@@ -14,8 +14,32 @@ class SecuritiesUseCase @Inject constructor(
     @Inject
     override lateinit var languageRepository: LanguageRepository
 
-    suspend fun getSubmissions(page: Int, limit: Int): NetworkResult<SecurityCheckSubmissionsPage> {
-        val result = securityCheckRepository.getSubmissions(page, limit)
+    suspend fun getSubmissions(
+        fromDate: String?,
+        toDate: String?,
+        query: String?,
+        page: Int?,
+        limit: Int?,
+        orderBy: String?,
+        sortBy: String?,
+        status: String?,
+        type: String?,
+        monthCode: String?,
+        groupId: String?,
+    ): NetworkResult<SecurityCheckSubmissionsPage> {
+        val result = securityCheckRepository.getSubmissions(
+            fromDate = fromDate,
+            toDate = toDate,
+            query = query,
+            page = page,
+            limit = limit,
+            orderBy = orderBy,
+            sortBy = sortBy,
+            status = status,
+            type = type,
+            monthCode = monthCode,
+            groupId = groupId,
+        )
         return translateResponse(result)
     }
 

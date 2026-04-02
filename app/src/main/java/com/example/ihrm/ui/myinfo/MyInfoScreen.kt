@@ -75,6 +75,8 @@ import com.example.ihrm.ui.components.ButtonSize
 import com.example.ihrm.ui.components.ButtonVariant
 import com.example.ihrm.ui.components.CustomButton
 import com.example.ihrm.ui.theme.DashboardFigmaInk
+import com.example.ihrm.ui.theme.GenderUnselectedBg
+import com.example.ihrm.ui.theme.GenderUnselectedText
 import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.util.DashboardBrush.MyInfoHeaderBrush
 import com.example.ihrm.util.dropShadow
@@ -86,8 +88,6 @@ private val CardBorder = Color(0xFFF3F4F6)
 private val FieldBorder = Color(0xFFE5E7EB)
 private val LabelGray = Color(0xFF6A7282)
 private val MutedValue = Color(0xFF99A1AF)
-private val GenderUnselectedBg = Color(0xFFF3F4F6)
-private val GenderUnselectedText = Color(0xFF4A5565)
 private val PrimaryBar = Color(0xFF155DFC)
 private val ChangeInfoBlue = Color(0xFF0747A6)
 private val CancelText = Color(0xFF364153)

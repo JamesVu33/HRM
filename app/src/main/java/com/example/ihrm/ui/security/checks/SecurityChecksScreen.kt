@@ -28,14 +28,12 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -65,7 +63,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ihrm.R
 import com.example.ihrm.ui.common.BaseHRMCompose
-import com.example.ihrm.ui.common.SecurityChecksFilterBottomSheet
+import com.example.ihrm.ui.common.bottomsheet.SecurityChecksFilterBottomSheet
 import com.example.ihrm.ui.common.header.BaseHeader
 import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.util.DashboardBrush
@@ -285,17 +283,6 @@ fun SecurityChecksScreenContent(
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                     item { Spacer(modifier = Modifier.height(8.dp)) }
-                }
-
-                if (showInitialLoading) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Black.copy(alpha = 0.15f)),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        CircularProgressIndicator(color = White)
-                    }
                 }
             }
         }
