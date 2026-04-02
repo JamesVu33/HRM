@@ -32,6 +32,7 @@ data class SecurityCheckSubmissionUser(
     val employeeId: String?,
     val fullName: String?,
     val avatarUrl: String?,
+    val fullNameForSearching: String?,
 )
 
 data class SecurityCheckReviewer(

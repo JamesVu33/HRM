@@ -12,6 +12,7 @@ import com.example.ihrm.domain.model.SecurityCheckSubmission
 import com.example.ihrm.domain.model.SecurityCheckSubmissionUser
 import com.example.ihrm.domain.model.SecurityCheckTemplate
 import com.example.ihrm.domain.model.SubmissionPaginationMeta
+import com.example.ihrm.util.removeVietnameseAccents
 
 fun MetaDto.toSubmissionPaginationMeta(): SubmissionPaginationMeta =
     SubmissionPaginationMeta(
@@ -43,6 +44,7 @@ fun SecurityCheckSubmissionUserDto.toDomain(): SecurityCheckSubmissionUser =
         employeeId = employeeId,
         fullName = fullName,
         avatarUrl = profile?.avatarUrl,
+        fullNameForSearching = fullName?.removeVietnameseAccents()?.lowercase()
     )
 
 fun SecurityCheckReviewerDto.toDomain(): SecurityCheckReviewer =

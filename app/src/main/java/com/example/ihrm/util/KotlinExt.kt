@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.example.ihrm.data.remote.base.NetworkResult
+import java.text.Normalizer
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -61,4 +62,12 @@ fun (() -> Unit).singleClick(intervalMs: Long = 600L): () -> Unit {
             this()
         }
     }
+}
+
+fun String.removeVietnameseAccents(): String {
+    val normalized = Normalizer.normalize(this, Normalizer.Form.NFD)
+    return normalized
+        .replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
+        .replace("đ", "d")
+        .replace("Đ", "D")
 }

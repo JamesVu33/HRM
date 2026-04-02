@@ -1,5 +1,6 @@
 package com.example.ihrm.ui.security.checks
 
+import android.util.Log
 import com.example.ihrm.R
 import com.example.ihrm.domain.model.SecurityCheckSubmission
 import java.time.Instant
@@ -163,16 +164,15 @@ fun List<SecurityCheckSubmission>.filteredBySearchQuery(
             SecurityChecksSearchByMode.EMPLOYEE_ID ->
                 s.user?.employeeId?.lowercase(Locale.getDefault())?.contains(q) == true
             SecurityChecksSearchByMode.NAME ->
-                s.user?.fullName?.lowercase(Locale.getDefault())?.contains(q) == true
+                s.user?.fullNameForSearching?.lowercase(Locale.getDefault())?.contains(q) == true
             SecurityChecksSearchByMode.ALL ->
                 sequenceOf(
-                    s.user?.fullName,
+                    s.user?.fullNameForSearching,
                     s.user?.employeeId,
                     s.group?.name,
                     s.group?.code,
                     s.template?.name,
                     s.status,
-                    s.reviewedBy?.fullName,
                     s.rejectReason,
                 ).filterNotNull().any { it.lowercase(Locale.getDefault()).contains(q) }
         }

@@ -1,26 +1,19 @@
 package com.example.ihrm.ui.security.checks
 
 import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.example.ihrm.core.errorHandler.CommonErrorException
 import com.example.ihrm.core.viewmodel.BaseViewmodel
 import com.example.ihrm.core.viewmodel.CallbackWrapper
-import com.example.ihrm.data.remote.base.NetworkResult
 import com.example.ihrm.domain.model.SecurityCheckSubmission
 import com.example.ihrm.domain.model.SecurityCheckSubmissionsPage
 import com.example.ihrm.domain.model.SecurityGroups
 import com.example.ihrm.domain.model.SubmissionPaginationMeta
-import com.example.ihrm.domain.repository.SecurityCheckRepository
-import com.example.ihrm.domain.usecase.login.LoginUseCase
 import com.example.ihrm.domain.usecase.securities.SecuritiesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 data class SecurityChecksUiState(
@@ -43,6 +36,7 @@ class SecurityChecksViewModel @Inject constructor(
     val uiState: StateFlow<SecurityChecksUiState> = _uiState.asStateFlow()
     private val _uiStateSecurityGroups = MutableStateFlow(SecurityGroupsUiState())
     val uiStateSecurityGroups: StateFlow<SecurityGroupsUiState> = _uiStateSecurityGroups.asStateFlow()
+
     init {
         loadSubmissions()
         getGroups()
@@ -69,6 +63,7 @@ class SecurityChecksViewModel @Inject constructor(
                         )
                     }
                 }
+
                 override fun onFail(e: CommonErrorException) {
                     Log.d("apiFlows", "onFail get submissions: $e")
                     _uiState.update {
@@ -80,7 +75,7 @@ class SecurityChecksViewModel @Inject constructor(
                         )
                     }
                 }
-            }
+            },
         )
     }
 
@@ -102,7 +97,7 @@ class SecurityChecksViewModel @Inject constructor(
                     super.onFail(e)
                     Log.d("apiFlows", "onFail: $e")
                 }
-            }
+            },
         )
     }
 
