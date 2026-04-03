@@ -57,17 +57,12 @@ class SecurityCheckRepositoryImpl @Inject constructor(
 
     override suspend fun getGroups(): NetworkResult<List<SecurityGroups>> {
         val test = safeApiCall(retrofit) {
-            Log.d("apiFlows", "apiService.getGroups(): ${apiService.getGroups()}")
             return@safeApiCall apiService.getGroups()
         }.map { data ->
-            Log.d("apiFlows", "map with: $data")
             data.map {
                 it.fromResponseToInfo()
             }
         }
-        Log.d("apiFlows", "test: $test")
         return test
     }
-
-
 }

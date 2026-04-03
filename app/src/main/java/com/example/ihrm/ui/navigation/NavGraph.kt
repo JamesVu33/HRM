@@ -15,7 +15,7 @@ import com.example.ihrm.ui.employee.list.EmployeeListScreen
 import com.example.ihrm.ui.security.checks.CreateSecurityChecklistScreen
 import com.example.ihrm.ui.security.checks.MySecurityCheckScreen
 import com.example.ihrm.ui.security.checks.SecurityChecksAnalyticsScreen
-import com.example.ihrm.ui.security.checks.SecurityChecksLegendDetailScreen
+import com.example.ihrm.ui.security.detail.SecurityChecksLegendDetailScreen
 import com.example.ihrm.ui.security.checks.SecurityChecksScreen
 import com.example.ihrm.ui.stats.TeamStatisticsScreen
 import com.example.ihrm.ui.login.LoginScreen

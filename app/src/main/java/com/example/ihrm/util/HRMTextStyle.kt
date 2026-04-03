@@ -102,6 +102,12 @@ val LabelTextStyle13RegularGrey = TextStyle(
     color = DashboardFigmaMuted,
 )
 
+val LabelTextStyle13SemiBold= TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.SemiBold,
+    fontSize = 13.sp,
+)
+
 val LabelTextStyle13RegularWhite = TextStyle(
     fontFamily = InterFontFamily,
     fontWeight = FontWeight.Normal,

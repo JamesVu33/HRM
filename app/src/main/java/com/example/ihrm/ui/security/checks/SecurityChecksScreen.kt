@@ -277,7 +277,7 @@ fun SecurityChecksScreenContent(
                         SecurityCheckCard(
                             item = check,
                             onClick = {
-                                onSecurityCheckClick(check.statusUseApprovedChip.toLegendKey())
+                                onSecurityCheckClick(check.submissionId.toString())
                             }.singleClick()
                         )
                         Spacer(modifier = Modifier.height(8.dp))

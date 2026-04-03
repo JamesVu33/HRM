@@ -362,6 +362,8 @@
     <string name="security_checks_approve_prefix">Approve by %1$s</string>
     <string name="security_checks_approved_by">Approved by</string>
     <string name="security_checks_rejected_by">Rejected by</string>
+    <string name="security_checks_approved_by_param">Approved by: %1$s</string>
+    <string name="security_checks_rejected_by_param">Rejected by: %1$s</string>
     <string name="security_checks_wait_for_approve_by">Waiting for Approve by</string>
     <string name="security_checks_submitted_date">Submit Date</string>
     <string name="security_checks_approved_date">Approved Date</string>
@@ -395,7 +397,7 @@
     <string name="security_checks_analytics_this_month">This month</string>
     <string name="security_checks_analytics_active_users">Active Users</string>
     <string name="security_checks_analytics_trend_percent">+12%</string>
-    <string name="security_checks_detail_section_title">Work Environment &amp; Security Check\n(Moi truong lam viec &amp; Kiem tra an ninh)</string>
+    <string name="security_checks_detail_section_title">Work Environment &amp; Security Check\n(Môi trường làm việc &amp; Kiểm tra an ninh)</string>
     <string name="my_security_check_search_placeholder">Search checklists...</string>
     <string name="my_security_check_items_count">%1$d items</string>
     <string name="my_security_check_submitted">Submitted</string>

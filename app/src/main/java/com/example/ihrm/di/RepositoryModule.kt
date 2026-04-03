@@ -4,11 +4,13 @@ import com.example.ihrm.data.repository.AuthRepositoryImpl
 import com.example.ihrm.data.repository.EmployeeRepositoryImpl
 import com.example.ihrm.data.repository.LanguageRepositoryImpl
 import com.example.ihrm.data.repository.MyInfoRepositoryImpl
+import com.example.ihrm.data.repository.SecurityCheckDetailRepositoryImpl
 import com.example.ihrm.data.repository.SecurityCheckRepositoryImpl
 import com.example.ihrm.domain.repository.AuthRepository
 import com.example.ihrm.domain.repository.EmployeeRepository
 import com.example.ihrm.domain.repository.LanguageRepository
 import com.example.ihrm.domain.repository.MyInfoRepository
+import com.example.ihrm.domain.repository.SecurityCheckDetailRepository
 import com.example.ihrm.domain.repository.SecurityCheckRepository
 import dagger.Binds
 import dagger.Module
@@ -49,5 +51,11 @@ abstract class RepositoryModule {
     abstract fun bindSecurityCheckRepository(
         impl: SecurityCheckRepositoryImpl
     ): SecurityCheckRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSecurityCheckDetailRepository(
+        impl: SecurityCheckDetailRepositoryImpl
+    ): SecurityCheckDetailRepository
 
 }

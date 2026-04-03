@@ -7,6 +7,8 @@ import com.example.ihrm.data.remote.login.LoginResponse
 import com.example.ihrm.domain.model.AccountType
 import com.example.ihrm.domain.model.AppFeature
 import com.example.ihrm.domain.session.LoginSessionResolver
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
 /**
  * Holds auth state and tokens. Call [init] from [android.app.Application.onCreate].
@@ -18,6 +20,9 @@ object AuthManager {
 
     @Volatile
     private var prefs: SharedPreferences? = null
+
+    private val _authEvents = MutableSharedFlow<AuthEvent>()
+    val authEvents = _authEvents.asSharedFlow()
 
     /**
      * Must be called once (e.g. from [android.app.Application.onCreate]) before using login state.
@@ -99,4 +104,20 @@ object AuthManager {
             ?.putBoolean(Constants.PREF_IS_LOGGED_IN, false)
             ?.apply()
     }
+
+    fun updateTokens(accessToken: String, refreshToken: String) {
+        prefs?.edit {
+            putString(Constants.PREF_ACCESS_TOKEN, accessToken)
+            putString(Constants.PREF_REFRESH_TOKEN, refreshToken)
+            putBoolean(Constants.PREF_IS_LOGGED_IN, true)
+        }
+    }
+
+    suspend fun emitLogoutEvent() {
+        _authEvents.emit(AuthEvent.Logout)
+    }
+}
+
+sealed class AuthEvent {
+    object Logout : AuthEvent()
 }

@@ -31,9 +31,13 @@ data class APIErrorInfo(
         return when (errorType) {
             "VALIDATION_ERROR",
             "DOMAIN_ERROR" -> {
+                Log.d("apiFlows", "errorKey: $errorKey")
                 if (errorKey == "_global") {
                     invalidLogicType()
-                } else {
+                } else if (errorKey == "id") {
+                    invalidLogicType()
+                }
+                else {
                     CommonErrorException.InvalidInputException(
                         errorField = errorKey, // base on request data class to detect which field is invalid
                         errorMsg = "error",

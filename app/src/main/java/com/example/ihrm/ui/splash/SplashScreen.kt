@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ihrm.R
+import com.example.ihrm.ui.common.BaseHRMCompose
 import com.example.ihrm.ui.theme.Primary200
 import com.example.ihrm.ui.theme.SplashBlue100
 import com.example.ihrm.ui.theme.SplashBlueMid
@@ -45,6 +46,25 @@ import kotlinx.coroutines.delay
  */
 @Composable
 fun SplashScreen(
+    onNavigateToLogin: EmptyFunc,
+    onNavigateToHome: EmptyFunc,
+    isLoggedIn: Boolean,
+    viewmodel: SplashViewmodel = hiltViewModel()
+){
+    BaseHRMCompose(
+        content = {
+            SplashScreenContent(
+                onNavigateToLogin = onNavigateToLogin,
+                onNavigateToHome = onNavigateToHome,
+                isLoggedIn = isLoggedIn
+            )
+        },
+        viewmodel = viewmodel,
+        onErrorAlertClose = onNavigateToLogin
+    )
+}
+@Composable
+fun SplashScreenContent(
     onNavigateToLogin: EmptyFunc,
     onNavigateToHome: EmptyFunc,
     isLoggedIn: Boolean,
