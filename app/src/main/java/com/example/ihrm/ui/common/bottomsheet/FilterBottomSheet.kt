@@ -247,17 +247,16 @@ fun SecurityChecksFilterBottomSheet(
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .menuAnchor(), // Quan trọng để menu bám đúng vị trí
+                                .menuAnchor(),
                             shape = RoundedCornerShape(14.dp),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedContainerColor = FilterSheetFieldBg,
                                 unfocusedContainerColor = FilterSheetFieldBg,
-                                focusedBorderColor = FilterPrimaryBlue, // Đổi màu khi focus để người dùng biết đang chọn
+                                focusedBorderColor = FilterPrimaryBlue,
                                 unfocusedBorderColor = FilterSheetBorder,
-                                cursorColor = Color.Transparent // Vì là readOnly
+                                cursorColor = Color.Transparent
                             ),
                             trailingIcon = {
-                                // Sử dụng icon xoay mặc định của Material 3
                                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = groupMenuExpanded)
                             },
                             textStyle = TextStyle(
@@ -267,15 +266,13 @@ fun SecurityChecksFilterBottomSheet(
                             )
                         )
 
-                        // Sử dụng ExposedDropdownMenu để tự động khớp Width
                         ExposedDropdownMenu(
                             expanded = groupMenuExpanded,
                             onDismissRequest = { groupMenuExpanded = false },
                             modifier = Modifier
-                                .background(Color.White, RoundedCornerShape(14.dp))
-                                .border(1.dp, Color(0xFFEEEEEE), RoundedCornerShape(14.dp)) // Thêm viền nhẹ cho menu
+                                .background(Color.White)
+                                .border(1.dp, Color(0xFFEEEEEE))
                         ) {
-                            // Option: Tất cả
                             DropdownMenuItem(
                                 text = {
                                     Text(
