@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ihrm.ui.common.rememberThrottledClick
 import com.example.ihrm.ui.theme.Primary500
 
 @Composable
@@ -69,8 +70,9 @@ fun BaseHeader(
                 contentAlignment = Alignment.CenterStart
             ) {
                 if (showNavigationIcon && onNavigationClick != null) {
+                    val onNavThrottled = rememberThrottledClick(onClick = onNavigationClick)
                     IconButton(
-                        onClick = onNavigationClick,
+                        onClick = onNavThrottled,
                         modifier = Modifier.size(40.dp)
                     ) {
                         navigationIcon()

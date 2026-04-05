@@ -4,16 +4,25 @@ import com.example.ihrm.util.AuthManager
 import okhttp3.Interceptor
 import okhttp3.Response
 
-class AuthInterceptor: Interceptor {
+class AuthInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        val token = AuthManager.getAccessToken()
-        val request = if (!token.isNullOrBlank()) {
-            chain.request().newBuilder()
-                .addHeader("Authorization", "Bearer $token")
-                .build()
-        } else {
-            chain.request()
+        val originalRequest = chain.request()
+
+        // Bỏ qua việc thêm token cho login và refresh-token
+        if (originalRequest.url.encodedPath.contains("auth/login") ||
+            originalRequest.url.encodedPath.contains("auth/refresh-token")
+        ) {
+            return chain.proceed(originalRequest)
         }
-        return chain.proceed(request)
+
+        val token = AuthManager.getAccessToken()
+        return if (!token.isNullOrBlank()) {
+            val newRequest = originalRequest.newBuilder()
+                .header("Authorization", "Bearer $token") // Dùng .header() để ghi đè, tránh bị trùng
+                .build()
+            chain.proceed(newRequest)
+        } else {
+            chain.proceed(originalRequest)
+        }
     }
 }

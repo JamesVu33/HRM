@@ -99,4 +99,7 @@ val ApprovedText = Color(0xFF008236)
 val BgErrorMessage = Color(0xFFFFC1C2)
 val ErrorText = Color(0xFFF10C00)
 
+val GenderUnselectedText = Color(0xFF4A5565)
+val GenderUnselectedBg = Color(0xFFF3F4F6)
+
 

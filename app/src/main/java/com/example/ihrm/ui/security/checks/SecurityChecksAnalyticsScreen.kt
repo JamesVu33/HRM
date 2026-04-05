@@ -51,6 +51,7 @@ import com.example.ihrm.util.DashboardBrush
 import com.example.ihrm.util.LabelTextStyle13Regular8E8E93
 import com.example.ihrm.util.ValueTextStyle32BoldBlack
 import com.example.ihrm.util.ValueTextStyle36BoldBlack
+import com.example.ihrm.util.singleClick
 
 /** Static metrics aligned with [Figma 871:40126](https://www.figma.com/design/Q9qmml4Qj4FD73VnYshBsO/HRM-Mobile-App-Ver?node-id=871-40126). */
 private object SecurityChecksAnalyticsStatic {
@@ -135,7 +136,7 @@ fun SecurityChecksAnalyticsScreen(
                     BaseHeader(
                         title = stringResource(R.string.security_checks_analytics_title),
                         showNavigationIcon = true,
-                        onNavigationClick = onBackClick,
+                        onNavigationClick = onBackClick.singleClick(),
                         navigationIcon = {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,

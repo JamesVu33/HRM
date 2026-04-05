@@ -1,5 +1,6 @@
 package com.example.ihrm.ui.common
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -64,7 +65,7 @@ fun ErrorAlert(
 ) {
     val errorState by viewmodel.errorEvent.collectAsState()
     var errorMsg by remember { mutableStateOf<String?>(null) }
-
+    Log.d("apiFlows", "ErrorAlert: $errorState")
     if (errorState == null) return
 
     LaunchedEffect(Unit) {
@@ -75,11 +76,16 @@ fun ErrorAlert(
 
     val onClose: () -> Unit = {
         onErrorAlertClose?.invoke()
+        viewmodel.clearErrorEvent()
         errorMsg = null
     }
+    val onCloseThrottled = rememberThrottledClick(onClick = onClose)
 
     LaunchedEffect(key1 = errorState) {
-        errorMsg = errorState?.errorMsg
+        val state = errorState ?: return@LaunchedEffect
+        errorMsg = state.errorMsg?.takeIf { it.isNotBlank() }
+            ?: state.message?.takeIf { it.isNotBlank() }
+            ?: state.errorKey.takeIf { it.isNotBlank() }
     }
 
     if (errorMsg.isNullOrEmpty()) return
@@ -137,7 +143,7 @@ fun ErrorAlert(
                             .size(32.dp)
                             .clip(CircleShape)
                             .background(CloseCircleBg)
-                            .clickable(onClick = onClose),
+                            .clickable(onClick = onCloseThrottled),
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
@@ -169,7 +175,7 @@ fun ErrorAlert(
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     Button(
-                        onClick = onClose,
+                        onClick = onCloseThrottled,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(52.dp),

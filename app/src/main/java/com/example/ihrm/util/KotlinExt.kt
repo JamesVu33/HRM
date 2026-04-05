@@ -1,7 +1,13 @@
 package com.example.ihrm.util
 
-import com.example.ihrm.core.errorHandler.CommonErrorException
+import android.os.SystemClock
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.example.ihrm.data.remote.base.NetworkResult
+import java.text.Normalizer
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -43,4 +49,25 @@ fun <T> NetworkResult<T>.getErrorOrNull(): NetworkResult<Nothing>? {
         is NetworkResult.Exception -> this
         else -> null
     }
+}
+
+@Composable
+fun (() -> Unit).singleClick(intervalMs: Long = 600L): () -> Unit {
+    var lastClickTime by remember { mutableLongStateOf(0L) }
+
+    return {
+        val now = SystemClock.elapsedRealtime()
+        if (now - lastClickTime >= intervalMs) {
+            lastClickTime = now
+            this()
+        }
+    }
+}
+
+fun String.removeVietnameseAccents(): String {
+    val normalized = Normalizer.normalize(this, Normalizer.Form.NFD)
+    return normalized
+        .replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
+        .replace("đ", "d")
+        .replace("Đ", "D")
 }

@@ -49,6 +49,11 @@ abstract class BaseViewmodel : ViewModel() {
     private val _error = MutableStateFlow<CommonErrorException?>(null)
     val errorEvent = _error.asStateFlow()
 
+    /** Đặt lại sau khi user đóng ErrorAlert để lần báo lỗi sau vẫn cập nhật StateFlow. */
+    fun clearErrorEvent() {
+        _error.tryEmit(null)
+    }
+
     // for API calling indicator
     private val _loading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _loading.asStateFlow()
@@ -140,6 +145,7 @@ abstract class BaseViewmodel : ViewModel() {
         onCallbackWrapper: CallbackWrapper<T>,
         onSuccess: ParamFunc<T>
     ) {
+        Log.d("apiFlows", "handleApiResponse: response.error = $response")
         when (response) {
             is NetworkResult.Success -> {
                 onSuccess(response.data)
@@ -149,22 +155,27 @@ abstract class BaseViewmodel : ViewModel() {
                 when (response.error) {
 //                    is CommonErrorException.InvalidLogicException,
                     is CommonErrorException.InvalidInputException -> {
+                        Log.d("apiFlows", "handleApiResponse: response.error =  onCallbackWrapper.onFail(response.error)")
                         onCallbackWrapper.onFail(response.error)
                     }
                     else -> {
+                        Log.d("apiFlows", "handleApiResponse: response.error =  _error.tryEmit(response.error)")
+                        Log.d("apiFlows", "handleApiResponse: response.error =  ${response.error}")
                         _error.tryEmit(response.error)
                     }
                 }
             }
 
             is NetworkResult.Exception -> {
-//                onCallbackWrapper.onFail(CommonErrorException.UnknownException(response.e.message))
-                GlobalErrorHandler.showError(response.e.message)
-                _error.tryEmit(
-                    CommonErrorException.NetworkException(
-                        response.e.message ?: "Network error"
-                    )
-                )
+                // response.e là CommonErrorException: Throwable.message thường là errorKey ("network"),
+                // nội dung hiển thị nằm ở errorMsg — không được bọc lại NetworkException(response.e.message).
+                val ex = response.e
+                val displayMessage = ex.errorMsg?.takeIf { it.isNotBlank() }
+                    ?: ex.message?.takeIf { !it.isNullOrBlank() }
+                    ?: ex.errorKey.takeIf { it.isNotBlank() }
+                    ?: "Network error"
+                GlobalErrorHandler.showError(displayMessage)
+                _error.tryEmit(ex)
             }
         }
     }
@@ -213,11 +224,13 @@ abstract class BaseViewmodel : ViewModel() {
 
             is NetworkResult.Exception -> {
                 onFailure?.invoke()
-                _error.tryEmit(
-                    CommonErrorException.NetworkException(
-                        response.e.message ?: "Network error"
-                    )
-                )
+                val ex = response.e
+                val displayMessage = ex.errorMsg?.takeIf { it.isNotBlank() }
+                    ?: ex.message?.takeIf { !it.isNullOrBlank() }
+                    ?: ex.errorKey.takeIf { it.isNotBlank() }
+                    ?: "Network error"
+                GlobalErrorHandler.showError(displayMessage)
+                _error.tryEmit(ex)
             }
         }
     }

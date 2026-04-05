@@ -70,6 +70,7 @@ import com.example.ihrm.ui.theme.Neutral500
 import com.example.ihrm.ui.theme.Neutral700
 import com.example.ihrm.ui.theme.Primary500
 import com.example.ihrm.util.DashboardBrush
+import com.example.ihrm.util.singleClick
 import com.example.ihrm.util.txtInterBold24
 import com.example.ihrm.util.txtInterMedium14
 import com.example.ihrm.util.txtInterRegular14
@@ -172,7 +173,7 @@ fun CalendarManagementScreen(
                         modifier = Modifier,
                         title = stringResource(R.string.calendar_mgmt_title),
                         showNavigationIcon = true,
-                        onNavigationClick = onBackClick,
+                        onNavigationClick = onBackClick.singleClick(),
                         containerColor = Color.Transparent
                     )
                 }
@@ -397,7 +398,7 @@ private fun CalendarCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(onClick = onPrevMonth) {
+                IconButton(onClick = onPrevMonth.singleClick()) {
                     Icon(
                         Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                         contentDescription = stringResource(R.string.calendar_mgmt_cd_prev_month),
@@ -412,7 +413,7 @@ private fun CalendarCard(
                     color = Neutral700,
                     letterSpacing = (-0.43).sp
                 )
-                IconButton(onClick = onNextMonth) {
+                IconButton(onClick = onNextMonth.singleClick()) {
                     Icon(
                         Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         contentDescription = stringResource(R.string.calendar_mgmt_cd_next_month),
@@ -431,7 +432,7 @@ private fun CalendarCard(
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(14.dp))
                         .background(FilterRowBg)
-                        .clickable(onClick = onFilterClick)
+                        .clickable(onClick = onFilterClick.singleClick())
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -552,7 +553,7 @@ private fun CalendarCard(
                                     CalendarGridSlot.Pad -> Spacer(modifier = Modifier.size(40.dp))
                                     is CalendarGridSlot.Day -> CalendarDayCell(
                                         slot = slot,
-                                        onClick = { onSelectDay(slot.dayOfMonth) }
+                                        onClick = { onSelectDay(slot.dayOfMonth) }.singleClick()
                                     )
                                 }
                             }
@@ -581,7 +582,7 @@ private fun CalendarDayCell(
             .size(width = 44.dp, height = 44.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(bg)
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick.singleClick()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {

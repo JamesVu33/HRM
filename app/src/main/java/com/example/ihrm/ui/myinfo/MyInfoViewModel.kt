@@ -61,6 +61,7 @@ class MyInfoViewModel @Inject constructor(
                 }
 
                 override fun onFail(e: CommonErrorException) {
+                    super.onFail(e)
                     _myInfo.value = null
                 }
             },

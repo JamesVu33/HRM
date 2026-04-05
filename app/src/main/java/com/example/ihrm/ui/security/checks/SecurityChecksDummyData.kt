@@ -9,6 +9,9 @@ enum class SecurityCheckStatus {
 }
 
 data class SecurityCheckItemUi(
+    /** Id bản ghi API; dùng làm key LazyColumn. */
+    val submissionId: Int = 0,
+    val employeeId: String = "",
     val teamIndex: Int,
     val teamName: String,
     val department: String,
@@ -28,15 +31,16 @@ data class SecurityQuestionItem(
     val content: String,
 )
 
-private val figmaApprovedGreen = Color(0xFF34C759)
-private val figmaApprovedGreenBg = Color(0x1F34C759)
-private val figmaRejectedGreen = Color(0xFFF44336)
-private val figmaRejectedGreenBg = Color(0x21F44336)
-private val figmaSubmittedBlue = Color(0xFF007AFF)
-private val figmaSubmittedBlueBg = Color(0x1F007AFF)
+internal val figmaApprovedGreen = Color(0xFF34C759)
+internal val figmaApprovedGreenBg = Color(0x1F34C759)
+internal val figmaRejectedGreen = Color(0xFFF44336)
+internal val figmaRejectedGreenBg = Color(0x21F44336)
+internal val figmaSubmittedBlue = Color(0xFF007AFF)
+internal val figmaSubmittedBlueBg = Color(0x1F007AFF)
 
 val demoChecks = listOf(
     SecurityCheckItemUi(
+        submissionId = 1,
         teamIndex = 1,
         teamName = "GCD",
         department = "Department",
@@ -50,6 +54,7 @@ val demoChecks = listOf(
         statusUseApprovedChip = SecurityCheckStatus.APPROVED
     ),
     SecurityCheckItemUi(
+        submissionId = 2,
         teamIndex = 1,
         teamName = "GCD",
         department = "Department",
@@ -63,6 +68,7 @@ val demoChecks = listOf(
         statusUseApprovedChip = SecurityCheckStatus.APPROVED
     ),
     SecurityCheckItemUi(
+        submissionId = 3,
         teamIndex = 1,
         teamName = "GCD",
         department = "Department",
@@ -76,6 +82,7 @@ val demoChecks = listOf(
         statusUseApprovedChip = SecurityCheckStatus.REJECTED
     ),
     SecurityCheckItemUi(
+        submissionId = 4,
         teamIndex = 8,
         teamName = "GCD",
         department = "Department",

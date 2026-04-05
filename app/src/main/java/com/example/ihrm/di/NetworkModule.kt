@@ -1,13 +1,14 @@
 package com.example.ihrm.di
 
 import com.example.ihrm.BuildConfig
+import com.example.ihrm.core.refreshToken.TokenAuthenticator
 import com.example.ihrm.data.remote.api.AuthApiService
 import com.example.ihrm.data.remote.api.CountryApiService
 import com.example.ihrm.data.remote.api.EmployeeApiService
 import com.example.ihrm.data.remote.api.LanguageApiService
 import com.example.ihrm.data.remote.api.MyInfoApiService
+import com.example.ihrm.data.remote.api.SecurityCheckApiService
 import com.example.ihrm.data.remote.interceptor.AuthInterceptor
-import com.example.ihrm.data.remote.interceptor.ErrorInterceptor
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -44,7 +45,9 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(gson: Gson): OkHttpClient {
+    fun provideOkHttpClient(
+        tokenAuthenticator: TokenAuthenticator
+    ): OkHttpClient {
         val authInterceptor = AuthInterceptor()
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
@@ -53,6 +56,7 @@ object NetworkModule {
         return OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
             .addInterceptor(loggingInterceptor)
+            .authenticator(tokenAuthenticator)
             .connectTimeout(30L, TimeUnit.SECONDS)
             .readTimeout(30L, TimeUnit.SECONDS)
             .writeTimeout(30L, TimeUnit.SECONDS)
@@ -109,5 +113,11 @@ object NetworkModule {
     @Singleton
     fun provideCountryApi(@ExternalApi externalRetrofit: Retrofit): CountryApiService {
         return externalRetrofit.create(CountryApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSecurityCheckApiService(@InternalApi retrofit: Retrofit): SecurityCheckApiService {
+        return retrofit.create(SecurityCheckApiService::class.java)
     }
 }

@@ -39,6 +39,7 @@ import com.example.ihrm.ui.theme.DashboardGlassFill
 import com.example.ihrm.ui.theme.DashboardGlassStroke
 import com.example.ihrm.ui.theme.DashboardTabActiveBlue
 import com.example.ihrm.ui.theme.InterFontFamily
+import com.example.ihrm.ui.common.rememberThrottledClick
 import com.example.ihrm.ui.theme.Primary400
 
 /**
@@ -54,6 +55,8 @@ fun DashboardHomeTopBar(
     showBellBadge: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val throttledMenu = rememberThrottledClick(onClick = onMenuClick)
+    val throttledBell = rememberThrottledClick(onClick = onBellClick)
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -65,7 +68,7 @@ fun DashboardHomeTopBar(
             modifier = Modifier
                 .size(50.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .clickable(onClick = onMenuClick),
+                .clickable(onClick = throttledMenu),
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -107,7 +110,7 @@ fun DashboardHomeTopBar(
         }
 
         DashboardBellIconButton(
-            onClick = onBellClick,
+            onClick = throttledBell,
             showBadge = showBellBadge
         )
     }
@@ -159,6 +162,8 @@ fun DashboardHomeTabSwitcher(
     onSelect: (DashboardHomeTab) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val onPersonal = rememberThrottledClick { onSelect(DashboardHomeTab.Personal) }
+    val onManagement = rememberThrottledClick { onSelect(DashboardHomeTab.Management) }
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -181,7 +186,7 @@ fun DashboardHomeTabSwitcher(
                 )
             },
             selected = selected == DashboardHomeTab.Personal,
-            onClick = { onSelect(DashboardHomeTab.Personal) },
+            onClick = onPersonal,
             modifier = Modifier.weight(1f)
         )
         DashboardHomeTabChip(
@@ -195,7 +200,7 @@ fun DashboardHomeTabSwitcher(
                 )
             },
             selected = selected == DashboardHomeTab.Management,
-            onClick = { onSelect(DashboardHomeTab.Management) },
+            onClick = onManagement,
             modifier = Modifier.weight(1f)
         )
     }

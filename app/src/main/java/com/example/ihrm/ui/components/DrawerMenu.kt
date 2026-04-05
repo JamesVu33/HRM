@@ -66,6 +66,7 @@ import com.example.ihrm.ui.theme.Neutral600
 import com.example.ihrm.ui.theme.PrimaryTint
 import com.example.ihrm.util.AuthManager
 import com.example.ihrm.util.DashboardBrush.BaseBackgroundItemSelected
+import com.example.ihrm.util.singleClick
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -235,13 +236,13 @@ fun DrawerMenu(
                                     } else {
                                         onShowComingSoon(label)
                                     }
-                                }
+                                }.singleClick()
                             )
                         }
                     }
                 }
             }
-            DrawerLogoutButton(onClick = onLogoutClick)
+            DrawerLogoutButton(onClick = onLogoutClick.singleClick())
         }
     }
 }
@@ -384,7 +385,7 @@ private fun DrawerLogoutButton(onClick: () -> Unit) {
                 .clip(RoundedCornerShape(8.dp))
                 .border(1.5.dp, LogoutBorder, RoundedCornerShape(8.dp))
                 .background(androidx.compose.ui.graphics.Color.White, RoundedCornerShape(8.dp))
-                .clickable(onClick = onClick)
+                .clickable(onClick = onClick.singleClick())
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
@@ -424,7 +425,7 @@ private fun DrawerItem(
                         .border(1.dp, Color(0xFFD2E4FF), RoundedCornerShape(16.dp))
                 } else Modifier
             )
-            .clickable(onClick = onClick)
+            .clickable(onClick = onClick.singleClick())
             .padding(horizontal = 12.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

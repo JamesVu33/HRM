@@ -40,6 +40,7 @@ import com.example.ihrm.ui.components.ButtonSize
 import com.example.ihrm.ui.components.ButtonVariant
 import com.example.ihrm.ui.components.CustomButton
 import com.example.ihrm.util.dropShadow
+import com.example.ihrm.util.singleClick
 
 @Composable
 fun ChecklistConfirmDialog(
@@ -73,7 +74,7 @@ fun ChecklistConfirmDialog(
                         .size(32.dp)
                         .clip(CircleShape)
                         .background(Color(0xFFF3F4F6))
-                        .clickable(onClick = onDismiss),
+                        .clickable(onClick = onDismiss.singleClick()),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -163,7 +164,7 @@ fun PendingActionsRow(
             size = ButtonSize.Large,
             variant = variantButtonLeft,
             text = textButtonLeft,
-            onClick = onLeftClick,
+            onClick = onLeftClick.singleClick(),
         )
         CustomButton(
             modifier = Modifier
@@ -179,7 +180,7 @@ fun PendingActionsRow(
             size = ButtonSize.Large,
             variant = variantButtonRight,
             text = textButtonRight,
-            onClick = onRightClick,
+            onClick = onRightClick.singleClick(),
         )
     }
 }

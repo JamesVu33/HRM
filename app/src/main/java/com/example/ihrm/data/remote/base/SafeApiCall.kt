@@ -35,10 +35,12 @@ suspend fun <T> safeApiCall(
             Log.i("apiFlows", "safeApiCall: - failure")
             // ERROR CASE: Manually parse the errorBody
             val errorBody = response.errorBody()
+            Log.d("apiFlows", "safeApiCall: - errorBody: $errorBody")
             val adapter = retrofit.responseBodyConverter<AppErrorResponse>(
                 AppErrorResponse::class.java,
                 emptyArray()
             )
+            Log.d("apiFlows", "safeApiCall: - adapter: $adapter")
             val errorResponse = errorBody?.let { adapter.convert(it) }
                 ?: AppErrorResponse(errorType = "UNKNOWN_ERROR")
 
@@ -71,6 +73,58 @@ suspend fun <T> safeApiCall(
             )
         }
         Log.e("apiFlows", "safeApiCall: - exception: $errorException")
+        NetworkResult.Exception(errorException)
+    }
+}
+
+/**
+ * Giống [safeApiCall] nhưng trả về cả [PaginatedApiData.meta] (GET có phân trang).
+ */
+suspend fun <T> safeApiCallPaginated(
+    retrofit: Retrofit,
+    execute: suspend () -> Response<ApiSuccessResponse<T>>
+): NetworkResult<PaginatedApiData<T>> = withContext(Dispatchers.IO) {
+    return@withContext try {
+        val response = execute()
+        val body = response.body()
+
+        Log.i("apiFlows", "safeApiCallPaginated: - start")
+        if (response.isSuccessful && body != null) {
+            Log.i("apiFlows", "safeApiCallPaginated: - success")
+            NetworkResult.Success(PaginatedApiData(data = body.data, meta = body.meta))
+        } else {
+            Log.i("apiFlows", "safeApiCallPaginated: - failure")
+            val errorBody = response.errorBody()
+            val adapter = retrofit.responseBodyConverter<AppErrorResponse>(
+                AppErrorResponse::class.java,
+                emptyArray()
+            )
+            val errorResponse = errorBody?.let { adapter.convert(it) }
+                ?: AppErrorResponse(errorType = "UNKNOWN_ERROR")
+            val errorType = errorResponse.getErrorInfo().getCommonErrorType()
+            NetworkResult.Failure(errorType)
+        }
+    } catch (throwable: Exception) {
+        val errorException = when (throwable) {
+            is JSONException, is SocketTimeoutException, is SSLException, is ConnectException, is UnknownHostException -> {
+                CommonErrorException.NetworkException(
+                    throwable.message ?: "An unexpected error occurred"
+                )
+            }
+
+            is IOException -> CommonErrorException.NetworkException(
+                throwable.message ?: "An unexpected error occurred"
+            )
+
+            is HttpException -> CommonErrorException.ServerException(
+                throwable.message ?: "Server exception"
+            )
+
+            else -> CommonErrorException.UnknownException(
+                throwable.message ?: "An unexpected error occurred"
+            )
+        }
+        Log.e("apiFlows", "safeApiCallPaginated: - exception: $errorException")
         NetworkResult.Exception(errorException)
     }
 }

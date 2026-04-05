@@ -1,6 +1,6 @@
 package com.example.ihrm.domain.session
 
-import com.example.ihrm.data.remote.dto.LoginResponseDto
+import com.example.ihrm.data.remote.login.LoginResponse
 import com.example.ihrm.data.remote.dto.RoleShortDto
 import com.example.ihrm.data.remote.dto.UserShortDto
 import com.example.ihrm.domain.model.AccountType
@@ -24,7 +24,7 @@ class LoginSessionResolverTest {
         roles: List<RoleShortDto> = emptyList(),
         accountType: String? = null,
         modifiableFeatures: List<String>? = null,
-    ) = LoginResponseDto(
+    ) = LoginResponse(
         accessToken = "a",
         refreshToken = "r",
         accessTokenExp = 0L,

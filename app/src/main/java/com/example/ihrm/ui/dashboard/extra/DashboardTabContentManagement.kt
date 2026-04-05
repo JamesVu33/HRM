@@ -49,6 +49,7 @@ import com.example.ihrm.ui.theme.DashboardTabActiveBlue
 import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.ui.common.DonutChartTriple
 import com.example.ihrm.ui.theme.Primary400
+import com.example.ihrm.util.singleClick
 
 private val MgmtPresentGreen = Color(0xFF00BC7D)
 private val MgmtAbsentRed = Color(0xFFFF6467)
@@ -71,11 +72,11 @@ fun DashboardManagementTabContent(
     ) {
         ManagementCalendarCard(
             data = ui.calendar,
-            onChevronClick = onCalendarNavigate
+            onChevronClick = onCalendarNavigate.singleClick()
         )
         ManagementSecurityCard(
             data = ui.security,
-            onChevronClick = onSecurityNavigate
+            onChevronClick = onSecurityNavigate.singleClick()
         )
         Spacer(modifier = Modifier.height(72.dp))
     }
@@ -96,7 +97,7 @@ private fun ManagementCalendarCard(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.6f)),
-        onClick = { onChevronClick() }
+        onClick = { onChevronClick() }.singleClick()
     ) {
         Column(
             modifier = Modifier
@@ -153,7 +154,7 @@ private fun ManagementCalendarCard(
                         )
                     }
                 }
-                IconButton(onClick = onChevronClick) {
+                IconButton(onClick = onChevronClick.singleClick()) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         contentDescription = stringResource(R.string.dashboard_cd_navigate_forward),
@@ -544,7 +545,7 @@ private fun ManagementSecurityCard(
                         )
                     }
                 }
-                IconButton(onClick = onChevronClick) {
+                IconButton(onClick = onChevronClick.singleClick()) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         contentDescription = stringResource(R.string.dashboard_cd_navigate_forward),
