@@ -7,6 +7,7 @@ import com.example.ihrm.data.remote.login.LoginResponse
 import com.example.ihrm.domain.model.AccountType
 import com.example.ihrm.domain.model.AppFeature
 import com.example.ihrm.domain.session.LoginSessionResolver
+import com.example.ihrm.util.AuthManager.init
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
