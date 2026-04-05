@@ -231,19 +231,11 @@ class DashboardViewModel @Inject constructor(
     }
 
     private fun getTodayDate(): String {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val formatter = DateTimeFormatter.ofPattern(
-                "EEEE, dd MMM yyyy",
-                Locale.getDefault()
-            )
-            LocalDate.now().format(formatter)
-        } else {
-            val formatter = SimpleDateFormat(
-                "EEEE, dd MMM yyyy",
-                Locale.getDefault()
-            )
-            formatter.format(Date())
-        }
+        val formatter = DateTimeFormatter.ofPattern(
+            "EEEE, dd MMM yyyy",
+            Locale.getDefault()
+        )
+        return LocalDate.now().format(formatter)
     }
 
     fun clearError() {
