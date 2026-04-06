@@ -18,9 +18,13 @@ import javax.inject.Inject
 
 data class SecurityChecksUiState(
     val submissions: List<SecurityCheckSubmission> = emptyList(),
+    val notSubmission: List<SecurityCheckSubmission> = emptyList(),
     val pagination: SubmissionPaginationMeta? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
+    val approvedCount: Int = 0,
+    val submittedCount: Int = 0,
+    val rejectedCount: Int = 0,
 )
 
 data class SecurityGroupsUiState(
@@ -40,6 +44,7 @@ class SecurityChecksViewModel @Inject constructor(
 
     init {
         loadSubmissions()
+        //loadNotSubmissions()
         getGroups()
     }
 
@@ -84,9 +89,77 @@ class SecurityChecksViewModel @Inject constructor(
             callbackWrapper = object : CallbackWrapper<SecurityCheckSubmissionsPage> {
                 override fun onSuccess(data: SecurityCheckSubmissionsPage) {
                     Log.d("apiFlows", "success get submissions: $data")
+                    _uiState.update { state ->
+                        state.copy(
+                            submissions = data.items,
+                            pagination = data.meta,
+                            isLoading = false,
+                            errorMessage = null,
+                            approvedCount = data.listStats[0].count?:0,
+                            submittedCount = data.listStats[1].count?:0,
+                            rejectedCount = data.listStats[2].count?:0,
+                        )
+                    }
+                }
+
+                override fun onFail(e: CommonErrorException) {
+                    Log.d("apiFlows", "onFail get submissions: $e")
                     _uiState.update {
                         it.copy(
-                            submissions = data.items,
+                            isLoading = false,
+                            errorMessage = e.errorMsg
+                                ?: e.message
+                                ?: e.errorKey,
+                        )
+                    }
+                }
+            },
+        )
+    }
+
+    fun loadNotSubmissions(
+        page: Int = DEFAULT_PAGE,
+        limit: Int = DEFAULT_LIMIT,
+        fromDate: String? = null,
+        toDate: String? = null,
+        query: String? = null,
+        orderBy: String? = null,
+        sortBy: String? = null,
+        status: String? = null,
+        type: String? = null,
+        monthCode: String? = null,
+        groupId: String? = null,
+    ) {
+        _uiState.value = _uiState.value.copy(
+            submissions = emptyList(),
+            notSubmission = emptyList(),
+            pagination = null,
+            isLoading = true,
+            errorMessage = null,
+        )
+        fetchData(
+            fetching = {
+                securitiesUseCase.getNotSubmissions(
+                    fromDate = fromDate,
+                    toDate = toDate,
+                    query = query,
+                    page = page,
+                    limit = limit,
+                    orderBy = orderBy,
+                    sortBy = sortBy,
+                    status = status,
+                    type = type,
+                    monthCode = monthCode,
+                    groupId = groupId,
+                )
+            },
+            callbackWrapper = object : CallbackWrapper<SecurityCheckSubmissionsPage> {
+                override fun onSuccess(data: SecurityCheckSubmissionsPage) {
+                    Log.d("apiFlows", "success get not submissions: $data")
+                    _uiState.update {
+                        it.copy(
+                            submissions = emptyList(),
+                            notSubmission = data.items,
                             pagination = data.meta,
                             isLoading = false,
                             errorMessage = null,
@@ -129,6 +202,26 @@ class SecurityChecksViewModel @Inject constructor(
                 }
             },
         )
+    }
+
+    fun loadSecurityCheck(selectedSummaryFilter: SecuritySummaryFilter) {
+        when (selectedSummaryFilter) {
+            SecuritySummaryFilter.NOT_SUBMITTED -> {
+                loadNotSubmissions()
+            }
+
+            SecuritySummaryFilter.APPROVED -> {
+                loadSubmissions(status = SecuritySummaryFilter.APPROVED.name)
+            }
+
+            SecuritySummaryFilter.SUBMITTED -> {
+                loadSubmissions(status = SecuritySummaryFilter.SUBMITTED.name)
+            }
+
+            SecuritySummaryFilter.REJECTED -> {
+                loadSubmissions(status = SecuritySummaryFilter.REJECTED.name)
+            }
+        }
     }
 
     private companion object {

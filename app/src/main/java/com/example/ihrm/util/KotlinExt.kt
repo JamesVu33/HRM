@@ -71,3 +71,25 @@ fun String.removeVietnameseAccents(): String {
         .replace("đ", "d")
         .replace("Đ", "D")
 }
+
+fun String.formatVNPhoneNumber(): String {
+    val digits = this.filter { it.isDigit() }
+
+    return when {
+        // Trường hợp bắt đầu bằng 0 và có 10 chữ số (0918122223)
+        digits.length == 10 && digits.startsWith("0") -> {
+            val areaCode = digits.substring(1, 4) // 918
+            val mid = digits.substring(4, 7)      // 122
+            val end = digits.substring(7)         // 2223
+            "+84($areaCode) $mid-$end"
+        }
+        // Trường hợp đã có 84 ở đầu (84918122223)
+        digits.length == 11 && digits.startsWith("84") -> {
+            val areaCode = digits.substring(2, 5)
+            val mid = digits.substring(5, 8)
+            val end = digits.substring(8)
+            "+84($areaCode) $mid-$end"
+        }
+        else -> this
+    }
+}

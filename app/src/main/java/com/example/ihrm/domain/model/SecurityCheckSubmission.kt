@@ -1,7 +1,10 @@
 package com.example.ihrm.domain.model
 
+import com.example.ihrm.data.remote.dto.SubmissionByStatus
+
 data class SecurityCheckSubmissionsPage(
     val items: List<SecurityCheckSubmission>,
+    val listStats: List<SubmissionByStatus>,
     val meta: SubmissionPaginationMeta?,
 )
 
@@ -16,15 +19,17 @@ data class SecurityCheckSubmission(
     val id: Int,
     val templateId: Int,
     val userId: Int,
-    val submittedAt: String?,
-    val status: String?,
-    val rejectReason: String?,
-    val reviewedBy: SecurityCheckReviewer?,
-    val createdAt: String?,
-    val user: SecurityCheckSubmissionUser?,
-    val group: SecurityCheckGroup?,
-    val template: SecurityCheckTemplate?,
-    val employeeId: String?,
+    val email: String? = null,
+    val phoneNumber: String? = null,
+    val submittedAt: String? = null,
+    val status: String? = null,
+    val rejectReason: String? = null,
+    val reviewedBy: SecurityCheckReviewer? = null,
+    val createdAt: String? = null,
+    val user: SecurityCheckSubmissionUser? = null,
+    val group: SecurityCheckGroup? = null,
+    val template: SecurityCheckTemplate? = null,
+    val employeeId: String? = null,
 )
 
 data class SecurityCheckSubmissionUser(

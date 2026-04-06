@@ -55,6 +55,7 @@ data class SecurityDetailUiModel(
     val submittedAt: String? = null,
     val templateName: String? = null,
     val approveBy: String? = null,
+    val reason: String? = null,
     val checkList: List<CheckItemUiModel> = emptyList()
 )
 
@@ -105,7 +106,8 @@ class SecurityDetailUseCase @Inject constructor(
             submittedAt = formatDateTime(detail.submittedAt),
             templateName = detail.templateName,
             checkList = checkList,
-            approveBy = detail.approveBy
+            approveBy = detail.approveBy,
+            reason = detail.rejectReason
         )
     }
 

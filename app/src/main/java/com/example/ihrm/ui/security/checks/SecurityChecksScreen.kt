@@ -1,5 +1,6 @@
 package com.example.ihrm.ui.security.checks
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -48,6 +50,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -70,6 +73,7 @@ import com.example.ihrm.util.DashboardBrush
 import com.example.ihrm.util.LabelTextStyle13Regular
 import com.example.ihrm.util.LabelTextStyle13RegularGrey
 import com.example.ihrm.util.LabelTextStyle13RegularWhite
+import com.example.ihrm.util.formatVNPhoneNumber
 import com.example.ihrm.util.singleClick
 import com.example.ihrm.util.txtInterMedium15
 
@@ -96,8 +100,8 @@ fun SecurityChecksScreen(
     )
 }
 
-private enum class SecuritySummaryFilter {
-    TOTAL,
+enum class SecuritySummaryFilter {
+    NOT_SUBMITTED,
     APPROVED,
     SUBMITTED,
     REJECTED,
@@ -118,7 +122,7 @@ fun SecurityChecksScreenContent(
     var showFilterSheet by remember { mutableStateOf(false) }
     var appliedFilters by remember { mutableStateOf(SecurityChecksActiveFilters.Default) }
     var draftFilters by remember { mutableStateOf(SecurityChecksActiveFilters.Default) }
-    var selectedSummaryFilter by remember { mutableStateOf(SecuritySummaryFilter.TOTAL) }
+    var selectedSummaryFilter by remember { mutableStateOf(SecuritySummaryFilter.NOT_SUBMITTED) }
 
     LaunchedEffect(showFilterSheet) {
         if (showFilterSheet) {
@@ -133,60 +137,61 @@ fun SecurityChecksScreenContent(
     val labelApproved = stringResource(R.string.security_checks_approved)
     val labelSubmitted = stringResource(R.string.security_checks_submitted)
     val labelRejected = stringResource(R.string.security_checks_status_rejected)
+    val labelNotSubmitted = stringResource(R.string.security_checks_status_not_submitted)
     val dash = stringResource(R.string.security_checks_dash)
 
-    val filteredSubmissions = remember(
-        submissionsState.submissions,
-        searchQuery,
-        appliedFilters,
-    ) {
-        submissionsState.submissions
-            .filterByDateRange(appliedFilters.dateFromMillis, appliedFilters.dateToMillis)
-            .filterByGroup(appliedFilters.groupId)
-            .filteredBySearchQuery(searchQuery, appliedFilters.searchBy)
-    }
+//    val filteredSubmissions = remember(
+//        submissionsState.submissions,
+//        searchQuery,
+//        appliedFilters,
+//    ) {
+//        submissionsState.submissions
+//            .filterByDateRange(appliedFilters.dateFromMillis, appliedFilters.dateToMillis)
+//            .filterByGroup(appliedFilters.groupId)
+//            .filteredBySearchQuery(searchQuery, appliedFilters.searchBy)
+//    }
 
-    val submissionsBySummary = remember(filteredSubmissions, selectedSummaryFilter) {
-        when (selectedSummaryFilter) {
-            SecuritySummaryFilter.TOTAL -> filteredSubmissions
-            SecuritySummaryFilter.APPROVED -> filteredSubmissions.filter {
-                it.status.equals("APPROVED", ignoreCase = true)
-            }
-            SecuritySummaryFilter.SUBMITTED -> filteredSubmissions.filter {
-                it.status.equals("SUBMITTED", ignoreCase = true)
-            }
-            SecuritySummaryFilter.REJECTED -> filteredSubmissions.filter {
-                it.status.equals("REJECTED", ignoreCase = true)
-            }
-        }
+    LaunchedEffect(selectedSummaryFilter) {
+        viewModel.loadSecurityCheck(selectedSummaryFilter)
     }
 
     val uiItems = remember(
-        submissionsBySummary,
+        submissionsState,
         labelApproved,
         labelSubmitted,
         labelRejected,
+        labelNotSubmitted,
         dash,
     ) {
-        submissionsBySummary.toSecurityCheckItemUiList(
-            labelApproved = labelApproved,
-            labelSubmitted = labelSubmitted,
-            labelRejected = labelRejected,
-            dash = dash,
-        )
+        Log.d("Vinh", "selectedSummaryFilter: $selectedSummaryFilter")
+        if (selectedSummaryFilter == SecuritySummaryFilter.NOT_SUBMITTED) {
+            submissionsState.notSubmission
+                .toSecurityCheckItemUiList(
+                    labelApproved = labelApproved,
+                    labelSubmitted = labelSubmitted,
+                    labelRejected = labelRejected,
+                    labelNotSubmitted = labelNotSubmitted,
+                    dash = dash,
+                )
+        } else {
+            submissionsState.submissions
+                .toSecurityCheckItemUiList(
+                    labelApproved = labelApproved,
+                    labelSubmitted = labelSubmitted,
+                    labelRejected = labelRejected,
+                    labelNotSubmitted = labelNotSubmitted,
+                    dash = dash,
+                )
+        }
     }
 
-    val totalCount = filteredSubmissions.size
-    val approvedCount = filteredSubmissions.count {
-        it.status.equals("APPROVED", ignoreCase = true)
-    }
-    val submittedCount = filteredSubmissions.count {
-        it.status.equals("SUBMITTED", ignoreCase = true)
-    }
-    val rejectedCount = filteredSubmissions.count {
-        it.status.equals("REJECTED", ignoreCase = true)
-    }
 
+
+    val notSubmittedCount = submissionsState.submissions.size
+    val approvedCount = submissionsState.approvedCount
+    val submittedCount = submissionsState.submittedCount
+    val rejectedCount = submissionsState.rejectedCount
+    Log.d("Vinh", "approvedCount $approvedCount submittedCount $submittedCount rejectedCount $rejectedCount ")
     val showInitialLoading = submissionsState.isLoading && submissionsState.submissions.isEmpty()
     val filterIndicatorActive = appliedFilters.hasActiveFilters()
 
@@ -242,7 +247,7 @@ fun SecurityChecksScreenContent(
             Spacer(modifier = Modifier.height(20.dp))
             Spacer(modifier = Modifier.height(20.dp))
             SecuritySummaryCards(
-                total = totalCount.toString(),
+                total = notSubmittedCount.toString(),
                 approved = approvedCount.toString(),
                 submitted = submittedCount.toString(),
                 rejected = rejectedCount.toString(),
@@ -274,12 +279,16 @@ fun SecurityChecksScreenContent(
                         key = { it.submissionId },
                     ) { check ->
                         Spacer(modifier = Modifier.height(12.dp))
-                        SecurityCheckCard(
-                            item = check,
-                            onClick = {
-                                onSecurityCheckClick(check.submissionId.toString())
-                            }.singleClick()
-                        )
+                        if (selectedSummaryFilter == SecuritySummaryFilter.NOT_SUBMITTED) {
+                            SecurityCheckNotSubmittedCard(item = check)
+                        } else {
+                            SecurityCheckCard(
+                                item = check,
+                                onClick = {
+                                    onSecurityCheckClick(check.submissionId.toString())
+                                }.singleClick()
+                            )
+                        }
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                     item { Spacer(modifier = Modifier.height(8.dp)) }
@@ -288,6 +297,7 @@ fun SecurityChecksScreenContent(
         }
     }
 }
+
 @Composable
 private fun SecurityFiltersRow(
     searchQuery: String,
@@ -410,16 +420,6 @@ private fun SecuritySummaryCards(
         SecurityStatCard(
             modifier = Modifier
                 .weight(1f),
-            value = total,
-            label = stringResource(R.string.security_checks_total),
-            valueColor = Color(0xFFF0B100),
-            selected = selectedFilter == SecuritySummaryFilter.TOTAL,
-            selectedBackgroundColor = Color(0xFFF0F5D7),
-            onClick = { onFilterSelected(SecuritySummaryFilter.TOTAL) },
-        )
-        SecurityStatCard(
-            modifier = Modifier
-                .weight(1f),
             value = approved,
             label = stringResource(R.string.security_checks_approved),
             valueColor = Color(0xFF34C759),
@@ -446,6 +446,16 @@ private fun SecuritySummaryCards(
             selectedBackgroundColor = Color(0xFFFFD5D5),
             selected = selectedFilter == SecuritySummaryFilter.REJECTED,
             onClick = { onFilterSelected(SecuritySummaryFilter.REJECTED) },
+        )
+        SecurityStatCard(
+            modifier = Modifier
+                .weight(1f),
+            value = total,
+            label = stringResource(R.string.security_checks_not_submitted),
+            valueColor = Color(0xFFF0B100),
+            selected = selectedFilter == SecuritySummaryFilter.NOT_SUBMITTED,
+            selectedBackgroundColor = Color(0xFFF0F5D7),
+            onClick = { onFilterSelected(SecuritySummaryFilter.NOT_SUBMITTED) },
         )
     }
 }
@@ -542,13 +552,39 @@ private fun SecurityCheckCard(
 }
 
 @Composable
+private fun SecurityCheckNotSubmittedCard(
+    item: SecurityCheckItemUi,
+) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp)),
+        color = White,
+        shape = RoundedCornerShape(16.dp),
+        tonalElevation = 0.dp
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(1.dp, SecurityCheckCardBorder, RoundedCornerShape(16.dp))
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            CardHeader(item)
+            HorizontalDivider(thickness = 1.dp, color = SecurityCheckCardDivider)
+            CardInfo(item)
+        }
+    }
+}
+
+@Composable
 private fun CardHeader(item: SecurityCheckItemUi) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        TeamBadge(index = item.teamIndex)
+        TeamBadge()
         TeamInfo(
             modifier = Modifier.weight(1f),
             name = item.teamName,
@@ -559,7 +595,7 @@ private fun CardHeader(item: SecurityCheckItemUi) {
 }
 
 @Composable
-private fun TeamBadge(index: Int) {
+private fun TeamBadge() {
     Box(
         modifier = Modifier
             .size(45.dp)
@@ -610,6 +646,7 @@ private fun TeamInfo(modifier: Modifier = Modifier, name: String, employeeId: St
 private fun StatusChip(item: SecurityCheckItemUi) {
     val icon = when (item.statusUseApprovedChip) {
         SecurityCheckStatus.APPROVED -> R.drawable.ic_approved
+        SecurityCheckStatus.NOT_SUBMITTED -> R.drawable.ic_not_submitted
         SecurityCheckStatus.SUBMITTED -> R.drawable.ic_submitted
         else -> R.drawable.ic_rejected
     }
@@ -682,6 +719,36 @@ private fun CardDates(item: SecurityCheckItemUi) {
             modifier = Modifier.weight(1f),
             label = label,
             value = item.approvedDate
+        )
+    }
+}
+
+@Composable
+private fun CardInfo(item: SecurityCheckItemUi) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        RowInfo(text = item.email, icon = R.drawable.ic_email)
+        RowInfo(text = item.phoneNumber.formatVNPhoneNumber(), icon = R.drawable.ic_cellphone)
+    }
+}
+
+@Composable
+private fun RowInfo(text: String, icon: Int) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            painter = painterResource(icon),
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(Color(0xFF99A1AF)),
+            modifier = Modifier.size(14.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = text,
+            style = LabelTextStyle13RegularGrey
         )
     }
 }

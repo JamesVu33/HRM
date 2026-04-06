@@ -48,8 +48,47 @@ class SecurityCheckRepositoryImpl @Inject constructor(
                 groupId = groupId,
             )
         }.map { paginated ->
+            val items = paginated.data
+            SecurityCheckSubmissionsPage(
+                items = items?.data.orEmpty().map { it.toDomain() },
+                listStats = items?.submissionsByStatus ?: emptyList(),
+                meta = paginated.meta?.toSubmissionPaginationMeta(),
+            )
+        }
+    }
+
+    override suspend fun getNotSubmissions(
+        fromDate: String?,
+        toDate: String?,
+        query: String?,
+        page: Int?,
+        limit: Int?,
+        orderBy: String?,
+        sortBy: String?,
+        status: String?,
+        type: String?,
+        monthCode: String?,
+        groupId: String?,
+    ): NetworkResult<SecurityCheckSubmissionsPage> {
+        return safeApiCallPaginated(retrofit) {
+            apiService.getNotSubmissions(
+                fromDate = fromDate,
+                toDate = toDate,
+                query = query,
+                page = page,
+                limit = limit,
+                orderBy = orderBy,
+                sortBy = sortBy,
+                status = status,
+                type = type,
+                monthCode = monthCode,
+                groupId = groupId,
+            )
+        }.map { paginated ->
+            Log.d("not submitted", "getNotSubmissions: $paginated")
             SecurityCheckSubmissionsPage(
                 items = paginated.data.orEmpty().map { it.toDomain() },
+                listStats = emptyList(),
                 meta = paginated.meta?.toSubmissionPaginationMeta(),
             )
         }

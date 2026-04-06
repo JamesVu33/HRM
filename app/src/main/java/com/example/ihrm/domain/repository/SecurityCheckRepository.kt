@@ -20,5 +20,19 @@ interface SecurityCheckRepository {
         groupId: String?,
     ): NetworkResult<SecurityCheckSubmissionsPage>
 
+    suspend fun getNotSubmissions(
+        fromDate: String?,
+        toDate: String?,
+        query: String?,
+        page: Int?,
+        limit: Int?,
+        orderBy: String?,
+        sortBy: String?,
+        status: String?,
+        type: String?,
+        monthCode: String?,
+        groupId: String?,
+    ): NetworkResult<SecurityCheckSubmissionsPage>
+
     suspend fun getGroups(): NetworkResult<List<SecurityGroups>>
 }
