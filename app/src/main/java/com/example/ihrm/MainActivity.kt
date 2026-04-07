@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -15,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -75,6 +77,20 @@ fun HRMApp() {
     }
 }
 
+private val drawerGestureRoutes = setOf(
+    Screen.Dashboard.route,
+    Screen.EmployeeList.route,
+    Screen.SecurityChecks.route,
+    Screen.MyInfo.route,
+    Screen.MySecurityCheck.route,
+    Screen.Organization.route
+)
+
+private sealed class DrawerDialog {
+    data object Logout : DrawerDialog()
+    data class ComingSoon(val featureName: String) : DrawerDialog()
+}
+
 @Composable
 private fun DrawerContent(
     currentRoute: String,
@@ -82,73 +98,29 @@ private fun DrawerContent(
     scope: CoroutineScope,
     navController: NavHostController
 ) {
-    var showLogoutDialog by remember { mutableStateOf(false) }
-    var comingSoonFeatureName by remember { mutableStateOf<String?>(null) }
-    val gesturesEnabled = currentRoute == Screen.Dashboard.route
+    var activeDialog by remember { mutableStateOf<DrawerDialog?>(null) }
+    val gesturesEnabled = remember(currentRoute) { currentRoute in drawerGestureRoutes }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         gesturesEnabled = gesturesEnabled,
         drawerContent = {
-            DrawerMenu(
-                drawerState = drawerState,
-                scope = scope,
-                currentRoute = currentRoute,
-                onItemClick = { route ->
-                    when (route) {
-                        Screen.Dashboard.route -> {
-                            navController.navigate(route) {
-                                popUpTo(Screen.Dashboard.route) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-
-                        Screen.EmployeeList.route -> {
-                            navController.navigate(route) {
-                                popUpTo(Screen.Dashboard.route) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-
-                        Screen.SecurityChecks.route -> {
-                            navController.navigate(route) {
-                                popUpTo(Screen.Dashboard.route) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-
-                        Screen.MyInfo.route -> {
-                            navController.navigate(route) {
-                                popUpTo(Screen.Dashboard.route) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-
-                        Screen.MySecurityCheck.route -> {
-                            navController.navigate(route) {
-                                popUpTo(Screen.Dashboard.route) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-                    }
-                },
-                onLogoutClick = { showLogoutDialog = true },
-                onShowComingSoon = { featureName -> comingSoonFeatureName = featureName }
-            )
+            ModalDrawerSheet(drawerContainerColor = Color.White) {
+                DrawerMenu(
+                    drawerState = drawerState,
+                    scope = scope,
+                    currentRoute = currentRoute,
+                    onItemClick = { route ->
+                        scope.launch {
+                            drawerState.close()
+                            if (currentRoute != route) {
+                                navigateWithStandardOptions(navController, route)
+                            }}
+                    },
+                    onLogoutClick = { activeDialog = DrawerDialog.Logout },
+                    onShowComingSoon = { activeDialog = DrawerDialog.ComingSoon(it) }
+                )
+            }
         }
     ) {
         NavGraph(
@@ -157,23 +129,32 @@ private fun DrawerContent(
             scope = scope
         )
     }
-    if (showLogoutDialog) {
-        LogoutConfirmDialog(
+
+    when (val dialog = activeDialog) {
+        is DrawerDialog.Logout -> LogoutConfirmDialog(
             onConfirm = {
-                showLogoutDialog = false
-                scope.launch { drawerState.close() }
+                activeDialog = null
                 AuthManager.clearTokens()
                 navController.navigate(Screen.Login.route) {
-                    popUpTo(0) { inclusive = true }
+                    popUpTo(navController.graph.id) { inclusive = true }
+                    launchSingleTop = true
                 }
             },
-            onDismiss = { showLogoutDialog = false }
+            onDismiss = { activeDialog = null }
         )
+        is DrawerDialog.ComingSoon -> ComingSoonDialog(
+            featureName = dialog.featureName,
+            onDismiss = { activeDialog = null }
+        )
+        null -> Unit
     }
-    if (comingSoonFeatureName != null) {
-        ComingSoonDialog(
-            featureName = comingSoonFeatureName!!,
-            onDismiss = { comingSoonFeatureName = null }
-        )
+}
+private fun navigateWithStandardOptions(navController: NavHostController, route: String) {
+    navController.navigate(route) {
+        popUpTo(Screen.Dashboard.route) {
+            saveState = true
+        }
+        launchSingleTop = true
+        restoreState = true
     }
 }

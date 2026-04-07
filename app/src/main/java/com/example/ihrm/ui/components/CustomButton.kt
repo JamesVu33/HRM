@@ -475,7 +475,7 @@ private fun PillButtonsPreview() {
             selected = false
         )
         PillButton(
-            text = "Employee Info",
+            text = "EmployeeDepartmentResponse Info",
             onClick = {},
             selected = true
         )

@@ -18,7 +18,7 @@ interface EmployeeRepository {
     suspend fun syncEmployees(meta: UserMetaResponseDto? = null): NetworkResult<Unit>
     /** Fetches all levels and returns map levelId -> code for badge display (e.g. GET /levels). */
     suspend fun getLevelsMap(): NetworkResult<Map<Int, String>>
-    /** Fetches one level by id (GET /levels/{id}). Dùng để gộp với Employee mà không gọi trùng. */
+    /** Fetches one level by id (GET /levels/{id}). Dùng để gộp với EmployeeDepartmentResponse mà không gọi trùng. */
     suspend fun getLevelById(id: Int): NetworkResult<Level?>
     /** Lấy level theo employee id: gọi GET /employees/{id}, trả về level từ response. */
     suspend fun getLevelByEmployeeId(employeeId: String): NetworkResult<Level?>

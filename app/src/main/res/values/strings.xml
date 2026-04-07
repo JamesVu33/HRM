@@ -200,6 +200,10 @@
     <string name="drawer_item_leave_management">Leave Management</string>
     <string name="drawer_item_templates">Templates</string>
     <string name="drawer_section_organization">Organization</string>
+    <string name="organization_search_hint">Search</string>
+    <string name="organization_cd_open_menu">Open menu</string>
+    <string name="organization_cd_toggle_expand">Expand or collapse branch</string>
+    <string name="organization_cd_member_count">Member count</string>
     <string name="drawer_item_structure">Structure</string>
     <string name="drawer_item_master_data">Master Data</string>
     <string name="drawer_section_admin">Admin Management</string>
@@ -289,7 +293,7 @@
     <string name="my_info_change_password_close_cd">Close</string>
     <string name="my_info_change_password_toggle_visibility_cd">Toggle password visibility</string>
 
-    <!-- Employee Detail -->
+    <!-- EmployeeDepartmentResponse Detail -->
     <string name="employee_detail_title">Member Information</string>
     <string name="employee_detail_subtitle_format">%1$s | ID: %2$s</string>
     <string name="employee_detail_tab_basic_info">Basic Info</string>
@@ -309,7 +313,7 @@
     <string name="employee_detail_not_found">Employee not found</string>
     <string name="employee_detail_error_format">Error: %1$s</string>
 
-    <!-- Employee Info tab -->
+    <!-- EmployeeDepartmentResponse Info tab -->
     <string name="employee_info_employment_title">Employment Information</string>
     <string name="employee_info_role">Role</string>
     <string name="employee_info_job_title">Job Title</string>
@@ -450,7 +454,7 @@
     <string name="employee_info_status_other">Other</string>
     <string name="employee_info_department_address_placeholder">123 Business Park, Suite 500</string>
 
-    <!-- Add Employee -->
+    <!-- Add EmployeeDepartmentResponse -->
     <string name="add_employee_title">Add New Member</string>
     <string name="add_employee_upload_photo">Upload Photo</string>
     <string name="add_employee_take_photo">Take Photo</string>

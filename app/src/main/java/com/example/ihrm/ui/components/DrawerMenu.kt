@@ -54,6 +54,7 @@ import androidx.compose.ui.window.Dialog
 import com.example.ihrm.R
 import com.example.ihrm.ui.dashboard.DashboardRole
 import com.example.ihrm.ui.dashboard.toDashboardRole
+import com.example.ihrm.ui.navigation.Screen
 import com.example.ihrm.ui.theme.DrawerItemSelected
 import com.example.ihrm.ui.theme.DrawerSectionLabel
 import com.example.ihrm.ui.theme.FABGradientStart
@@ -72,7 +73,14 @@ import kotlinx.coroutines.launch
 
 /** Routes that have a real screen. Others show Coming Soon. */
 private val IMPLEMENTED_ROUTES =
-    setOf("dashboard", "my_info", "employee_list", "security_checks", "my_security_check")
+    setOf(
+        Screen.Dashboard.route,
+        Screen.MyInfo.route,
+        Screen.EmployeeList.route,
+        Screen.SecurityChecks.route,
+        Screen.MySecurityCheck.route,
+        Screen.Organization.route
+    )
 
 data class DrawerMenuItem(
     val route: String,
@@ -131,7 +139,7 @@ private val DRAWER_SECTIONS: List<DrawerMenuSection> = listOf(
     DrawerMenuSection(
         titleResId = R.string.drawer_section_organization,
         items = listOf(
-            DrawerMenuItem("structure", R.string.drawer_item_structure, R.drawable.ic_structure),
+            DrawerMenuItem(Screen.Organization.route, R.string.drawer_item_structure, R.drawable.ic_structure),
             DrawerMenuItem("master_data", R.string.drawer_item_master_data, R.drawable.ic_master_data)
         )
     ),

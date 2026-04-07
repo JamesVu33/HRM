@@ -20,6 +20,7 @@ import com.example.ihrm.ui.security.checks.SecurityChecksScreen
 import com.example.ihrm.ui.stats.TeamStatisticsScreen
 import com.example.ihrm.ui.login.LoginScreen
 import com.example.ihrm.ui.myinfo.MyInfoScreen
+import com.example.ihrm.ui.organization.OrganizationScreen
 import com.example.ihrm.util.AuthManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -192,6 +193,13 @@ fun NavGraph(
                 employeeId = employeeId,
                 onSaveSuccess = { navController.popBackStackIfPossible() },
                 onBack = { navController.popBackStackIfPossible() }
+            )
+        }
+
+        composable(route = Screen.Organization.route) {
+            OrganizationScreen(
+                onMenuClick = { scope.launch { drawerState?.open() } },
+                onBackClick = { navController.popBackStackIfPossible() }
             )
         }
     }
