@@ -2,6 +2,20 @@ package com.example.ihrm.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 
+data class ChecksSecuritySubmissionResponse(
+    @SerializedName("data")
+    val data: List<SecurityCheckSubmissionDto> = emptyList(),
+    @SerializedName("submissionsByStatus")
+    val submissionsByStatus: List<SubmissionByStatus> = emptyList(),
+)
+
+data class SubmissionByStatus(
+    @SerializedName("status")
+    val status: String? = null,
+    @SerializedName("count")
+    val count: Int? = null,
+)
+
 data class SecurityCheckSubmissionDto(
     @SerializedName("id")
     val id: Int,

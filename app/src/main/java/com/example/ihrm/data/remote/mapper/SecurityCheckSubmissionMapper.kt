@@ -1,11 +1,13 @@
 package com.example.ihrm.data.remote.mapper
 
+import com.example.ihrm.R
 import com.example.ihrm.data.remote.dto.MetaDto
 import com.example.ihrm.data.remote.dto.SecurityCheckGroupDto
 import com.example.ihrm.data.remote.dto.SecurityCheckReviewerDto
 import com.example.ihrm.data.remote.dto.SecurityCheckSubmissionDto
 import com.example.ihrm.data.remote.dto.SecurityCheckSubmissionUserDto
 import com.example.ihrm.data.remote.dto.SecurityCheckTemplateDto
+import com.example.ihrm.data.remote.employee.EmployeeResponse
 import com.example.ihrm.domain.model.SecurityCheckGroup
 import com.example.ihrm.domain.model.SecurityCheckReviewer
 import com.example.ihrm.domain.model.SecurityCheckSubmission
@@ -36,6 +38,22 @@ fun SecurityCheckSubmissionDto.toDomain(): SecurityCheckSubmission =
         group = group?.toDomain(),
         template = template?.toDomain(),
         employeeId = employeeId,
+    )
+
+fun EmployeeResponse.toDomain(): SecurityCheckSubmission =
+    SecurityCheckSubmission(
+        id = id,
+        templateId = 0,
+        userId = employeeId.toInt(),
+        user = SecurityCheckSubmissionUser(
+            id = 0,
+            employeeId = employeeId,
+            fullName = fullName,
+            avatarUrl = profile?.avatarUrl,
+            fullNameForSearching = fullName.removeVietnameseAccents().lowercase()
+        ),
+        email = email,
+        phoneNumber = phoneNumber
     )
 
 fun SecurityCheckSubmissionUserDto.toDomain(): SecurityCheckSubmissionUser =

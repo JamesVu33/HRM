@@ -40,6 +40,7 @@ class SecurityChecksUiMapperTest {
             labelApproved = "Approved",
             labelSubmitted = "Submitted",
             labelRejected = "Rejected",
+            labelNotSubmitted = "Not Submitted",
             dash = "—",
         )
         assertEquals(SecurityCheckStatus.APPROVED, item.statusUseApprovedChip)
@@ -65,6 +66,7 @@ class SecurityChecksUiMapperTest {
             employeeId = employeeId,
             fullName = fullName,
             avatarUrl = null,
+            fullNameForSearching = fullName?.lowercase(),
         ),
         group = null,
         template = null,

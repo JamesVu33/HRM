@@ -1,23 +1,23 @@
-package com.example.ihrm.ui.security.checks
+package com.example.ihrm.ui.security.mysecurity
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,15 +30,15 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,20 +47,34 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ihrm.R
+import com.example.ihrm.domain.usecase.securities.SecurityStatus
+import com.example.ihrm.ui.common.BaseHRMCompose
 import com.example.ihrm.ui.common.header.BaseHeader
+import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.util.DashboardBrush
+import com.example.ihrm.util.LabelTextStyle13MediumGrey
+import com.example.ihrm.util.LabelTextStyle13RegularGrey
+import com.example.ihrm.util.LabelTextStyle13SemiBold
+import com.example.ihrm.util.LabelTextStyle14RegularBlack
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -78,12 +92,6 @@ private data class MySecurityChecklistUi(
     val date: String,
     val approver: String? = null
 )
-
-private fun MySecurityStatus.toLegendKey(): String = when (this) {
-    MySecurityStatus.PENDING -> "submitted"
-    MySecurityStatus.APPROVED -> "approved"
-    MySecurityStatus.REJECT -> "rejected"
-}
 
 private val mySecurityItems = listOf(
     MySecurityChecklistUi(
@@ -145,7 +153,31 @@ fun MySecurityCheckScreen(
     onMenuClick: () -> Unit,
     onChecklistClick: (String) -> Unit = {},
     onCreateChecklistClick: () -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: MySecurityCheckViewModel = hiltViewModel()
+) {
+    BaseHRMCompose(
+        content = {
+            MySecurityCheckScreenContent(
+                onMenuClick = onMenuClick,
+                onChecklistClick = onChecklistClick,
+                onCreateChecklistClick = onCreateChecklistClick,
+                modifier = modifier,
+                viewModel = viewModel
+            )
+        },
+        onErrorAlertClose = onMenuClick,
+        viewmodel = viewModel
+    )
+}
+
+@Composable
+fun MySecurityCheckScreenContent(
+    onMenuClick: () -> Unit,
+    onChecklistClick: (String) -> Unit = {},
+    onCreateChecklistClick: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    viewModel: MySecurityCheckViewModel
 ) {
     var keyword by remember { mutableStateOf("") }
     var showCreatedInMonthDialog by remember { mutableStateOf(false) }
@@ -161,6 +193,7 @@ fun MySecurityCheckScreen(
             }
         }
     }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     Scaffold(
         modifier = modifier
             .fillMaxSize()
@@ -185,7 +218,7 @@ fun MySecurityCheckScreen(
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = stringResource(R.string.my_security_check_add_cd),
-                    tint = Color.White
+                    tint = White
                 )
             }
         }
@@ -232,7 +265,7 @@ fun MySecurityCheckScreen(
                             R.string.my_security_check_items_count,
                             filtered.size
                         ),
-                        color = Color.White,
+                        color = White,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -246,10 +279,10 @@ fun MySecurityCheckScreen(
                 ),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                items(filtered) { item ->
+                items(uiState) { item ->
                     ChecklistCard(
                         item = item,
-                        onClick = { onChecklistClick(item.status.toLegendKey()) }
+                        onClick = { onChecklistClick(item.status.label.lowercase()) }
                     )
                 }
                 item { Spacer(modifier = Modifier.height(8.dp)) }
@@ -336,137 +369,96 @@ private fun SearchBar(keyword: String, onKeywordChange: (String) -> Unit) {
 }
 
 @Composable
-private fun ChecklistCard(item: MySecurityChecklistUi, onClick: () -> Unit) {
+private fun ChecklistCard(
+    item: MySecurityCheckUiState,
+    onClick: () -> Unit
+) {
+    val status = SecurityStatus.fromKey(item.status?.key ?: "")
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .clickable(onClick = onClick),
-        color = Color.White,
+        color = White,
         shape = RoundedCornerShape(16.dp),
         shadowElevation = 2.dp
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .border(1.dp, Color(0xFFE5E7EB), RoundedCornerShape(16.dp))
-                .padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(2.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = item.title,
-                            color = Color(0xFF091E42),
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(text = "•", color = Color(0xFF6A7282), fontSize = 16.sp)
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(text = item.category, color = Color(0xFF6A7282), fontSize = 14.sp)
-                    }
-                    Text(
-                        text = item.name,
-                        color = Color(0xFF364153),
-                        fontSize = 14.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = null,
-                    tint = Color(0xFF6A7282)
-                )
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFFEFF6FF))
-                        .padding(horizontal = 10.dp, vertical = 6.dp)
-                ) {
-                    Text(
-                        text = item.template,
-                        color = Color(0xFF155DFC),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(
-                    text = "ID: ${item.code}",
-                    color = Color(0xFF6A7282),
-                    fontSize = 12.sp
-                )
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                StatusChip(status = item.status)
-                Spacer(modifier = Modifier.weight(1f))
-                Column(horizontalAlignment = Alignment.End) {
-                    Text(
-                        text = stringResource(item.dateLabel),
-                        color = Color(0xFF6A7282),
-                        fontSize = 12.sp
-                    )
-                    Text(
-                        text = item.date,
-                        color = Color(0xFF364153),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
-
-            if (item.approver != null) {
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(Color(0xFFE5E7EB))
+                Text(
+                    text = "ID: ${item.employeeId}",
+                    style = LabelTextStyle13RegularGrey
                 )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFFF3F4F6)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.shinhan_logo),
-                            contentDescription = null,
-                            tint = Color.Unspecified,
-                            modifier = Modifier.fillMaxSize()
-                        )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = item.userName,
+                    style = LabelTextStyle14RegularBlack
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(color = Color(0xFF364153), fontSize = 13.sp)) {
+                            append(stringResource(R.string.my_security_check_submitted))
+                        }
+                        append(" ")
+                        withStyle(SpanStyle(color = Color(0xFF364153), fontWeight = FontWeight.Medium, fontSize = 13.sp)) {
+                            append(item.submittedAt)
+                        }
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Column {
+                )
+            }
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.End,
+            ) {
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(999.dp))
+                        .background(status.backgroundColor)
+                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        imageVector = ImageVector.vectorResource(status.iconRes),
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp)
+                    )
+                    Text(
+                        text = item.status.label,
+                        color = item.status.chipTextColor,
+                        style = LabelTextStyle13SemiBold
+                    )
+                }
+                Spacer(modifier = Modifier.height(26.dp))
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Surface(
+                        color = Color(0xFFEFF6FF),
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.padding(all = 5.dp)
+                    ) {
                         Text(
-                            text = if (item.status == MySecurityStatus.REJECT) stringResource(R.string.my_security_check_rejecter) else stringResource(
-                                R.string.my_security_check_approver
-                            ),
-                            color = Color(0xFF6A7282),
-                            fontSize = 11.sp
-                        )
-                        Text(
-                            text = item.approver,
-                            color = Color(0xFF364153),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium
+                            text = item.templateName,
+                            color = Color(0xFF155DFC),
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            style = LabelTextStyle13MediumGrey,
+                            textAlign = TextAlign.Center
                         )
                     }
                 }
+
             }
         }
     }

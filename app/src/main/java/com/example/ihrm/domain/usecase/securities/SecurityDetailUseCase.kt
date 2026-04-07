@@ -10,6 +10,7 @@ import com.example.ihrm.domain.model.securitycheck.SecurityCheckDetail
 import com.example.ihrm.domain.model.securitycheck.SecurityTemplate
 import com.example.ihrm.domain.repository.LanguageRepository
 import com.example.ihrm.domain.repository.SecurityCheckDetailRepository
+import com.example.ihrm.util.formatDateTime
 import javax.inject.Inject
 
 enum class SecurityStatus(
@@ -55,6 +56,7 @@ data class SecurityDetailUiModel(
     val submittedAt: String? = null,
     val templateName: String? = null,
     val approveBy: String? = null,
+    val reason: String? = null,
     val checkList: List<CheckItemUiModel> = emptyList()
 )
 
@@ -102,20 +104,11 @@ class SecurityDetailUseCase @Inject constructor(
             userName = detail.userName,
             employeeId = detail.userEmployeeId,
             status = detail.status,
-            submittedAt = formatDateTime(detail.submittedAt),
+            submittedAt = detail.submittedAt.formatDateTime(),
             templateName = detail.templateName,
             checkList = checkList,
-            approveBy = detail.approveBy
+            approveBy = detail.approveBy,
+            reason = detail.rejectReason
         )
-    }
-
-    fun formatDateTime(isoString: String?): String {
-        return try {
-            val parsed = java.time.OffsetDateTime.parse(isoString)
-            val formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
-            parsed.format(formatter)
-        } catch (e: Exception) {
-            isoString ?: ("" + e)
-        }
     }
 }

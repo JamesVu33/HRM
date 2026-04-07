@@ -65,7 +65,8 @@ private fun SecurityCheckSubmission.uiStatus(): SecurityCheckStatus =
     when (status?.uppercase(Locale.US)) {
         "APPROVED" -> SecurityCheckStatus.APPROVED
         "REJECTED" -> SecurityCheckStatus.REJECTED
-        else -> SecurityCheckStatus.SUBMITTED
+        "SUBMITTED" -> SecurityCheckStatus.SUBMITTED
+        else -> SecurityCheckStatus.NOT_SUBMITTED
     }
 
 /**
@@ -76,6 +77,7 @@ fun SecurityCheckSubmission.toSecurityCheckItemUi(
     labelApproved: String,
     labelSubmitted: String,
     labelRejected: String,
+    labelNotSubmitted: String,
     dash: String,
 ): SecurityCheckItemUi {
     val uiStatus = uiStatus()
@@ -83,16 +85,19 @@ fun SecurityCheckSubmission.toSecurityCheckItemUi(
         SecurityCheckStatus.APPROVED -> figmaApprovedGreen to figmaApprovedGreenBg
         SecurityCheckStatus.REJECTED -> figmaRejectedGreen to figmaRejectedGreenBg
         SecurityCheckStatus.SUBMITTED -> figmaSubmittedBlue to figmaSubmittedBlueBg
+        else -> figmaNotSubmittedYellow to figmaNotSubmittedYellowBg
     }
     val statusLabel = when (uiStatus) {
         SecurityCheckStatus.APPROVED -> labelApproved
         SecurityCheckStatus.REJECTED -> labelRejected
         SecurityCheckStatus.SUBMITTED -> labelSubmitted
+        else -> labelNotSubmitted
     }
     val approvedByLabelRes = when (uiStatus) {
         SecurityCheckStatus.APPROVED -> R.string.security_checks_approved_by
         SecurityCheckStatus.REJECTED -> R.string.security_checks_rejected_by
         SecurityCheckStatus.SUBMITTED -> R.string.security_checks_wait_for_approve_by
+        else -> R.string.security_checks_empty_content
     }
     val approverName = when (uiStatus) {
         SecurityCheckStatus.SUBMITTED -> dash
@@ -120,6 +125,8 @@ fun SecurityCheckSubmission.toSecurityCheckItemUi(
 
     val employeeId = user?.employeeId?.takeIf { it.isNotBlank() } ?: dash
 
+    val email = email?.takeIf { it.isNotBlank() } ?: dash
+    val phone = phoneNumber?.takeIf { it.isNotBlank() } ?: dash
 
     return SecurityCheckItemUi(
         submissionId = id,
@@ -135,6 +142,8 @@ fun SecurityCheckSubmission.toSecurityCheckItemUi(
         submittedDate = formatIsoDate(submittedAt ?: createdAt, dash),
         approvedDate = secondColumnDate,
         statusUseApprovedChip = uiStatus,
+        email = email,
+        phoneNumber = phone
     )
 }
 
@@ -143,12 +152,14 @@ fun List<SecurityCheckSubmission>.toSecurityCheckItemUiList(
     labelSubmitted: String,
     labelRejected: String,
     dash: String,
+    labelNotSubmitted: String,
 ): List<SecurityCheckItemUi> = mapIndexed { index, submission ->
     submission.toSecurityCheckItemUi(
         badgeIndex = index + 1,
         labelApproved = labelApproved,
         labelSubmitted = labelSubmitted,
         labelRejected = labelRejected,
+        labelNotSubmitted = labelNotSubmitted,
         dash = dash,
     )
 }

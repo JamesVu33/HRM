@@ -13,7 +13,7 @@ import com.example.ihrm.ui.employee.addedit.AddEditEmployeeScreen
 import com.example.ihrm.ui.employee.detail.EmployeeDetailScreen
 import com.example.ihrm.ui.employee.list.EmployeeListScreen
 import com.example.ihrm.ui.security.checks.CreateSecurityChecklistScreen
-import com.example.ihrm.ui.security.checks.MySecurityCheckScreen
+import com.example.ihrm.ui.security.mysecurity.MySecurityCheckScreen
 import com.example.ihrm.ui.security.checks.SecurityChecksAnalyticsScreen
 import com.example.ihrm.ui.security.detail.SecurityChecksLegendDetailScreen
 import com.example.ihrm.ui.security.checks.SecurityChecksScreen
