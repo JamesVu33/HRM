@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import com.example.ihrm.data.remote.base.NetworkResult
 import java.text.Normalizer
 import java.time.Instant
@@ -72,6 +73,16 @@ fun String.removeVietnameseAccents(): String {
         .replace("Đ", "D")
 }
 
+fun String?.formatDateTime(): String {
+    return try {
+        val parsed = java.time.OffsetDateTime.parse(this)
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        parsed.format(formatter)
+    } catch (e: Exception) {
+        this ?: ("" + e)
+    }
+}
+
 fun String.formatVNPhoneNumber(): String {
     val digits = this.filter { it.isDigit() }
 
@@ -91,5 +102,74 @@ fun String.formatVNPhoneNumber(): String {
             "+84($areaCode) $mid-$end"
         }
         else -> this
+    }
+}
+
+data class SecurityLegendMeta(
+    val key: String,
+    val label: String,
+    val chipText: String,
+    val chipTextColor: Color,
+    val chipBackground: Color,
+    val highlightedQuestionIndices: Set<Int> = emptySet(),
+    val outlinedQuestionIndices: Set<Int> = emptySet(),
+    val showPendingActions: Boolean = false,
+) {
+    companion object {
+        val DEFAULT = SecurityLegendMeta(
+            key = "",
+            label = "",
+            chipText = "",
+            chipTextColor = Color.Unspecified,
+            chipBackground = Color.Unspecified,
+        )
+    }
+}
+
+fun legendByKey(key: String): SecurityLegendMeta {
+    return when (key.lowercase()) {
+        "approved" -> SecurityLegendMeta(
+            key = key,
+            label = "Approved",
+            chipText = "APPROVED",
+            chipTextColor = Color(0xFF008236),
+            chipBackground = Color(0xFFDCFCE7),
+        )
+
+        "rejected" -> SecurityLegendMeta(
+            key = key,
+            label = "Rejected",
+            chipText = "REJECT",
+            chipTextColor = Color(0xFFF10C00),
+            chipBackground = Color(0xFFFFC1C2),
+            highlightedQuestionIndices = setOf(1),
+        )
+
+        "submitted" -> SecurityLegendMeta(
+            key = key,
+            label = "Submitted",
+            chipText = "SUBMITTED",
+            chipTextColor = Color(0xFF007AFF),
+            chipBackground = Color(0xFFDDEBFF),
+            showPendingActions = true,
+        )
+
+        "pending" -> SecurityLegendMeta(
+            key = key,
+            label = "Pending",
+            chipText = "PENDING",
+            chipTextColor = Color(0xFFB35A00),
+            chipBackground = Color(0xFFF9D9A7),
+            outlinedQuestionIndices = setOf(3),
+            showPendingActions = true,
+        )
+
+        else -> SecurityLegendMeta(
+            key = key,
+            label = "Not Submitted",
+            chipText = "NOT SUBMITTED",
+            chipTextColor = Color(0xFF4B5563),
+            chipBackground = Color(0xFFE5E7EB),
+        )
     }
 }

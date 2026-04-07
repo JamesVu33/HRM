@@ -9,6 +9,8 @@ import com.example.ihrm.domain.model.SecurityCheckSubmissionsPage
 import com.example.ihrm.domain.model.SecurityGroups
 import com.example.ihrm.domain.model.SubmissionPaginationMeta
 import com.example.ihrm.domain.usecase.securities.SecuritiesUseCase
+import com.example.ihrm.util.Constants.DEFAULT_LIMIT
+import com.example.ihrm.util.Constants.DEFAULT_PAGE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,6 +27,7 @@ data class SecurityChecksUiState(
     val approvedCount: Int = 0,
     val submittedCount: Int = 0,
     val rejectedCount: Int = 0,
+    val notSubmittedCount: Int = 0,
 )
 
 data class SecurityGroupsUiState(
@@ -163,6 +166,7 @@ class SecurityChecksViewModel @Inject constructor(
                             pagination = data.meta,
                             isLoading = false,
                             errorMessage = null,
+                            notSubmittedCount = data.meta?.total ?: 0
                         )
                     }
                 }
@@ -222,10 +226,5 @@ class SecurityChecksViewModel @Inject constructor(
                 loadSubmissions(status = SecuritySummaryFilter.REJECTED.name)
             }
         }
-    }
-
-    private companion object {
-        const val DEFAULT_PAGE = 1
-        const val DEFAULT_LIMIT = 100
     }
 }

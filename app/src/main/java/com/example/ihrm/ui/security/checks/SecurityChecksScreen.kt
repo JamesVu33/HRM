@@ -187,11 +187,10 @@ fun SecurityChecksScreenContent(
 
 
 
-    val notSubmittedCount = submissionsState.submissions.size
+    val notSubmittedCount = submissionsState.notSubmission.size
     val approvedCount = submissionsState.approvedCount
     val submittedCount = submissionsState.submittedCount
     val rejectedCount = submissionsState.rejectedCount
-    Log.d("Vinh", "approvedCount $approvedCount submittedCount $submittedCount rejectedCount $rejectedCount ")
     val showInitialLoading = submissionsState.isLoading && submissionsState.submissions.isEmpty()
     val filterIndicatorActive = appliedFilters.hasActiveFilters()
 

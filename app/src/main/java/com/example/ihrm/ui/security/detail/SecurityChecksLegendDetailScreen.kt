@@ -79,17 +79,8 @@ import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.util.AuthManager
 import com.example.ihrm.util.DashboardBrush
 import com.example.ihrm.util.LabelTextStyle13SemiBold
-
-private data class SecurityLegendMeta(
-    val key: String,
-    val label: String,
-    val chipText: String,
-    val chipTextColor: Color,
-    val chipBackground: Color,
-    val highlightedQuestionIndices: Set<Int> = emptySet(),
-    val outlinedQuestionIndices: Set<Int> = emptySet(),
-    val showPendingActions: Boolean = false,
-)
+import com.example.ihrm.util.SecurityLegendMeta
+import com.example.ihrm.util.legendByKey
 
 private val SecurityDetailHeaderBrush = DashboardBrush.BaseBackground
 private val AccordionCardBg = Color(0xFFABF5D1)
@@ -562,56 +553,6 @@ private fun ExpandableText(
                 }
             }
         }
-    }
-
-
-}
-
-private fun legendByKey(key: String): SecurityLegendMeta {
-    return when (key.lowercase()) {
-        "approved" -> SecurityLegendMeta(
-            key = key,
-            label = "Approved",
-            chipText = "APPROVED",
-            chipTextColor = Color(0xFF008236),
-            chipBackground = Color(0xFFDCFCE7),
-        )
-
-        "rejected" -> SecurityLegendMeta(
-            key = key,
-            label = "Rejected",
-            chipText = "REJECT",
-            chipTextColor = Color(0xFFF10C00),
-            chipBackground = Color(0xFFFFC1C2),
-            highlightedQuestionIndices = setOf(1),
-        )
-
-        "submitted" -> SecurityLegendMeta(
-            key = key,
-            label = "Submitted",
-            chipText = "SUBMITTED",
-            chipTextColor = Color(0xFF007AFF),
-            chipBackground = Color(0xFFDDEBFF),
-            showPendingActions = true,
-        )
-
-        "pending" -> SecurityLegendMeta(
-            key = key,
-            label = "Pending",
-            chipText = "PENDING",
-            chipTextColor = Color(0xFFB35A00),
-            chipBackground = Color(0xFFF9D9A7),
-            outlinedQuestionIndices = setOf(3),
-            showPendingActions = true,
-        )
-
-        else -> SecurityLegendMeta(
-            key = key,
-            label = "Not Submitted",
-            chipText = "NOT SUBMITTED",
-            chipTextColor = Color(0xFF4B5563),
-            chipBackground = Color(0xFFE5E7EB),
-        )
     }
 }
 

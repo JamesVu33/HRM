@@ -11,6 +11,7 @@ import com.example.ihrm.ui.theme.DashboardFigmaInk
 import com.example.ihrm.ui.theme.DashboardFigmaMuted
 import com.example.ihrm.ui.theme.DashboardTabActiveBlue
 import com.example.ihrm.ui.theme.InterFontFamily
+import com.example.ihrm.ui.theme.Neutral600
 
 val statLabelStyle = TextStyle(
     fontFamily = InterFontFamily,
@@ -100,6 +101,13 @@ val LabelTextStyle13RegularGrey = TextStyle(
     fontWeight = FontWeight.Normal,
     fontSize = 13.sp,
     color = DashboardFigmaMuted,
+)
+
+val LabelTextStyle14RegularBlack = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.Normal,
+    fontSize = 14.sp,
+    color = Neutral600,
 )
 
 val LabelTextStyle13SemiBold= TextStyle(

@@ -1,5 +1,8 @@
 package com.example.ihrm.util
 
+import androidx.compose.ui.res.stringResource
+import com.example.ihrm.R
+
 object Constants {
     const val AUTH_PREFS_NAME = "auth_prefs"
     const val PREF_ACCESS_TOKEN = "access_token"
@@ -9,4 +12,9 @@ object Constants {
     const val PREF_USER_EMAIL = "user_email"
     const val PREF_ACCOUNT_TYPE = "account_type"
     const val PREF_MODIFIABLE_FEATURES = "modifiable_features"
+
+    const val DEFAULT_PAGE = 1
+
+    const val DEFAULT_LIMIT = 100
+    const val DASH = "-"
 }
