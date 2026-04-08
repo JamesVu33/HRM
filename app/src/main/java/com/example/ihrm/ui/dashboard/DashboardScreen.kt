@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,24 +21,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ihrm.R
+import com.example.ihrm.ui.common.BaseHRMCompose
+import com.example.ihrm.ui.common.header.DashboardHomeTab
+import com.example.ihrm.ui.common.header.DashboardHomeTabSubtitle
+import com.example.ihrm.ui.common.header.DashboardHomeTabSwitcher
+import com.example.ihrm.ui.common.header.DashboardHomeTopBar
 import com.example.ihrm.ui.dashboard.dashboardSections.DashboardLeaveSection
-import com.example.ihrm.ui.dashboard.extra.DashboardSecurityCardManagement
 import com.example.ihrm.ui.dashboard.extra.DashboardManagementTabContent
 import com.example.ihrm.ui.dashboard.extra.DashboardProfileCardManagement
+import com.example.ihrm.ui.dashboard.extra.DashboardSecurityCardManagement
 import com.example.ihrm.ui.dashboard.personal.DashboardProfileCardPersonal
 import com.example.ihrm.ui.dashboard.personal.DashboardSecurityCardPersonal
 import com.example.ihrm.ui.theme.DashboardGradientMid
 import com.example.ihrm.ui.theme.DashboardGradientSoft
 import com.example.ihrm.ui.theme.DashboardGradientTop
 import com.example.ihrm.ui.theme.IHRMTheme
-import com.example.ihrm.ui.common.header.DashboardHomeTab
-import com.example.ihrm.ui.common.header.DashboardHomeTabSubtitle
-import com.example.ihrm.ui.common.header.DashboardHomeTabSwitcher
-import com.example.ihrm.ui.common.header.DashboardHomeTopBar
 import com.example.ihrm.util.AuthManager
 import com.example.ihrm.ui.localization.tr
 
@@ -49,13 +50,68 @@ fun DashboardScreen(
     onProfileClick: () -> Unit,
     onBellClick: () -> Unit = onProfileClick,
     onCalendarManagement: () -> Unit,
+    onViewStats: () -> Unit,
+    viewmodel: DashboardViewModel = hiltViewModel()
+) {
+    BaseHRMCompose(
+        content = {
+            DashboardScreenContent(
+                onMenuClick = onMenuClick,
+                onProfileClick = onProfileClick,
+                onBellClick = onBellClick,
+                onCalendarManagement = onCalendarManagement,
+                onViewStats = onViewStats,
+                viewmodel = viewmodel
+            )
+        },
+        onErrorAlertClose = onMenuClick,
+        viewmodel = viewmodel
+    )
+}
+
+@Composable
+fun DashboardScreenContent(
+    viewmodel: DashboardViewModel,
+    onMenuClick: () -> Unit,
+    onProfileClick: () -> Unit,
+    onBellClick: () -> Unit = onProfileClick,
+    onCalendarManagement: () -> Unit,
     onViewStats: () -> Unit
 ) {
     val mock = DashboardMockData.rememberHomeModel()
+    val meEmployeeInfo by viewmodel.meEmployeeInfo.collectAsStateWithLifecycle()
+    val homeModel = remember(mock, meEmployeeInfo) {
+        val me = meEmployeeInfo
+        if (me == null) {
+            mock
+        } else {
+            mock.copy(
+                profile = mapMeEmployeeToDashboardProfile(
+                    me,
+                    mock.profile,
+                    AuthManager.getUserFullName(),
+                    AuthManager.getUserEmail(),
+                    AuthManager.getUserEmployeeId(),
+                    AuthManager.getUserPhone()
+                )
+            )
+        }
+    }
     val accountType = AuthManager.getAccountType()
     val role = remember(accountType) { accountType.toDashboardRole() }
-    val personalUi = remember(mock) { buildPersonalRoleUi(mock) }
-    val extraUi = remember(mock) { buildExtraRoleUi(mock) }
+    val securityCard by viewmodel.dashboardSecurityCardState.collectAsStateWithLifecycle()
+    val personalUi = remember(homeModel, securityCard) {
+        buildPersonalRoleUi(homeModel).copy(
+            securityMonthly = securityCard.monthly,
+            securityBanner = securityCard.banner
+        )
+    }
+    val extraUi = remember(homeModel, securityCard) {
+        buildExtraRoleUi(homeModel).copy(
+            securityMonthly = securityCard.monthly,
+            securityBanner = securityCard.banner
+        )
+    }
     var selectedTab by remember { mutableStateOf(DashboardHomeTab.Personal) }
 
     Scaffold(
@@ -117,7 +173,8 @@ fun DashboardScreen(
                                     personalUi = DashboardPersonalRoleUi(
                                         profile = extraUi.profile,
                                         leaveStats = extraUi.leaveStats,
-                                        securityMonthly = extraUi.securityMonthly
+                                        securityMonthly = extraUi.securityMonthly,
+                                        securityBanner = extraUi.securityBanner
                                     )
                                 )
                             }
@@ -158,7 +215,8 @@ private fun DashboardExtraRoleSection(
         DashboardLeaveSection(stats = personalUi.leaveStats)
         DashboardSecurityCardManagement(
             monthly = personalUi.securityMonthly,
-            profile = personalUi.profile
+            profile = personalUi.profile,
+            banner = personalUi.securityBanner
         )
     }
 }
@@ -178,7 +236,8 @@ private fun DashboardPersonalRoleSection(
         DashboardLeaveSection(stats = personalUi.leaveStats)
         DashboardSecurityCardPersonal(
             monthly = personalUi.securityMonthly,
-            profile = personalUi.profile
+            profile = personalUi.profile,
+            banner = personalUi.securityBanner
         )
     }
 }

@@ -1,9 +1,14 @@
 package com.example.ihrm.ui.dashboard
 
+import android.content.Context
 import android.os.Build
 import androidx.lifecycle.viewModelScope
+import com.example.ihrm.R
+import com.example.ihrm.core.errorHandler.CommonErrorException
 import com.example.ihrm.core.viewmodel.BaseViewmodel
 import com.example.ihrm.core.viewmodel.CallbackWrapper
+import com.example.ihrm.data.remote.base.NetworkResult
+import com.example.ihrm.data.remote.dto.MeEmployeeResponse
 import com.example.ihrm.data.remote.dto.UserMetaResponseDto
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.model.Level
@@ -13,13 +18,17 @@ import com.example.ihrm.domain.usecase.employees.GetEmployeesUseCase
 import com.example.ihrm.domain.usecase.employees.GetLevelByEmployeeIdUseCase
 import com.example.ihrm.domain.usecase.employees.GetMeEmployeeInfoUseCase
 import com.example.ihrm.domain.usecase.employees.SyncEmployeesUseCase
+import com.example.ihrm.util.Constants.DEFAULT_LIMIT
+import com.example.ihrm.util.Constants.DEFAULT_PAGE
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.merge
@@ -30,6 +39,7 @@ import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.time.Year
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -59,7 +69,8 @@ class DashboardViewModel @Inject constructor(
     private val getLevelByEmployeeIdUseCase: GetLevelByEmployeeIdUseCase,
     private val getMeEmployeeInfoUseCase: GetMeEmployeeInfoUseCase,
     private val getEmployeesMetaUseCase: GetEmployeesMetaUseCase,
-    private val deleteEmployeeUseCase: DeleteEmployeeUseCase
+    private val deleteEmployeeUseCase: DeleteEmployeeUseCase,
+    @ApplicationContext private val appContext: Context,
 ) : BaseViewmodel() {
 
     private val _uiState = MutableStateFlow(DashboardUiState())
@@ -76,6 +87,23 @@ class DashboardViewModel @Inject constructor(
     /** Gộp 2 flow lỗi để combine tối đa 5 flow (combine không có overload 6 tham số). */
     private val syncErrorState = combine(syncError, syncErrorUnauthorized) { err, unauth -> err to unauth }
 
+    private val _meEmployeeInfo = MutableStateFlow<MeEmployeeResponse?>(null)
+
+    /** Current user employee info from GET /me/employee-info; null until loaded or on failure. */
+    val meEmployeeInfo: StateFlow<MeEmployeeResponse?> = _meEmployeeInfo.asStateFlow()
+
+    private val _securityCardState = MutableStateFlow(
+        buildDashboardSecurityCardState(
+            counts = SecuritySubmissionCounts(0, 0, 0, 0, 0),
+            isLoading = true,
+            errorMessage = null
+        )
+    )
+
+    /** Security submissions + banner copy for dashboard cards (Personal + Extra). */
+    val dashboardSecurityCardState: StateFlow<DashboardSecurityCardState> =
+        _securityCardState.asStateFlow()
+
     private val employeesFlow = getEmployeesUseCase()
 
     /** Emit when returning to Dashboard to force reload from DB (e.g. after updating employee in detail). */
@@ -91,6 +119,14 @@ class DashboardViewModel @Inject constructor(
         updateGreetingAndDate()
         loadEmployees()
         loadLevelCodesWhenEmployeesChange()
+        loadMeEmployeeInfo()
+        loadDashboardSecuritySubmissions()
+    }
+
+    private fun loadMeEmployeeInfo() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _meEmployeeInfo.value = getMeEmployeeInfoUseCase().getOrNull()
+        }
     }
 
     private fun loadEmployees() {
@@ -231,19 +267,11 @@ class DashboardViewModel @Inject constructor(
     }
 
     private fun getTodayDate(): String {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val formatter = DateTimeFormatter.ofPattern(
-                "EEEE, dd MMM yyyy",
-                Locale.getDefault()
-            )
-            LocalDate.now().format(formatter)
-        } else {
-            val formatter = SimpleDateFormat(
-                "EEEE, dd MMM yyyy",
-                Locale.getDefault()
-            )
-            formatter.format(Date())
-        }
+        val formatter = DateTimeFormatter.ofPattern(
+            "EEEE, dd MMM yyyy",
+            Locale.getDefault()
+        )
+        return LocalDate.now().format(formatter)
     }
 
     fun clearError() {
@@ -271,6 +299,65 @@ class DashboardViewModel @Inject constructor(
     private fun filterEmployees(employees: List<Employee>, query: String): List<Employee> {
         return filterEmployeesByQuery(employees, query)
     }
+
+    /**
+     * Loads self security submissions for [year] and updates [dashboardSecurityCardState]
+     * (monthly counts + banner title/subtitle per iOS rules).
+     */
+    fun loadDashboardSecuritySubmissions(
+        year: Int? = null,
+        page: Int = DEFAULT_PAGE,
+        limit: Int = DEFAULT_LIMIT,
+        orderBy: String? = null,
+        sortBy: String? = null,
+        status: String? = null,
+    ) {
+        val y = year ?: Year.now().value
+        viewModelScope.launch(Dispatchers.IO) {
+            _securityCardState.value = _securityCardState.value.copy(isLoading = true)
+            when (
+                val result = getMeEmployeeInfoUseCase.getMySecurityCheck(
+                    year = y,
+                    page = page,
+                    limit = limit,
+                    orderBy = orderBy,
+                    sortBy = sortBy,
+                    status = status
+                )
+            ) {
+                is NetworkResult.Success -> {
+                    val counts = aggregateSecuritySubmissions(result.data)
+                    _securityCardState.value = buildDashboardSecurityCardState(
+                        counts = counts,
+                        isLoading = false,
+                        errorMessage = null
+                    )
+                }
+
+                is NetworkResult.Failure -> {
+                    _securityCardState.value = buildDashboardSecurityCardState(
+                        counts = SecuritySubmissionCounts(0, 0, 0, 0, 0),
+                        isLoading = false,
+                        errorMessage = securityErrorDisplayMessage(result.error)
+                    )
+                }
+
+                is NetworkResult.Exception -> {
+                    _securityCardState.value = buildDashboardSecurityCardState(
+                        counts = SecuritySubmissionCounts(0, 0, 0, 0, 0),
+                        isLoading = false,
+                        errorMessage = securityErrorDisplayMessage(result.e)
+                    )
+                }
+            }
+        }
+    }
+
+    private fun securityErrorDisplayMessage(e: CommonErrorException): String =
+        e.errorMsg?.takeIf { it.isNotBlank() }
+            ?: e.message?.takeIf { !it.isNullOrBlank() }
+            ?: e.errorKey.takeIf { it.isNotBlank() }
+            ?: appContext.getString(R.string.dashboard_security_error_fallback)
 }
 
 /**

@@ -9,6 +9,7 @@ import com.example.ihrm.data.remote.dto.UserResponseDto
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.model.Level
 import java.text.SimpleDateFormat
+import java.time.Instant
 import java.util.Locale
 import java.util.TimeZone
 
@@ -33,11 +34,18 @@ private val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.
 private fun parseIsoToLong(iso: String?): Long {
     if (iso.isNullOrBlank()) return System.currentTimeMillis()
     return try {
-        isoFormat.parse(iso)?.time ?: System.currentTimeMillis()
+        Instant.parse(iso).toEpochMilli()
     } catch (_: Exception) {
-        System.currentTimeMillis()
+        try {
+            isoFormat.parse(iso)?.time ?: System.currentTimeMillis()
+        } catch (_: Exception) {
+            System.currentTimeMillis()
+        }
     }
 }
+
+/** Serialize local epoch ms for outbound [EmployeeDto] (GET responses use ISO strings). */
+fun Long.toIso8601UtcString(): String = Instant.ofEpochMilli(this).toString()
 
 /** Level id for lookup via GET /levels/{id}; no mapping to code here, UI will call API. */
 private fun UserResponseDto.resolveLevelId(): Int? = levelId ?: level?.id
@@ -110,8 +118,8 @@ fun EmployeeDto.toEmployeeEntity(): EmployeeEntity {
         gender = gender,
         personalId = personalId,
         idIssueDate = idIssueDate,
-        createdAt = createdAt ?: System.currentTimeMillis(),
-        updatedAt = updatedAt ?: System.currentTimeMillis()
+        createdAt = parseIsoToLong(createdAt),
+        updatedAt = parseIsoToLong(updatedAt)
     )
 }
 
@@ -132,8 +140,8 @@ fun EmployeeDto.toEmployee(): Employee {
         gender = gender,
         personalId = personalId,
         idIssueDate = idIssueDate,
-        createdAt = createdAt ?: System.currentTimeMillis(),
-        updatedAt = updatedAt ?: System.currentTimeMillis()
+        createdAt = parseIsoToLong(createdAt),
+        updatedAt = parseIsoToLong(updatedAt)
     )
 }
 

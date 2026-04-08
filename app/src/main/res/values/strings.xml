@@ -88,7 +88,7 @@
     <string name="dashboard_profile_email_label">Email Address</string>
     <string name="dashboard_profile_phone_label">Phone Number</string>
     <string name="dashboard_profile_joined_label">Joined</string>
-    <string name="dashboard_profile_department_label">Role</string>
+    <string name="dashboard_profile_department_label">Level</string>
     <string name="dashboard_leave_section_title">Leave Management</string>
     <string name="dashboard_leave_total_title">Total Allowance</string>
     <string name="dashboard_leave_total_desc">Annual leave days granted for current year</string>
@@ -108,6 +108,16 @@
     <string name="dashboard_security_approved">Approved</string>
     <string name="dashboard_security_rechecking">Re-checking</string>
     <string name="dashboard_security_rejected">Rejected</string>
+    <string name="dashboard_security_banner_error_title">Unable to load</string>
+    <string name="dashboard_security_banner_review_title">Submission in review</string>
+    <string name="dashboard_security_banner_action_title">Action required</string>
+    <string name="dashboard_security_banner_empty_title">No submissions yet</string>
+    <string name="dashboard_security_banner_all_good_title">All caught up</string>
+    <string name="dashboard_security_banner_review_subtitle">Your security check is being reviewed. Please wait for the approval status.</string>
+    <string name="dashboard_security_banner_rejected_subtitle">Review rejected items and resubmit if needed.</string>
+    <string name="dashboard_security_banner_empty_subtitle">You have no security check submissions for this year.</string>
+    <string name="dashboard_security_banner_default_subtitle">Latest status is reflected below.</string>
+    <string name="dashboard_security_error_fallback">Couldn\'t load security data. Try again later.</string>
     <string name="dashboard_management_section_title">Team overview</string>
     <string name="dashboard_management_section_body">Review employees, add new hires, and open the full directory.</string>
     <string name="dashboard_management_team_title">Team members</string>

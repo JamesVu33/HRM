@@ -98,9 +98,9 @@ class SecurityChecksViewModel @Inject constructor(
                             pagination = data.meta,
                             isLoading = false,
                             errorMessage = null,
-                            approvedCount = data.listStats[0].count?:0,
-                            submittedCount = data.listStats[1].count?:0,
-                            rejectedCount = data.listStats[2].count?:0,
+                            approvedCount = 0,
+                            submittedCount = 0,
+                            rejectedCount = 0,
                         )
                     }
                 }

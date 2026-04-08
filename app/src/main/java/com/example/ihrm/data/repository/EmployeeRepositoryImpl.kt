@@ -9,6 +9,7 @@ import com.example.ihrm.data.remote.base.NetworkResult
 import com.example.ihrm.data.remote.dto.UserMetaResponseDto
 import com.example.ihrm.data.remote.mapper.toEmployee
 import com.example.ihrm.data.remote.mapper.toEmployeeEntity
+import com.example.ihrm.data.remote.mapper.toIso8601UtcString
 import com.example.ihrm.data.remote.mapper.toLevel
 import com.example.ihrm.di.NetworkModule
 import com.example.ihrm.domain.model.Employee
@@ -51,8 +52,8 @@ class EmployeeRepositoryImpl @Inject constructor(
             gender = employee.gender,
             personalId = employee.personalId,
             idIssueDate = employee.idIssueDate,
-            createdAt = employee.createdAt,
-            updatedAt = employee.updatedAt
+            createdAt = employee.createdAt.toIso8601UtcString(),
+            updatedAt = employee.updatedAt.toIso8601UtcString()
         )
         val result = safeApiCall(retrofit) { apiService.createEmployee(dto) }
         if (result is NetworkResult.Success) {
@@ -77,8 +78,8 @@ class EmployeeRepositoryImpl @Inject constructor(
             gender = employee.gender,
             personalId = employee.personalId,
             idIssueDate = employee.idIssueDate,
-            createdAt = employee.createdAt,
-            updatedAt = employee.updatedAt
+            createdAt = employee.createdAt.toIso8601UtcString(),
+            updatedAt = employee.updatedAt.toIso8601UtcString()
         )
         val result = safeApiCall(retrofit) { apiService.updateEmployee(employee.id, dto) }
         if (result is NetworkResult.Success) {

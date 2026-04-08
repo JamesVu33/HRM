@@ -89,7 +89,7 @@
     <string name="dashboard_profile_email_label">Email</string>
     <string name="dashboard_profile_phone_label">Số điện thoại</string>
     <string name="dashboard_profile_joined_label">Ngày vào</string>
-    <string name="dashboard_profile_department_label">Vai trò</string>
+    <string name="dashboard_profile_department_label">Trình độ</string>
     <string name="dashboard_leave_section_title">Quản lý nghỉ phép</string>
     <string name="dashboard_leave_total_title">Tổng phép</string>
     <string name="dashboard_leave_total_desc">Số ngày phép năm được cấp trong năm hiện tại</string>
@@ -109,6 +109,16 @@
     <string name="dashboard_security_approved">Đã duyệt</string>
     <string name="dashboard_security_rechecking">Kiểm tra lại</string>
     <string name="dashboard_security_rejected">Từ chối</string>
+    <string name="dashboard_security_banner_error_title">Không tải được</string>
+    <string name="dashboard_security_banner_review_title">Bản gửi đang xem xét</string>
+    <string name="dashboard_security_banner_action_title">Cần xử lý</string>
+    <string name="dashboard_security_banner_empty_title">Chưa có bản gửi</string>
+    <string name="dashboard_security_banner_all_good_title">Đã cập nhật</string>
+    <string name="dashboard_security_banner_review_subtitle">Bản kiểm tra an ninh của bạn đang được xem xét. Vui lòng chờ trạng thái phê duyệt.</string>
+    <string name="dashboard_security_banner_rejected_subtitle">Xem các mục bị từ chối và gửi lại nếu cần.</string>
+    <string name="dashboard_security_banner_empty_subtitle">Bạn chưa có bản gửi kiểm tra an ninh trong năm này.</string>
+    <string name="dashboard_security_banner_default_subtitle">Trạng thái mới nhất được hiển thị bên dưới.</string>
+    <string name="dashboard_security_error_fallback">Không tải được dữ liệu bảo mật. Vui lòng thử lại sau.</string>
     <string name="dashboard_management_section_title">Tổng quan nhóm</string>
     <string name="dashboard_management_section_body">Xem nhân viên, thêm người mới và mở danh bạ đầy đủ.</string>
     <string name="dashboard_management_team_title">Thành viên nhóm</string>

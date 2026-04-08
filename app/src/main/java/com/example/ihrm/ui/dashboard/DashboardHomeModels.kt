@@ -38,6 +38,20 @@ data class SecurityMonthlyModel(
     val rejected: Int
 )
 
+/** Banner copy for security cards (aligned with iOS dashboard security banner). */
+data class DashboardSecurityBannerModel(
+    @StringRes val titleRes: Int,
+    @StringRes val subtitleRes: Int,
+    /** When set (e.g. API error), shown instead of [subtitleRes]. */
+    val subtitleOverride: String? = null
+)
+
+data class DashboardSecurityCardState(
+    val isLoading: Boolean,
+    val monthly: SecurityMonthlyModel,
+    val banner: DashboardSecurityBannerModel
+)
+
 data class DashboardHomeMockModel(
     val profile: DashboardProfileModel,
     val leaveStats: List<LeaveStatModel>,

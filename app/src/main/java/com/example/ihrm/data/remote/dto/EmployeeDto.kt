@@ -33,8 +33,9 @@ data class EmployeeDto(
     val levelId: Int? = null,
     @SerializedName("level")
     val level: LevelShortDto? = null,
+    /** ISO-8601 from API (e.g. `2026-04-01T02:26:02.728Z`); not a Unix ms number. */
     @SerializedName("createdAt")
-    val createdAt: Long?,
+    val createdAt: String? = null,
     @SerializedName("updatedAt")
-    val updatedAt: Long?
+    val updatedAt: String? = null
 )
