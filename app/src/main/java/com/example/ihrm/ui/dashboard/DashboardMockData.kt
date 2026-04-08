@@ -5,6 +5,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import com.example.ihrm.R
 import com.example.ihrm.domain.model.Employee
+import com.example.ihrm.ui.localization.tr
 
 /**
  * Mock dashboard payload aligned with Figma HRM dashboard (Personal + Management).
@@ -13,12 +14,12 @@ object DashboardMockData {
 
     @Composable
     fun rememberHomeModel(): DashboardHomeMockModel {
-        val name = stringResource(R.string.dashboard_mock_profile_name)
-        val id = stringResource(R.string.dashboard_mock_profile_id)
-        val dept = stringResource(R.string.dashboard_mock_department)
-        val email = stringResource(R.string.dashboard_mock_email)
-        val phone = stringResource(R.string.dashboard_mock_phone)
-        val joined = stringResource(R.string.dashboard_mock_joined)
+        val name = tr(R.string.dashboard_mock_profile_name)
+        val id = tr(R.string.dashboard_mock_profile_id)
+        val dept = tr(R.string.dashboard_mock_department)
+        val email = tr(R.string.dashboard_mock_email)
+        val phone = tr(R.string.dashboard_mock_phone)
+        val joined = tr(R.string.dashboard_mock_joined)
         return remember(name, id, dept, email, phone, joined) {
             DashboardHomeMockModel(
                 profile = DashboardProfileModel(

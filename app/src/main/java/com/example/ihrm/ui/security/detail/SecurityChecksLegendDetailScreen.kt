@@ -81,6 +81,7 @@ import com.example.ihrm.util.DashboardBrush
 import com.example.ihrm.util.LabelTextStyle13SemiBold
 import com.example.ihrm.util.SecurityLegendMeta
 import com.example.ihrm.util.legendByKey
+import com.example.ihrm.ui.localization.tr
 
 private val SecurityDetailHeaderBrush = DashboardBrush.BaseBackground
 private val AccordionCardBg = Color(0xFFABF5D1)
@@ -148,7 +149,7 @@ fun SecurityChecksLegendDetailContent(
                     .padding(horizontal = 16.dp)
                     .padding(paddingValues)
                     .statusBarsPadding(),
-                title = stringResource(R.string.security_checks_title),
+                title = tr(R.string.security_checks_title),
                 showNavigationIcon = true,
                 onNavigationClick = onBackClick,
                 navigationIcon = {
@@ -177,7 +178,7 @@ fun SecurityChecksLegendDetailContent(
                                 .padding(vertical = 10.dp, horizontal = 16.dp)
                         ) {
                             Text(
-                                text = stringResource(R.string.security_checks_detail_section_title),
+                                text = tr(R.string.security_checks_detail_section_title),
                                 color = Color(0xFF0747A6),
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.SemiBold,
@@ -334,7 +335,7 @@ private fun CardSecurityDetail(
             if (status != SecurityStatus.SUBMITTED) {
                 Text(
                     text = buildAnnotatedString {
-                        append(stringResource(status.labelRes))
+                        append(tr(status.labelRes))
                         append(" ")
                         withStyle(
                             style = SpanStyle(
@@ -359,7 +360,7 @@ private fun CardSecurityDetail(
         }
         Text(
             text = buildAnnotatedString {
-                append(stringResource(R.string.security_checks_submitted_date))
+                append(tr(R.string.security_checks_submitted_date))
                 append(" ")
                 withStyle(
                     style = SpanStyle(
@@ -399,10 +400,10 @@ private fun ExpandableText(
 ) {
     if (text.isEmpty()) return
 
-    val reasonPrefix = stringResource(R.string.security_checks_rejection_reason_prefix)
-    val seeMoreText = stringResource(R.string.security_checks_reason_see_more)
+    val reasonPrefix = tr(R.string.security_checks_rejection_reason_prefix)
+    val seeMoreText = tr(R.string.security_checks_reason_see_more)
     val seeMoreWithLeadingSpace = " $seeMoreText"
-    val reasonTitle = stringResource(R.string.security_checks_rejection_reason_title)
+    val reasonTitle = tr(R.string.security_checks_rejection_reason_title)
 
     var isOverflowing by remember(text) { mutableStateOf(false) }
     var lastCharIndex by remember(text) { mutableIntStateOf(0) }
@@ -528,7 +529,7 @@ private fun ExpandableText(
                         IconButton(onClick = { showBottomSheet = false }) {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = stringResource(R.string.coming_soon_close),
+                                contentDescription = tr(R.string.coming_soon_close),
                                 tint = Color.Black
                             )
                         }

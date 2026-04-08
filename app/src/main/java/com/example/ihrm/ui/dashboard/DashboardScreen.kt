@@ -41,6 +41,7 @@ import com.example.ihrm.ui.common.header.DashboardHomeTabSubtitle
 import com.example.ihrm.ui.common.header.DashboardHomeTabSwitcher
 import com.example.ihrm.ui.common.header.DashboardHomeTopBar
 import com.example.ihrm.util.AuthManager
+import com.example.ihrm.ui.localization.tr
 
 @Composable
 fun DashboardScreen(
@@ -67,8 +68,8 @@ fun DashboardScreen(
                 modifier = Modifier.fillMaxWidth().statusBarsPadding()
             ){
                 DashboardHomeTopBar(
-                    greeting = stringResource(R.string.dashboard_good_morning),
-                    dateText = stringResource(R.string.dashboard_mock_date),
+                    greeting = tr(R.string.dashboard_good_morning),
+                    dateText = tr(R.string.dashboard_mock_date),
                     onMenuClick = onMenuClick,
                     onBellClick = onBellClick,
                     showBellBadge = true

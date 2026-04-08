@@ -33,7 +33,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
@@ -51,6 +50,7 @@ import com.example.ihrm.ui.theme.Neutral500
 import com.example.ihrm.ui.theme.Neutral700
 import com.example.ihrm.ui.theme.Neutral50
 import com.example.ihrm.util.singleClick
+import com.example.ihrm.ui.localization.tr
 
 private val LanguageRadioBorderUnselected = Color(0xFFd1d5db)
 
@@ -102,8 +102,8 @@ fun ChangeLanguageDialog(
                 languageRows.forEachIndexed { index, row ->
                     if (index > 0) Spacer(modifier = Modifier.height(12.dp))
                     LanguageOptionRow(
-                        title = stringResource(row.titleRes),
-                        subtitle = stringResource(row.subtitleRes),
+                        title = tr(row.titleRes),
+                        subtitle = tr(row.subtitleRes),
                         selected = selectedCode == row.code,
                         onClick = { selectedCode = row.code }
                     )
@@ -119,7 +119,7 @@ fun ChangeLanguageDialog(
 
 @Composable
 private fun ChangeLanguageHeader(onDismiss: () -> Unit) {
-    val closeCd = stringResource(R.string.change_language_cd_close)
+    val closeCd = tr(R.string.change_language_cd_close)
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -142,7 +142,7 @@ private fun ChangeLanguageHeader(onDismiss: () -> Unit) {
                 .padding(end = 48.dp)
         ) {
             Text(
-                text = stringResource(R.string.change_language_title),
+                text = tr(R.string.change_language_title),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
@@ -151,7 +151,7 @@ private fun ChangeLanguageHeader(onDismiss: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = stringResource(R.string.change_language_subtitle),
+                text = tr(R.string.change_language_subtitle),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Normal,
                 color = Color.White.copy(alpha = 0.8f),
@@ -191,7 +191,7 @@ private fun ChangeLanguageSectionLabel() {
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = stringResource(R.string.change_language_section_label),
+            text = tr(R.string.change_language_section_label),
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
             color = Neutral500,
@@ -210,7 +210,7 @@ private fun LanguageOptionRow(
 ) {
     val primary = if (selected) DrawerItemSelected else Neutral700
     val secondary = if (selected) DrawerItemSelected else Neutral500
-    val rowCd = stringResource(R.string.change_language_option_cd, title)
+    val rowCd = tr(R.string.change_language_option_cd, title)
     val bgBrush = if (selected) {
         Brush.linearGradient(
             colors = listOf(
@@ -311,7 +311,7 @@ private fun SaveLanguageButton(onClick: () -> Unit) {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = stringResource(R.string.change_language_save),
+            text = tr(R.string.change_language_save),
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
             color = Color.White,

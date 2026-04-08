@@ -94,6 +94,7 @@ import com.example.ihrm.ui.theme.Primary50
 import com.example.ihrm.ui.theme.Primary500
 import com.example.ihrm.ui.theme.SurfaceBorder
 import com.example.ihrm.util.DashboardBrush
+import com.example.ihrm.ui.localization.tr
 
 private val FormInputBg = Color(0xFFF9FAFB)
 private val Neutral200 = Color(0xFFe5e7eb)
@@ -114,7 +115,7 @@ fun EmployeeDetailScreen(
         viewModel.loadEmployee(employeeId)
     }
 
-    val successMessage = stringResource(R.string.employee_info_update_success)
+    val successMessage = tr(R.string.employee_info_update_success)
     LaunchedEffect(uiState.updateSuccess) {
         if (uiState.updateSuccess) {
             snackbarHostState.showSnackbar(
@@ -133,7 +134,7 @@ fun EmployeeDetailScreen(
         topBar = {
             BaseHeader(
                 modifier = Modifier.statusBarsPadding(),
-                title = stringResource(R.string.employee_detail_title),
+                title = tr(R.string.employee_detail_title),
                 showNavigationIcon = true,
                 onNavigationClick = onBackClick,
                 containerColor = Color.Transparent
@@ -164,7 +165,7 @@ fun EmployeeDetailScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = stringResource(
+                            text = tr(
                                 R.string.employee_detail_error_format,
                                 uiState.error!!
                             )
@@ -179,7 +180,7 @@ fun EmployeeDetailScreen(
                             .padding(16.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text = stringResource(R.string.employee_detail_not_found))
+                        Text(text = tr(R.string.employee_detail_not_found))
                     }
                 }
 
@@ -207,9 +208,9 @@ private fun EmployeeDetailContent(
 ) {
     var selectedTabIndex by remember { mutableStateOf(0) }
     val tabs = listOf(
-        stringResource(R.string.employee_detail_tab_basic_info),
-        stringResource(R.string.employee_detail_tab_employee_info),
-        stringResource(R.string.employee_detail_tab_emergency_contact)
+        tr(R.string.employee_detail_tab_basic_info),
+        tr(R.string.employee_detail_tab_employee_info),
+        tr(R.string.employee_detail_tab_emergency_contact)
     )
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -243,7 +244,7 @@ private fun EmployeeDetailContent(
                     color = Color.White
                 )
                 Text(
-                    text = stringResource(
+                    text = tr(
                         R.string.employee_detail_subtitle_format,
                         employee.position ?: "",
                         employee.id
@@ -335,7 +336,7 @@ private fun BasicInfoSection(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = stringResource(R.string.employee_detail_personal_info),
+            text = tr(R.string.employee_detail_personal_info),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = Neutral700
@@ -374,7 +375,7 @@ private fun BasicInfoSection(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = if (isEditing) stringResource(R.string.employee_detail_save) else stringResource(
+                text = if (isEditing) tr(R.string.employee_detail_save) else tr(
                     R.string.employee_detail_change_info
                 ),
                 fontSize = 14.sp,
@@ -417,42 +418,42 @@ private fun BasicInfoSection(
                 )
             } else {
                 DetailField(
-                    label = stringResource(R.string.employee_detail_full_name),
+                    label = tr(R.string.employee_detail_full_name),
                     value = employee.name,
                     icon = Icons.Default.Person
                 )
                 DetailField(
-                    label = stringResource(R.string.employee_detail_english_name),
+                    label = tr(R.string.employee_detail_english_name),
                     value = employee.englishName ?: "—",
                     icon = Icons.Default.Person
                 )
                 DetailField(
-                    label = stringResource(R.string.employee_detail_gender),
+                    label = tr(R.string.employee_detail_gender),
                     value = employee.gender ?: "—",
                     icon = Icons.Default.Person
                 )
                 DetailField(
-                    label = stringResource(R.string.employee_detail_email_address),
+                    label = tr(R.string.employee_detail_email_address),
                     value = employee.email,
                     icon = Icons.Default.Email
                 )
                 DetailField(
-                    label = stringResource(R.string.employee_detail_contact_number),
+                    label = tr(R.string.employee_detail_contact_number),
                     value = employee.phone,
                     icon = Icons.Default.Phone
                 )
                 DetailField(
-                    label = stringResource(R.string.employee_detail_personal_id),
+                    label = tr(R.string.employee_detail_personal_id),
                     value = employee.personalId ?: "—",
                     icon = Icons.Default.Person
                 )
                 DetailField(
-                    label = stringResource(R.string.employee_detail_id_issue_date),
+                    label = tr(R.string.employee_detail_id_issue_date),
                     value = employee.idIssueDate ?: "—",
                     icon = Icons.Default.Person
                 )
                 DetailField(
-                    label = stringResource(R.string.employee_detail_permanent_address),
+                    label = tr(R.string.employee_detail_permanent_address),
                     value = employee.address ?: "—",
                     icon = Icons.Default.LocationOn,
                     showDivider = false
@@ -485,13 +486,13 @@ private fun BasicInfoEditFields(
     onAddressChange: (String) -> Unit
 ) {
     DetailEditField(
-        label = stringResource(R.string.employee_detail_full_name),
+        label = tr(R.string.employee_detail_full_name),
         value = fullName,
         onValueChange = onFullNameChange,
         icon = Icons.Default.Person
     )
     DetailEditField(
-        label = stringResource(R.string.employee_detail_english_name),
+        label = tr(R.string.employee_detail_english_name),
         value = englishName,
         onValueChange = onEnglishNameChange,
         icon = Icons.Default.Person
@@ -508,7 +509,7 @@ private fun BasicInfoEditFields(
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = stringResource(R.string.employee_detail_gender).uppercase(),
+            text = tr(R.string.employee_detail_gender).uppercase(),
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
             color = Neutral500
@@ -548,33 +549,33 @@ private fun BasicInfoEditFields(
     }
     Spacer(modifier = Modifier.height(16.dp))
     DetailEditField(
-        label = stringResource(R.string.employee_detail_email_address),
+        label = tr(R.string.employee_detail_email_address),
         value = email,
         onValueChange = onEmailChange,
         icon = Icons.Default.Email,
         keyboardType = KeyboardType.Email
     )
     DetailEditField(
-        label = stringResource(R.string.employee_detail_contact_number),
+        label = tr(R.string.employee_detail_contact_number),
         value = phone,
         onValueChange = onPhoneChange,
         icon = Icons.Default.Phone,
         keyboardType = KeyboardType.Phone
     )
     DetailEditField(
-        label = stringResource(R.string.employee_detail_personal_id),
+        label = tr(R.string.employee_detail_personal_id),
         value = personalId,
         onValueChange = onPersonalIdChange,
         icon = Icons.Default.Person
     )
     DetailEditField(
-        label = stringResource(R.string.employee_detail_id_issue_date),
+        label = tr(R.string.employee_detail_id_issue_date),
         value = idIssueDate,
         onValueChange = onIdIssueDateChange,
         icon = Icons.Default.Person
     )
     DetailEditField(
-        label = stringResource(R.string.employee_detail_permanent_address),
+        label = tr(R.string.employee_detail_permanent_address),
         value = address,
         onValueChange = onAddressChange,
         icon = Icons.Default.LocationOn,
@@ -733,10 +734,10 @@ private fun EmployeeInfoDatePickerContent(
                 horizontalArrangement = Arrangement.End
             ) {
                 TextButton(onClick = onDismiss) {
-                    Text(stringResource(android.R.string.cancel), color = Neutral500)
+                    Text(tr(android.R.string.cancel), color = Neutral500)
                 }
                 TextButton(onClick = onConfirm) {
-                    Text(stringResource(android.R.string.ok), color = Primary400)
+                    Text(tr(android.R.string.ok), color = Primary400)
                 }
             }
         }
@@ -748,37 +749,37 @@ private fun EmployeeInfoSection(
     employee: Employee,
     onSave: (Employee) -> Unit
 ) {
-    val role1Str = stringResource(R.string.employee_info_role1)
-    val role2Str = stringResource(R.string.employee_info_role2)
-    val jobDeveloperStr = stringResource(R.string.employee_info_job_developer)
-    val levelJ1Str = stringResource(R.string.employee_info_level_j1)
-    val statusWorkingStr = stringResource(R.string.employee_info_status_working)
-    val contractFullStr = stringResource(R.string.employee_info_contract_full)
+    val role1Str = tr(R.string.employee_info_role1)
+    val role2Str = tr(R.string.employee_info_role2)
+    val jobDeveloperStr = tr(R.string.employee_info_job_developer)
+    val levelJ1Str = tr(R.string.employee_info_level_j1)
+    val statusWorkingStr = tr(R.string.employee_info_status_working)
+    val contractFullStr = tr(R.string.employee_info_contract_full)
     val jobTitleOptionsStr = listOf(
-        stringResource(R.string.employee_info_job_accounting),
-        stringResource(R.string.employee_info_job_ga),
-        stringResource(R.string.employee_info_job_hr),
-        stringResource(R.string.employee_info_job_contract),
-        stringResource(R.string.employee_info_job_developer)
+        tr(R.string.employee_info_job_accounting),
+        tr(R.string.employee_info_job_ga),
+        tr(R.string.employee_info_job_hr),
+        tr(R.string.employee_info_job_contract),
+        tr(R.string.employee_info_job_developer)
     )
     val levelOptionsStr = listOf(
-        stringResource(R.string.employee_info_level_j1),
-        stringResource(R.string.employee_info_level_j2),
-        stringResource(R.string.employee_info_level_s1),
-        stringResource(R.string.employee_info_level_s2),
-        stringResource(R.string.employee_info_level_m1),
-        stringResource(R.string.employee_info_level_m2),
-        stringResource(R.string.employee_info_level_m3),
-        stringResource(R.string.employee_info_level_d1),
-        stringResource(R.string.employee_info_level_d2)
+        tr(R.string.employee_info_level_j1),
+        tr(R.string.employee_info_level_j2),
+        tr(R.string.employee_info_level_s1),
+        tr(R.string.employee_info_level_s2),
+        tr(R.string.employee_info_level_m1),
+        tr(R.string.employee_info_level_m2),
+        tr(R.string.employee_info_level_m3),
+        tr(R.string.employee_info_level_d1),
+        tr(R.string.employee_info_level_d2)
     )
     val contractOptionsStr = listOf(
-        stringResource(R.string.employee_info_contract_full),
-        stringResource(R.string.employee_info_contract_part),
-        stringResource(R.string.employee_info_contract_contract),
-        stringResource(R.string.employee_info_contract_internship)
+        tr(R.string.employee_info_contract_full),
+        tr(R.string.employee_info_contract_part),
+        tr(R.string.employee_info_contract_contract),
+        tr(R.string.employee_info_contract_internship)
     )
-    val statusOtherStr = stringResource(R.string.employee_info_status_other)
+    val statusOtherStr = tr(R.string.employee_info_status_other)
 
     var role by remember(role1Str) { mutableStateOf(role1Str) }
     var jobTitle by remember(jobDeveloperStr) { mutableStateOf(jobDeveloperStr) }
@@ -810,7 +811,7 @@ private fun EmployeeInfoSection(
             .padding(horizontal = SectionPaddingHorizontal)
     ) {
         Text(
-            text = stringResource(R.string.employee_info_employment_title),
+            text = tr(R.string.employee_info_employment_title),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = Neutral700
@@ -829,36 +830,36 @@ private fun EmployeeInfoSection(
                     .padding(16.dp)
             ) {
                 EmployeeInfoDropdown(
-                    label = stringResource(R.string.employee_info_role),
+                    label = tr(R.string.employee_info_role),
                     value = role,
                     options = roleOptions,
                     onValueChange = { role = it },
                     icon = Icons.Default.Person
                 )
                 EmployeeInfoDropdown(
-                    label = stringResource(R.string.employee_info_job_title),
+                    label = tr(R.string.employee_info_job_title),
                     value = jobTitle,
                     options = jobTitleOptions,
                     onValueChange = { jobTitle = it },
                     icon = Icons.Default.Person,
-                    hint = stringResource(R.string.employee_info_job_title_hint)
+                    hint = tr(R.string.employee_info_job_title_hint)
                 )
                 EmployeeInfoDropdown(
-                    label = stringResource(R.string.employee_info_level),
+                    label = tr(R.string.employee_info_level),
                     value = level,
                     options = levelOptions,
                     onValueChange = { level = it },
                     icon = Icons.Default.Person
                 )
                 EmployeeInfoDropdown(
-                    label = stringResource(R.string.employee_info_department),
+                    label = tr(R.string.employee_info_department),
                     value = department,
                     options = departmentOptions,
                     onValueChange = { department = it },
                     icon = Icons.Default.LocationOn
                 )
                 EmployeeInfoDropdown(
-                    label = stringResource(R.string.employee_info_status),
+                    label = tr(R.string.employee_info_status),
                     value = status,
                     options = statusOptions,
                     onValueChange = { status = it },
@@ -878,7 +879,7 @@ private fun EmployeeInfoSection(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = stringResource(R.string.employee_info_contract_type).uppercase(),
+                        text = tr(R.string.employee_info_contract_type).uppercase(),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Neutral500
@@ -952,7 +953,7 @@ private fun EmployeeInfoSection(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = stringResource(R.string.employee_info_department_address).uppercase(),
+                        text = tr(R.string.employee_info_department_address).uppercase(),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Neutral500
@@ -965,7 +966,7 @@ private fun EmployeeInfoSection(
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {
                         Text(
-                            stringResource(R.string.employee_info_department_address_placeholder),
+                            tr(R.string.employee_info_department_address_placeholder),
                             color = Neutral500
                         )
                     },
@@ -993,7 +994,7 @@ private fun EmployeeInfoSection(
 //                    )
 //                    Spacer(modifier = Modifier.width(8.dp))
 //                    Text(
-//                        text = stringResource(R.string.employee_info_date_of_birth).uppercase(),
+//                        text = tr(R.string.employee_info_date_of_birth).uppercase(),
 //                        fontSize = 12.sp,
 //                        fontWeight = FontWeight.SemiBold,
 //                        color = Neutral500
@@ -1049,7 +1050,7 @@ private fun EmployeeInfoSection(
 //                elevation = ButtonDefaults.buttonElevation(0.dp)
 //            ) {
 //                Text(
-//                    text = stringResource(R.string.employee_info_cancel),
+//                    text = tr(R.string.employee_info_cancel),
 //                    fontSize = 14.sp,
 //                    fontWeight = FontWeight.SemiBold
 //                )
@@ -1074,7 +1075,7 @@ private fun EmployeeInfoSection(
                 elevation = ButtonDefaults.buttonElevation(4.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.employee_info_update),
+                    text = tr(R.string.employee_info_update),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -1196,7 +1197,7 @@ private fun PlaceholderSection(tabName: String) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = stringResource(R.string.employee_detail_personal_info),
+            text = tr(R.string.employee_detail_personal_info),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = Neutral700

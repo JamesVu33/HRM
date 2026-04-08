@@ -44,7 +44,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -61,6 +60,7 @@ import com.example.ihrm.domain.model.toTreeNodes
 import com.example.ihrm.ui.common.BaseHRMCompose
 import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.util.getAvatarById
+import com.example.ihrm.ui.localization.tr
 
 // --- Design tokens (Figma node 871:41281) ---
 private val OrgBlue400 = Color(0xFF0052CC)
@@ -257,13 +257,13 @@ private fun OrganizationScreenContent(
                 IconButton(onClick = onMenuClick) {
                     Icon(
                         imageVector = Icons.Default.Menu,
-                        contentDescription = stringResource(R.string.organization_cd_open_menu),
+                        contentDescription = tr(R.string.organization_cd_open_menu),
                         tint = Color.White,
                         modifier = Modifier.size(24.dp)
                     )
                 }
                 Text(
-                    text = stringResource(R.string.drawer_section_organization),
+                    text = tr(R.string.drawer_section_organization),
                     color = Color.White,
                     fontFamily = InterFontFamily,
                     fontWeight = FontWeight.Bold,
@@ -379,7 +379,7 @@ private fun OrganizationSearchBar(
                     Box(contentAlignment = Alignment.CenterStart) {
                         if (query.isEmpty()) {
                             Text(
-                                text = stringResource(R.string.organization_search_hint),
+                                text = tr(R.string.organization_search_hint),
                                 color = OrgSearchHint,
                                 fontSize = 17.sp,
                                 fontFamily = InterFontFamily
@@ -467,7 +467,7 @@ private fun OrganizationTreeRow(
                     } else {
                         Icons.AutoMirrored.Filled.KeyboardArrowRight
                     },
-                    contentDescription = stringResource(R.string.organization_cd_toggle_expand),
+                    contentDescription = tr(R.string.organization_cd_toggle_expand),
                     tint = OrgLeaderMuted2,
                     modifier = Modifier
                         .size(20.dp)
@@ -524,7 +524,7 @@ private fun OrganizationTreeRow(
             ) {
                 Icon(
                     imageVector = androidx.compose.ui.graphics.vector.ImageVector.vectorResource(R.drawable.ic_employees),
-                    contentDescription = stringResource(R.string.organization_cd_member_count),
+                    contentDescription = tr(R.string.organization_cd_member_count),
                     tint = OrgLeaderMuted2,
                     modifier = Modifier.size(16.dp)
                 )

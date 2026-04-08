@@ -52,6 +52,7 @@ import com.example.ihrm.util.LabelTextStyle13Regular8E8E93
 import com.example.ihrm.util.ValueTextStyle32BoldBlack
 import com.example.ihrm.util.ValueTextStyle36BoldBlack
 import com.example.ihrm.util.singleClick
+import com.example.ihrm.ui.localization.tr
 
 /** Static metrics aligned with [Figma 871:40126](https://www.figma.com/design/Q9qmml4Qj4FD73VnYshBsO/HRM-Mobile-App-Ver?node-id=871-40126). */
 private object SecurityChecksAnalyticsStatic {
@@ -134,7 +135,7 @@ fun SecurityChecksAnalyticsScreen(
             ) {
                 item {
                     BaseHeader(
-                        title = stringResource(R.string.security_checks_analytics_title),
+                        title = tr(R.string.security_checks_analytics_title),
                         showNavigationIcon = true,
                         onNavigationClick = onBackClick.singleClick(),
                         navigationIcon = {
@@ -151,9 +152,9 @@ fun SecurityChecksAnalyticsScreen(
                 item {
                     val summaryCards = listOf(
                         SummaryCardData(
-                            label = stringResource(R.string.security_checks_analytics_total_submissions),
+                            label = tr(R.string.security_checks_analytics_total_submissions),
                             value = SecurityChecksAnalyticsStatic.totalSubmissions.toString(),
-                            caption = stringResource(R.string.security_checks_analytics_this_month),
+                            caption = tr(R.string.security_checks_analytics_this_month),
                             iconBackground = Color.Transparent,
                             iconRes = R.drawable.ic_templates,
                             iconTint = Color.Transparent,
@@ -165,14 +166,14 @@ fun SecurityChecksAnalyticsScreen(
                             textStyleCaption = CaptionTextStyle13Regular9C9CA1,
                         ),
                         SummaryCardData(
-                            label = stringResource(R.string.security_checks_analytics_active_users),
+                            label = tr(R.string.security_checks_analytics_active_users),
                             value = SecurityChecksAnalyticsStatic.activeUsers.toString(),
                             caption = "",
                             iconBackground = Color.Transparent,
                             iconRes = R.drawable.ic_employees,
                             iconTint = Color.Transparent,
                             plainHeaderIcon = true,
-                            trendText = stringResource(R.string.security_checks_analytics_trend_percent),
+                            trendText = tr(R.string.security_checks_analytics_trend_percent),
                             containerColor = Color.White,
                             borderColor = AnalyticsCardBorder,
                             textStyleLabel = LabelTextStyle13Regular8E8E93,
@@ -212,12 +213,12 @@ fun SecurityChecksAnalyticsScreen(
                             horizontalAlignment = Alignment.Start,
                         ) {
                             Text(
-                                text = stringResource(R.string.security_checks_analytics_current_status),
+                                text = tr(R.string.security_checks_analytics_current_status),
                                 style = AnalyticsCurrentStatusTitleStyle
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = stringResource(R.string.security_checks_analytics_breakdown_by_submission_status),
+                                text = tr(R.string.security_checks_analytics_breakdown_by_submission_status),
                                 style = LabelTextStyle13Regular8E8E93
                             )
                             Spacer(modifier = Modifier.height(16.dp))
@@ -240,7 +241,7 @@ fun SecurityChecksAnalyticsScreen(
                                         textAlign = TextAlign.Center
                                     )
                                     Text(
-                                        text = stringResource(R.string.security_checks_analytics_total_users_center),
+                                        text = tr(R.string.security_checks_analytics_total_users_center),
                                         style = LabelTextStyle13Regular8E8E93,
                                         textAlign = TextAlign.Center
                                     )
@@ -249,10 +250,10 @@ fun SecurityChecksAnalyticsScreen(
                             Spacer(modifier = Modifier.height(16.dp))
                             AnalyticsStatusLegendGrid(
                                 entries = listOf(
-                                    LegendEntry(stringResource(R.string.dashboard_mgmt_legend_submitted), SecurityChecksStatusDonutDummy.submitted, StatusDonutSegmentColors[0]),
-                                    LegendEntry(stringResource(R.string.dashboard_mgmt_legend_pending), SecurityChecksStatusDonutDummy.pending, StatusDonutSegmentColors[1]),
-                                    LegendEntry(stringResource(R.string.dashboard_security_rejected), SecurityChecksStatusDonutDummy.rejected, StatusDonutSegmentColors[2]),
-                                    LegendEntry(stringResource(R.string.dashboard_mgmt_legend_not_submitted), SecurityChecksStatusDonutDummy.notSubmitted, StatusDonutSegmentColors[3]),
+                                    LegendEntry(tr(R.string.dashboard_mgmt_legend_submitted), SecurityChecksStatusDonutDummy.submitted, StatusDonutSegmentColors[0]),
+                                    LegendEntry(tr(R.string.dashboard_mgmt_legend_pending), SecurityChecksStatusDonutDummy.pending, StatusDonutSegmentColors[1]),
+                                    LegendEntry(tr(R.string.dashboard_security_rejected), SecurityChecksStatusDonutDummy.rejected, StatusDonutSegmentColors[2]),
+                                    LegendEntry(tr(R.string.dashboard_mgmt_legend_not_submitted), SecurityChecksStatusDonutDummy.notSubmitted, StatusDonutSegmentColors[3]),
                                 )
                             )
                         }

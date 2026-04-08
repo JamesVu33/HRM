@@ -31,6 +31,7 @@ import com.example.ihrm.R
 import com.example.ihrm.domain.model.MaritalStatus
 import com.example.ihrm.ui.theme.DashboardFigmaInk
 import com.example.ihrm.ui.theme.InterFontFamily
+import com.example.ihrm.ui.localization.tr
 
 @Composable
 fun MaritalStatusBottomSheet(
@@ -76,7 +77,7 @@ fun MaritalStatusBottomSheet(
                 }
 
                 Text(
-                    text = stringResource(R.string.my_info_marital_status_picker_title),
+                    text = tr(R.string.my_info_marital_status_picker_title),
                     style = TextStyle(
                         fontFamily = InterFontFamily,
                         fontWeight = FontWeight.SemiBold,

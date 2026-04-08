@@ -43,6 +43,7 @@ import com.example.ihrm.ui.theme.DashboardProfileTitleBlue
 import com.example.ihrm.ui.theme.DashboardTabActiveBlue
 import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.ui.theme.PrimaryTint
+import com.example.ihrm.ui.localization.tr
 
 @Composable
 fun DashboardProfileCardManagement(
@@ -96,7 +97,7 @@ fun DashboardProfileCardManagement(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = stringResource(R.string.dashboard_id_format, profile.employeeId),
+                        text = tr(R.string.dashboard_id_format, profile.employeeId),
                         style = TextStyle(
                             fontFamily = InterFontFamily,
                             fontWeight = FontWeight.Normal,
@@ -139,7 +140,7 @@ fun DashboardProfileCardManagement(
                             modifier = Modifier.size(14.dp)
                         )
                     },
-                    label = stringResource(R.string.dashboard_profile_email_label),
+                    label = tr(R.string.dashboard_profile_email_label),
                     value = profile.email,
                     valueSemiBold = true,
                     modifier = Modifier.weight(1f)
@@ -153,7 +154,7 @@ fun DashboardProfileCardManagement(
                             modifier = Modifier.size(14.dp)
                         )
                     },
-                    label = stringResource(R.string.dashboard_profile_phone_label),
+                    label = tr(R.string.dashboard_profile_phone_label),
                     value = profile.phone,
                     valueSemiBold = true,
                     modifier = Modifier.weight(1f)
@@ -172,7 +173,7 @@ fun DashboardProfileCardManagement(
                             modifier = Modifier.size(14.dp)
                         )
                     },
-                    label = stringResource(R.string.dashboard_profile_joined_label),
+                    label = tr(R.string.dashboard_profile_joined_label),
                     value = profile.joined,
                     valueSemiBold = true,
                     modifier = Modifier.weight(1f)
@@ -186,7 +187,7 @@ fun DashboardProfileCardManagement(
                             modifier = Modifier.size(14.dp)
                         )
                     },
-                    label = stringResource(R.string.dashboard_profile_department_label),
+                    label = tr(R.string.dashboard_profile_department_label),
                     value = profile.departmentDetail,
                     valueSemiBold = true,
                     modifier = Modifier.weight(1f)

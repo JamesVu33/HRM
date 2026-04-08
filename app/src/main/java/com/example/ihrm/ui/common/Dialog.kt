@@ -41,6 +41,7 @@ import com.example.ihrm.ui.components.ButtonVariant
 import com.example.ihrm.ui.components.CustomButton
 import com.example.ihrm.util.dropShadow
 import com.example.ihrm.util.singleClick
+import com.example.ihrm.ui.localization.tr
 
 @Composable
 fun ChecklistConfirmDialog(
@@ -125,7 +126,7 @@ fun ChecklistConfirmDialog(
                             .padding(horizontal = 16.dp, vertical = 6.dp),
                         onLeftClick = onDismiss,
                         onRightClick = onConfirm,
-                        textButtonLeft = stringResource(R.string.logout_cancel_button),
+                        textButtonLeft = tr(R.string.logout_cancel_button),
                         textButtonRight = ui.confirmText,
                         variantButtonLeft = ButtonVariant.Neutral,
                         variantButtonRight = ui.confirmVariant,

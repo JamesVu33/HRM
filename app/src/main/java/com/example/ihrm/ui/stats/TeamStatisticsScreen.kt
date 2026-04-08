@@ -56,6 +56,7 @@ import com.example.ihrm.util.CaptionTextStyle12NormalGrey
 import com.example.ihrm.util.DashboardBrush
 import com.example.ihrm.util.LabelTextStyle13MediumGrey
 import com.example.ihrm.util.ValueTextStyle32BoldBlack
+import com.example.ihrm.ui.localization.tr
 
 /** Static snapshot values aligned with [Figma 871:34408](https://www.figma.com/design/Q9qmml4Qj4FD73VnYshBsO/HRM-Mobile-App-Ver?node-id=871-34408). */
 private object TeamStatisticsStatic {
@@ -92,18 +93,18 @@ fun TeamStatisticsScreen(
     onBackClick: () -> Unit
 ) {
     val deptLabels = listOf(
-        stringResource(R.string.team_statistics_dept_gdc),
-        stringResource(R.string.team_statistics_dept_bank_biz),
-        stringResource(R.string.team_statistics_dept_operation),
-        stringResource(R.string.team_statistics_dept_it),
-        stringResource(R.string.team_statistics_dept_other)
+        tr(R.string.team_statistics_dept_gdc),
+        tr(R.string.team_statistics_dept_bank_biz),
+        tr(R.string.team_statistics_dept_operation),
+        tr(R.string.team_statistics_dept_it),
+        tr(R.string.team_statistics_dept_other)
     )
     val statusLabels = listOf(
-        stringResource(R.string.team_statistics_status_working),
-        stringResource(R.string.team_statistics_status_resigned),
-        stringResource(R.string.team_statistics_status_suspended),
-        stringResource(R.string.team_statistics_status_probation),
-        stringResource(R.string.team_statistics_status_intern)
+        tr(R.string.team_statistics_status_working),
+        tr(R.string.team_statistics_status_resigned),
+        tr(R.string.team_statistics_status_suspended),
+        tr(R.string.team_statistics_status_probation),
+        tr(R.string.team_statistics_status_intern)
     )
 
     Scaffold(
@@ -132,7 +133,7 @@ fun TeamStatisticsScreen(
             ) {
                 item {
                     BaseHeader(
-                        title = stringResource(R.string.team_statistics_title),
+                        title = tr(R.string.team_statistics_title),
                         showNavigationIcon = true,
                         onNavigationClick = onBackClick,
                         navigationIcon = {
@@ -149,17 +150,17 @@ fun TeamStatisticsScreen(
                 item {
                     val summaryCards = listOf(
                         SummaryCardData(
-                            label = stringResource(R.string.dashboard_total_employees),
+                            label = tr(R.string.dashboard_total_employees),
                             value = TeamStatisticsStatic.totalCompanyEmployees.toString(),
-                            caption = stringResource(R.string.team_statistics_active_employees_hint),
+                            caption = tr(R.string.team_statistics_active_employees_hint),
                             iconBackground = StatIconBgBlue,
                             iconRes = R.drawable.ic_list_person,
                             iconTint = StatIconTintBlue
                         ),
                         SummaryCardData(
-                            label = stringResource(R.string.team_statistics_active_now),
+                            label = tr(R.string.team_statistics_active_now),
                             value = TeamStatisticsStatic.activeNow.toString(),
-                            caption = stringResource(R.string.team_statistics_working_today),
+                            caption = tr(R.string.team_statistics_working_today),
                             iconBackground = StatIconBgGreen,
                             iconRes = R.drawable.icon_person_check,
                             iconTint = StatIconTintGreen
@@ -185,10 +186,10 @@ fun TeamStatisticsScreen(
                 item { Spacer(modifier = Modifier.height(16.dp)) }
                 item {
                     DistributionDonutCard(
-                        title = stringResource(R.string.team_statistics_dept_title),
-                        subtitle = stringResource(R.string.team_statistics_dept_subtitle),
-                        centerTop = stringResource(R.string.team_statistics_center_total),
-                        centerBottom = stringResource(R.string.team_statistics_center_employees),
+                        title = tr(R.string.team_statistics_dept_title),
+                        subtitle = tr(R.string.team_statistics_dept_subtitle),
+                        centerTop = tr(R.string.team_statistics_center_total),
+                        centerBottom = tr(R.string.team_statistics_center_employees),
                         counts = TeamStatisticsStatic.departmentCounts,
                         colors = DeptColors,
                         legendLabels = deptLabels
@@ -197,10 +198,10 @@ fun TeamStatisticsScreen(
                 item { Spacer(modifier = Modifier.height(16.dp)) }
                 item {
                     DistributionDonutCard(
-                        title = stringResource(R.string.team_statistics_status_title),
-                        subtitle = stringResource(R.string.team_statistics_status_subtitle),
-                        centerTop = stringResource(R.string.team_statistics_center_total),
-                        centerBottom = stringResource(R.string.team_statistics_center_status_label),
+                        title = tr(R.string.team_statistics_status_title),
+                        subtitle = tr(R.string.team_statistics_status_subtitle),
+                        centerTop = tr(R.string.team_statistics_center_total),
+                        centerBottom = tr(R.string.team_statistics_center_status_label),
                         counts = TeamStatisticsStatic.statusCounts,
                         colors = StatusColors,
                         legendLabels = statusLabels

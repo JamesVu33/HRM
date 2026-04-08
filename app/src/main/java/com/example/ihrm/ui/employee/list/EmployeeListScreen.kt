@@ -92,6 +92,7 @@ import com.example.ihrm.ui.theme.StrokeColor
 import com.example.ihrm.ui.theme.SuccessGreen
 import com.example.ihrm.ui.theme.SurfaceBorder
 import com.example.ihrm.util.DashboardBrush
+import com.example.ihrm.ui.localization.tr
 
 @Composable
 fun EmployeeListScreen(
@@ -172,7 +173,7 @@ fun EmployeeListScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = stringResource(R.string.dashboard_fab_add)
+                            contentDescription = tr(R.string.dashboard_fab_add)
                         )
                     }
                 }
@@ -220,7 +221,7 @@ fun EmployeeListScreen(
                         )
                         TextButton(onClick = { viewModel.clearError() }) {
                             Text(
-                                text = stringResource(R.string.dashboard_error_dismiss),
+                                text = tr(R.string.dashboard_error_dismiss),
                                 color = Primary400,
                                 fontSize = 13.sp
                             )
@@ -248,7 +249,7 @@ fun EmployeeListScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = stringResource(R.string.employee_list_load_error),
+                                text = tr(R.string.employee_list_load_error),
                                 color = Neutral600,
                                 fontSize = 15.sp
                             )
@@ -288,7 +289,7 @@ private fun EmployeeListScrollContent(
 ) {
     val totalEmployees = baseModels.size
     val activeToday = derivedActiveToday(totalEmployees)
-    val noLevelLabel = stringResource(R.string.dashboard_badge_no_level)
+    val noLevelLabel = tr(R.string.dashboard_badge_no_level)
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier
@@ -305,7 +306,7 @@ private fun EmployeeListScrollContent(
             item {
                 BaseHeader(
                     modifier = Modifier,
-                    title = stringResource(R.string.employee_list_title),
+                    title = tr(R.string.employee_list_title),
                     showNavigationIcon = onBackClick != null,
                     onNavigationClick = onBackClick,
                     navigationIcon = {
@@ -323,7 +324,7 @@ private fun EmployeeListScrollContent(
                 EmployeeListSearchBar(
                     query = searchQuery,
                     onQueryChange = onSearchQueryChange,
-                    placeholder = stringResource(R.string.dashboard_search_placeholder)
+                    placeholder = tr(R.string.dashboard_search_placeholder)
                 )
             }
             item {
@@ -341,7 +342,7 @@ private fun EmployeeListScrollContent(
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(R.string.dashboard_team_members),
+                    text = tr(R.string.dashboard_team_members),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Neutral700
@@ -351,7 +352,7 @@ private fun EmployeeListScrollContent(
             if (filteredModels.isEmpty()) {
                 item {
                     Text(
-                        text = stringResource(R.string.employee_list_no_match),
+                        text = tr(R.string.employee_list_no_match),
                         fontSize = 14.sp,
                         color = Neutral600,
                         modifier = Modifier.padding(vertical = 24.dp)
@@ -437,14 +438,14 @@ private fun DeleteConfirmDialog(
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = stringResource(R.string.dashboard_delete_dialog_title),
+                    text = tr(R.string.dashboard_delete_dialog_title),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF101828)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = stringResource(R.string.dashboard_delete_dialog_message, employeeName),
+                    text = tr(R.string.dashboard_delete_dialog_message, employeeName),
                     fontSize = 14.sp,
                     color = Neutral500,
                     lineHeight = 20.sp
@@ -465,7 +466,7 @@ private fun DeleteConfirmDialog(
                         elevation = ButtonDefaults.buttonElevation(0.dp)
                     ) {
                         Text(
-                            text = stringResource(R.string.dashboard_delete_dialog_cancel),
+                            text = tr(R.string.dashboard_delete_dialog_cancel),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -481,7 +482,7 @@ private fun DeleteConfirmDialog(
                         elevation = ButtonDefaults.buttonElevation(4.dp)
                     ) {
                         Text(
-                            text = stringResource(R.string.dashboard_delete_dialog_confirm),
+                            text = tr(R.string.dashboard_delete_dialog_confirm),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -556,13 +557,13 @@ private fun StatsRow(
         StatCard(
             modifier = Modifier.weight(1f),
             value = totalEmployees.toString(),
-            label = stringResource(R.string.dashboard_total_employees),
+            label = tr(R.string.dashboard_total_employees),
             valueColor = Primary400
         )
         StatCard(
             modifier = Modifier.weight(1f),
             value = activeToday.toString(),
-            label = stringResource(R.string.dashboard_active_today),
+            label = tr(R.string.dashboard_active_today),
             valueColor = SuccessGreen
         )
     }
@@ -627,20 +628,20 @@ private fun ManageTeamCard(onViewStats: () -> Unit) {
                 modifier = Modifier.padding(20.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.dashboard_manage_team_title),
+                    text = tr(R.string.dashboard_manage_team_title),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color.Black
                 )
                 Spacer(modifier = Modifier.height(5.dp))
                 Text(
-                    text = stringResource(R.string.dashboard_manage_team_subtitle),
+                    text = tr(R.string.dashboard_manage_team_subtitle),
                     fontSize = 14.sp,
                     color = Color.Black
                 )
                 Spacer(modifier = Modifier.height(11.dp))
                 CustomButton(
-                    text = stringResource(R.string.dashboard_view_stats),
+                    text = tr(R.string.dashboard_view_stats),
                     onClick = onViewStats,
                     modifier = Modifier,
                     isPill = true
@@ -681,7 +682,7 @@ private fun EmployeeListScrollContentPreview() {
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Add,
-                                    contentDescription = stringResource(R.string.dashboard_fab_add)
+                                    contentDescription = tr(R.string.dashboard_fab_add)
                                 )
                             }
                         }

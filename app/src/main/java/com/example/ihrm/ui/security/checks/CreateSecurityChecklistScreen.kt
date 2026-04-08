@@ -50,6 +50,7 @@ import com.example.ihrm.ui.common.header.BaseHeader
 import com.example.ihrm.ui.components.ButtonSize
 import com.example.ihrm.ui.components.CustomButton
 import com.example.ihrm.util.DashboardBrush
+import com.example.ihrm.ui.localization.tr
 
 private data class CreateChecklistQuestionUi(
     val content: String,
@@ -96,7 +97,7 @@ fun CreateSecurityChecklistScreen(
         bottomBar = {
             CustomButton(
                 modifier = Modifier.padding(horizontal = 14.dp).padding(top = 30.dp, bottom = 8.dp),
-                text = stringResource(R.string.create_security_checklist_submit),
+                text = tr(R.string.create_security_checklist_submit),
                 size = ButtonSize.Large,
                 fullWidth = true,
                 enabled = true,
@@ -129,7 +130,7 @@ private fun HeaderSection(
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         BaseHeader(
-            title = stringResource(R.string.create_security_checklist_title),
+            title = tr(R.string.create_security_checklist_title),
             showNavigationIcon = true,
             onNavigationClick = onBackClick,
             navigationIcon = {
@@ -142,7 +143,7 @@ private fun HeaderSection(
             containerColor = Color.Transparent
         )
         Text(
-            text = stringResource(R.string.create_security_checklist_subtitle),
+            text = tr(R.string.create_security_checklist_subtitle),
             color = Color.White,
             fontSize = 14.sp,
             modifier = Modifier.padding(start = 8.dp, top = 4.dp)
@@ -169,14 +170,14 @@ private fun QuestionsCard() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(R.string.create_security_checklist_items_title),
+                    text = tr(R.string.create_security_checklist_items_title),
                     color = Color(0xFF091E42),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    text = stringResource(R.string.create_security_checklist_items_count),
+                    text = tr(R.string.create_security_checklist_items_count),
                     color = Color(0xFF6A7282),
                     fontSize = 14.sp
                 )
@@ -245,7 +246,7 @@ private fun QuestionRow(
                     if (item.selected) {
                         Icon(
                             imageVector = Icons.Default.Check,
-                            contentDescription = stringResource(R.string.create_security_checklist_select_item_cd),
+                            contentDescription = tr(R.string.create_security_checklist_select_item_cd),
                             tint = Color(0xFF12B76A),
                             modifier = Modifier.size(14.dp)
                         )
@@ -275,7 +276,7 @@ private fun QuestionRow(
                 IconButton(onClick = onExpandedToggle) {
                     Icon(
                         imageVector = if (item.expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                        contentDescription = stringResource(R.string.create_security_checklist_expand_translation_cd),
+                        contentDescription = tr(R.string.create_security_checklist_expand_translation_cd),
                         tint = Color(0xFF6A7282),
                     )
                 }

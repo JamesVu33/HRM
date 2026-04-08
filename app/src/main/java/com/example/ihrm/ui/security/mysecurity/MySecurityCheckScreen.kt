@@ -78,6 +78,7 @@ import com.example.ihrm.util.LabelTextStyle14RegularBlack
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import com.example.ihrm.ui.localization.tr
 
 private enum class MySecurityStatus { PENDING, APPROVED, REJECT }
 
@@ -217,7 +218,7 @@ fun MySecurityCheckScreenContent(
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(R.string.my_security_check_add_cd),
+                    contentDescription = tr(R.string.my_security_check_add_cd),
                     tint = White
                 )
             }
@@ -241,14 +242,14 @@ fun MySecurityCheckScreenContent(
                     modifier = Modifier
                         .padding(paddingValues)
                         .statusBarsPadding(),
-                    title = stringResource(R.string.drawer_item_security_check),
+                    title = tr(R.string.drawer_item_security_check),
                     showNavigationIcon = true,
                     onNavigationClick = onMenuClick,
                     containerColor = Color.Transparent,
                     navigationIcon = {
                         Icon(
                             imageVector = Icons.Default.Menu,
-                            contentDescription = stringResource(R.string.dashboard_cd_open_menu),
+                            contentDescription = tr(R.string.dashboard_cd_open_menu),
                             tint = White
                         )
                     }
@@ -261,7 +262,7 @@ fun MySecurityCheckScreenContent(
                 Spacer(modifier = Modifier.height(6.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     Text(
-                        text = stringResource(
+                        text = tr(
                             R.string.my_security_check_items_count,
                             filtered.size
                         ),
@@ -294,14 +295,14 @@ fun MySecurityCheckScreenContent(
             onDismissRequest = { showCreatedInMonthDialog = false },
             confirmButton = {
                 TextButton(onClick = { showCreatedInMonthDialog = false }) {
-                    Text(text = stringResource(R.string.my_security_check_exists_dialog_ok))
+                    Text(text = tr(R.string.my_security_check_exists_dialog_ok))
                 }
             },
             title = {
-                Text(text = stringResource(R.string.my_security_check_exists_dialog_title))
+                Text(text = tr(R.string.my_security_check_exists_dialog_title))
             },
             text = {
-                Text(text = stringResource(R.string.my_security_check_exists_dialog_message))
+                Text(text = tr(R.string.my_security_check_exists_dialog_message))
             }
         )
     }
@@ -351,7 +352,7 @@ private fun SearchBar(keyword: String, onKeywordChange: (String) -> Unit) {
             decorationBox = { inner ->
                 if (keyword.isBlank()) {
                     Text(
-                        text = stringResource(R.string.my_security_check_search_placeholder),
+                        text = tr(R.string.my_security_check_search_placeholder),
                         color = Color(0xFF99A1AF),
                         fontSize = 14.sp
                     )
@@ -361,7 +362,7 @@ private fun SearchBar(keyword: String, onKeywordChange: (String) -> Unit) {
         )
         Icon(
             painter = painterResource(R.drawable.ic_filter),
-            contentDescription = stringResource(R.string.my_security_check_filter_cd),
+            contentDescription = tr(R.string.my_security_check_filter_cd),
             tint = Color(0xFF6A7282),
             modifier = Modifier.size(18.dp)
         )
@@ -407,7 +408,7 @@ private fun ChecklistCard(
                 Text(
                     text = buildAnnotatedString {
                         withStyle(SpanStyle(color = Color(0xFF364153), fontSize = 13.sp)) {
-                            append(stringResource(R.string.my_security_check_submitted))
+                            append(tr(R.string.my_security_check_submitted))
                         }
                         append(" ")
                         withStyle(SpanStyle(color = Color(0xFF364153), fontWeight = FontWeight.Medium, fontSize = 13.sp)) {

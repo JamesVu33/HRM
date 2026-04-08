@@ -49,6 +49,7 @@ import com.example.ihrm.ui.theme.PrimaryTint
 import com.example.ihrm.ui.theme.SurfaceBorder
 import com.example.ihrm.ui.theme.TextSecondary
 import com.example.ihrm.util.singleClick
+import com.example.ihrm.ui.localization.tr
 
 /**
  * EmployeeDepartmentResponse card matching [Figma HRM EmployeeCard](https://www.figma.com/design/Q9qmml4Qj4FD73VnYshBsO/HRM-Mobile-App-Ver?node-id=255-11482).
@@ -113,7 +114,7 @@ fun EmployeeCard(
                     EmployeeCardBadge(text = levelCode)
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = stringResource(R.string.dashboard_id_format, employee.id),
+                        text = tr(R.string.dashboard_id_format, employee.id),
                         fontSize = 12.sp,
                         color = Neutral400
                     )
@@ -174,14 +175,14 @@ fun EmployeeCard(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 FlatButton(
-                    text = stringResource(R.string.dashboard_view_details),
+                    text = tr(R.string.dashboard_view_details),
                     textColor = Primary400,
                     backgroundColor = PrimaryTint,
                     onClick = onViewDetails.singleClick(),
                     modifier = Modifier.weight(1f)
                 )
                 FlatButton(
-                    text = stringResource(R.string.dashboard_delete),
+                    text = tr(R.string.dashboard_delete),
                     textColor = Error,
                     backgroundColor = ErrorLight,
                     onClick = onDelete.singleClick(),

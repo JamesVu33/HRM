@@ -82,6 +82,7 @@ import com.example.ihrm.util.DashboardBrush.MyInfoHeaderBrush
 import com.example.ihrm.util.dropShadow
 import com.example.ihrm.util.toDisplayDate
 import com.example.ihrm.util.txtInterMedium14White90Percent
+import com.example.ihrm.ui.localization.tr
 
 private val PageBg = Color(0xFFF9FAFB)
 private val CardBorder = Color(0xFFF3F4F6)
@@ -129,7 +130,7 @@ private val SectionSubtitleStyle = TextStyle(
 
 @Composable
 private fun textOrPlaceholder(value: String?): String {
-    if (value.isNullOrBlank()) return stringResource(R.string.my_info_not_available)
+    if (value.isNullOrBlank()) return tr(R.string.my_info_not_available)
     return value
 }
 
@@ -141,13 +142,13 @@ private fun rolesDisplay(info: MyInfo?): String? {
 
 @Composable
 private fun maritalStatusLabel(status: MaritalStatus?): String {
-    if (status == null) return stringResource(R.string.my_info_not_available)
+    if (status == null) return tr(R.string.my_info_not_available)
     return when (status) {
-        MaritalStatus.SINGLE -> stringResource(R.string.marital_single)
-        MaritalStatus.MARRIED -> stringResource(R.string.marital_married)
-        MaritalStatus.DIVORCED -> stringResource(R.string.marital_divorced)
-        MaritalStatus.WIDOWED -> stringResource(R.string.marital_widowed)
-        MaritalStatus.UNKNOWN -> stringResource(R.string.my_info_not_available)
+        MaritalStatus.SINGLE -> tr(R.string.marital_single)
+        MaritalStatus.MARRIED -> tr(R.string.marital_married)
+        MaritalStatus.DIVORCED -> tr(R.string.marital_divorced)
+        MaritalStatus.WIDOWED -> tr(R.string.marital_widowed)
+        MaritalStatus.UNKNOWN -> tr(R.string.my_info_not_available)
     }
 }
 
@@ -353,10 +354,10 @@ fun MyInfoScreenContent(
     MaritalStatusBottomSheet(
         isVisible = showMaritalStatusPicker,
         statuses = listOf(
-            MaritalStatus.SINGLE to stringResource(R.string.marital_single),
-            MaritalStatus.MARRIED to stringResource(R.string.marital_married),
-            MaritalStatus.DIVORCED to stringResource(R.string.marital_divorced),
-            MaritalStatus.WIDOWED to stringResource(R.string.marital_widowed),
+            MaritalStatus.SINGLE to tr(R.string.marital_single),
+            MaritalStatus.MARRIED to tr(R.string.marital_married),
+            MaritalStatus.DIVORCED to tr(R.string.marital_divorced),
+            MaritalStatus.WIDOWED to tr(R.string.marital_widowed),
         ),
         onDismiss = { showMaritalStatusPicker = false },
         onStatusSelected = { selectedStatus ->
@@ -410,7 +411,7 @@ fun MyInfoScreenContent(
                     ) {
                         Icon(
                             imageVector = ImageVector.vectorResource(R.drawable.ic_upload),
-                            contentDescription = stringResource(R.string.my_info_change_photo),
+                            contentDescription = tr(R.string.my_info_change_photo),
                             tint = Color(0xFF155DFC),
                             modifier = Modifier.size(20.dp)
                         )
@@ -418,7 +419,7 @@ fun MyInfoScreenContent(
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = stringResource(R.string.my_info_change_photo),
+                    text = tr(R.string.my_info_change_photo),
                     style = txtInterMedium14White90Percent,
                 )
             }
@@ -435,11 +436,11 @@ fun MyInfoScreenContent(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     MyInfoFormCard(
-                        title = stringResource(R.string.my_info_section_basic_title),
-                        subtitle = stringResource(R.string.my_info_section_basic_subtitle),
+                        title = tr(R.string.my_info_section_basic_title),
+                        subtitle = tr(R.string.my_info_section_basic_subtitle),
                     ) {
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_full_name),
+                            label = tr(R.string.my_info_label_full_name),
                             icon = ImageVector.vectorResource(R.drawable.ic_person),
                             content = {
                                 MyInfoValueBox(
@@ -450,7 +451,7 @@ fun MyInfoScreenContent(
                         )
                         MyInfoDivider()
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_english_name),
+                            label = tr(R.string.my_info_label_english_name),
                             icon = ImageVector.vectorResource(R.drawable.ic_person),
                             content = {
                                 MyInfoValueBox(
@@ -461,7 +462,7 @@ fun MyInfoScreenContent(
                         )
                         MyInfoDivider()
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_email),
+                            label = tr(R.string.my_info_label_email),
                             icon = ImageVector.vectorResource(R.drawable.ic_email),
                             content = {
                                 MyInfoValueBox(
@@ -473,7 +474,7 @@ fun MyInfoScreenContent(
                         )
                         MyInfoDivider()
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_phone),
+                            label = tr(R.string.my_info_label_phone),
                             icon = ImageVector.vectorResource(R.drawable.ic_cellphone),
                             content = {
                                 MyInfoValueBox(
@@ -485,7 +486,7 @@ fun MyInfoScreenContent(
                         )
                         MyInfoDivider()
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_dob),
+                            label = tr(R.string.my_info_label_dob),
                             icon = ImageVector.vectorResource(R.drawable.ic_calendar),
                             content = {
                                 MyInfoValueBox(
@@ -496,7 +497,7 @@ fun MyInfoScreenContent(
                         )
                         MyInfoDivider()
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_gender),
+                            label = tr(R.string.my_info_label_gender),
                             icon = ImageVector.vectorResource(R.drawable.ic_person),
                             content = {
                                 MyInfoGenderRow(
@@ -507,7 +508,7 @@ fun MyInfoScreenContent(
                         )
                         MyInfoDivider()
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_identity_id),
+                            label = tr(R.string.my_info_label_identity_id),
                             icon = ImageVector.vectorResource(R.drawable.ic_calendar),
                             content = {
                                 MyInfoValueBox(
@@ -518,7 +519,7 @@ fun MyInfoScreenContent(
                         )
                         MyInfoDivider()
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_identity_issue_day),
+                            label = tr(R.string.my_info_label_identity_issue_day),
                             icon = ImageVector.vectorResource(R.drawable.ic_calendar),
                             content = {
                                 MyInfoValueBox(
@@ -529,7 +530,7 @@ fun MyInfoScreenContent(
                         )
                         MyInfoDivider()
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_identity_issue_place),
+                            label = tr(R.string.my_info_label_identity_issue_place),
                             icon = ImageVector.vectorResource(R.drawable.ic_location),
                             content = {
                                 MyInfoValueBox(
@@ -540,7 +541,7 @@ fun MyInfoScreenContent(
                         )
                         MyInfoDivider()
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_nationality),
+                            label = tr(R.string.my_info_label_nationality),
                             icon = ImageVector.vectorResource(R.drawable.ic_location),
                             content = {
                                 MyInfoDropdownRow(
@@ -557,7 +558,7 @@ fun MyInfoScreenContent(
                         )
                         MyInfoDivider()
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_marital_status),
+                            label = tr(R.string.my_info_label_marital_status),
                             icon = ImageVector.vectorResource(R.drawable.ic_person),
                             content = {
                                 MyInfoDropdownRow(
@@ -574,7 +575,7 @@ fun MyInfoScreenContent(
                         )
                         MyInfoDivider()
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_address),
+                            label = tr(R.string.my_info_label_address),
                             icon = ImageVector.vectorResource(R.drawable.ic_location),
                             content = {
                                 MyInfoAddressBox(
@@ -586,31 +587,31 @@ fun MyInfoScreenContent(
                     }
 
                     MyInfoFormCard(
-                        title = stringResource(R.string.my_info_section_employee_title),
+                        title = tr(R.string.my_info_section_employee_title),
                         subtitle = null,
                     ) {
                         MyInfoReadOnlyEmployeeField(
-                            label = stringResource(R.string.my_info_label_role),
+                            label = tr(R.string.my_info_label_role),
                             value = textOrPlaceholder(rolesDisplay(myInfo)),
                         )
                         MyInfoDivider()
                         MyInfoReadOnlyEmployeeField(
-                            label = stringResource(R.string.my_info_label_job_title),
+                            label = tr(R.string.my_info_label_job_title),
                             value = textOrPlaceholder(profile?.title?.name),
                         )
                         MyInfoDivider()
                         MyInfoReadOnlyEmployeeField(
-                            label = stringResource(R.string.my_info_label_level),
+                            label = tr(R.string.my_info_label_level),
                             value = textOrPlaceholder(profile?.level?.name),
                         )
                         MyInfoDivider()
                         MyInfoReadOnlyEmployeeField(
-                            label = stringResource(R.string.my_info_label_department),
-                            value = stringResource(R.string.my_info_not_available),
+                            label = tr(R.string.my_info_label_department),
+                            value = tr(R.string.my_info_not_available),
                         )
                         MyInfoDivider()
                         MyInfoReadOnlyEmployeeField(
-                            label = stringResource(R.string.my_info_label_status),
+                            label = tr(R.string.my_info_label_status),
                             value = textOrPlaceholder(myInfo?.status),
                         )
                     }
@@ -705,7 +706,7 @@ fun MyInfoScreenContent(
                             )
                             Spacer(modifier = Modifier.size(8.dp))
                             Text(
-                                text = stringResource(R.string.my_info_change_info),
+                                text = tr(R.string.my_info_change_info),
                                 style = TextStyle(
                                     fontFamily = InterFontFamily,
                                     fontWeight = FontWeight.Medium,
@@ -744,13 +745,13 @@ private fun MyInfoHeader(
             ) {
                 Icon(
                     imageVector = Icons.Default.Menu,
-                    contentDescription = stringResource(R.string.my_info_menu_cd),
+                    contentDescription = tr(R.string.my_info_menu_cd),
                     tint = Color.White,
                     modifier = Modifier.size(24.dp)
                 )
             }
             Text(
-                text = stringResource(R.string.my_info_screen_title),
+                text = tr(R.string.my_info_screen_title),
                 style = TextStyle(
                     fontFamily = InterFontFamily,
                     fontWeight = FontWeight.SemiBold,
@@ -772,7 +773,7 @@ private fun MyInfoHeader(
             ) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_key),
-                    contentDescription = stringResource(R.string.my_info_key_cd),
+                    contentDescription = tr(R.string.my_info_key_cd),
                     tint = Color.White,
                     modifier = Modifier.size(22.dp)
                 )
@@ -977,8 +978,8 @@ private fun MyInfoGenderRow(
         GenderOption.entries.forEach { option ->
             val isSelected = option == selected
             val label = when (option) {
-                GenderOption.Male -> stringResource(R.string.my_info_gender_male)
-                GenderOption.Female -> stringResource(R.string.my_info_gender_female)
+                GenderOption.Male -> tr(R.string.my_info_gender_male)
+                GenderOption.Female -> tr(R.string.my_info_gender_female)
             }
             Box(
                 modifier = Modifier
@@ -1102,7 +1103,7 @@ private fun ChangePasswordDialog(
                             verticalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
                             Text(
-                                text = stringResource(R.string.my_info_change_password_title),
+                                text = tr(R.string.my_info_change_password_title),
                                 style = TextStyle(
                                     fontFamily = InterFontFamily,
                                     fontWeight = FontWeight.Bold,
@@ -1113,7 +1114,7 @@ private fun ChangePasswordDialog(
                                 ),
                             )
                             Text(
-                                text = stringResource(R.string.my_info_change_password_subtitle),
+                                text = tr(R.string.my_info_change_password_subtitle),
                                 style = TextStyle(
                                     fontFamily = InterFontFamily,
                                     fontWeight = FontWeight.Normal,
@@ -1134,7 +1135,7 @@ private fun ChangePasswordDialog(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = stringResource(R.string.my_info_change_password_close_cd),
+                                contentDescription = tr(R.string.my_info_change_password_close_cd),
                                 tint = Color.White,
                                 modifier = Modifier.size(20.dp),
                             )
@@ -1149,26 +1150,26 @@ private fun ChangePasswordDialog(
                     verticalArrangement = Arrangement.spacedBy(24.dp),
                 ) {
                     ChangePasswordField(
-                        label = stringResource(R.string.my_info_change_password_current_label),
+                        label = tr(R.string.my_info_change_password_current_label),
                         value = currentPassword,
                         onValueChange = { currentPassword = it },
-                        placeholder = stringResource(R.string.my_info_change_password_current_placeholder),
+                        placeholder = tr(R.string.my_info_change_password_current_placeholder),
                         visible = currentVisible,
                         onToggleVisible = { currentVisible = !currentVisible },
                     )
                     ChangePasswordField(
-                        label = stringResource(R.string.my_info_change_password_new_label),
+                        label = tr(R.string.my_info_change_password_new_label),
                         value = newPassword,
                         onValueChange = { newPassword = it },
-                        placeholder = stringResource(R.string.my_info_change_password_new_placeholder),
+                        placeholder = tr(R.string.my_info_change_password_new_placeholder),
                         visible = newVisible,
                         onToggleVisible = { newVisible = !newVisible },
                     )
                     ChangePasswordField(
-                        label = stringResource(R.string.my_info_change_password_confirm_label),
+                        label = tr(R.string.my_info_change_password_confirm_label),
                         value = confirmPassword,
                         onValueChange = { confirmPassword = it },
-                        placeholder = stringResource(R.string.my_info_change_password_confirm_placeholder),
+                        placeholder = tr(R.string.my_info_change_password_confirm_placeholder),
                         visible = confirmVisible,
                         onToggleVisible = { confirmVisible = !confirmVisible },
                     )
@@ -1184,7 +1185,7 @@ private fun ChangePasswordDialog(
                             ),
                         size = ButtonSize.Large,
                         variant = ButtonVariant.Primary,
-                        text = stringResource(R.string.employee_detail_save),
+                        text = tr(R.string.employee_detail_save),
                         onClick = { onSave(currentPassword, newPassword, confirmPassword) },
                         enabled = currentPassword.isNotEmpty() && newPassword.isNotEmpty() && confirmPassword.isNotEmpty(),
                         fullWidth = true,
@@ -1250,7 +1251,7 @@ private fun ChangePasswordField(
                         } else {
                             ImageVector.vectorResource(R.drawable.icon_remember)
                         },
-                        contentDescription = stringResource(R.string.my_info_change_password_toggle_visibility_cd),
+                        contentDescription = tr(R.string.my_info_change_password_toggle_visibility_cd),
                         tint = DashboardFigmaInk,
                         modifier = Modifier.size(20.dp),
                     )

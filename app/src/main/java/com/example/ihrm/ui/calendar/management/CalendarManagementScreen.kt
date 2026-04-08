@@ -77,6 +77,7 @@ import com.example.ihrm.util.txtInterRegular14
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import com.example.ihrm.ui.localization.tr
 
 private val StatYellow = Color(0xFFF0B100)
 private val StatBlue = Color(0xFF2B7FFF)
@@ -126,10 +127,10 @@ fun CalendarManagementScreen(
 
     val filterHintText = when {
         appliedLeaveFilters.isEmpty() ->
-            stringResource(R.string.calendar_mgmt_filter_calendar_hint_empty)
+            tr(R.string.calendar_mgmt_filter_calendar_hint_empty)
 
         appliedLeaveFilters.size < LeaveFilterType.entries.size ->
-            stringResource(
+            tr(
                 R.string.calendar_mgmt_filter_calendar_hint_partial,
                 appliedLeaveFilters.size,
                 LeaveFilterType.entries.size
@@ -171,7 +172,7 @@ fun CalendarManagementScreen(
                 item {
                     BaseHeader(
                         modifier = Modifier,
-                        title = stringResource(R.string.calendar_mgmt_title),
+                        title = tr(R.string.calendar_mgmt_title),
                         showNavigationIcon = true,
                         onNavigationClick = onBackClick.singleClick(),
                         containerColor = Color.Transparent
@@ -241,7 +242,7 @@ private fun StatsGrid(statValue: Int) {
             StatMiniCard(
                 modifier = Modifier.weight(1f),
                 value = statValue,
-                label = stringResource(R.string.calendar_mgmt_stat_leaves_today),
+                label = tr(R.string.calendar_mgmt_stat_leaves_today),
                 valueColor = StatYellow,
                 circleColor = StatYellow,
                 icon = {
@@ -256,7 +257,7 @@ private fun StatsGrid(statValue: Int) {
             StatMiniCard(
                 modifier = Modifier.weight(1f),
                 value = statValue,
-                label = stringResource(R.string.calendar_mgmt_stat_total_requested),
+                label = tr(R.string.calendar_mgmt_stat_total_requested),
                 valueColor = StatBlue,
                 circleColor = StatBlue,
                 icon = {
@@ -276,7 +277,7 @@ private fun StatsGrid(statValue: Int) {
             StatMiniCard(
                 modifier = Modifier.weight(1f),
                 value = statValue,
-                label = stringResource(R.string.calendar_mgmt_stat_pending),
+                label = tr(R.string.calendar_mgmt_stat_pending),
                 valueColor = StatOrange,
                 circleColor = StatOrange,
                 icon = {
@@ -291,7 +292,7 @@ private fun StatsGrid(statValue: Int) {
             StatMiniCard(
                 modifier = Modifier.weight(1f),
                 value = statValue,
-                label = stringResource(R.string.calendar_mgmt_stat_approved),
+                label = tr(R.string.calendar_mgmt_stat_approved),
                 valueColor = StatGreen,
                 circleColor = StatGreen,
                 icon = {
@@ -401,7 +402,7 @@ private fun CalendarCard(
                 IconButton(onClick = onPrevMonth.singleClick()) {
                     Icon(
                         Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                        contentDescription = stringResource(R.string.calendar_mgmt_cd_prev_month),
+                        contentDescription = tr(R.string.calendar_mgmt_cd_prev_month),
                         tint = Neutral700
                     )
                 }
@@ -416,7 +417,7 @@ private fun CalendarCard(
                 IconButton(onClick = onNextMonth.singleClick()) {
                     Icon(
                         Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = stringResource(R.string.calendar_mgmt_cd_next_month),
+                        contentDescription = tr(R.string.calendar_mgmt_cd_next_month),
                         tint = Neutral700
                     )
                 }
@@ -449,7 +450,7 @@ private fun CalendarCard(
                             modifier = Modifier.size(18.dp)
                         )
                         Text(
-                            text = stringResource(R.string.calendar_mgmt_filter_leave_types),
+                            text = tr(R.string.calendar_mgmt_filter_leave_types),
                             fontFamily = InterFontFamily,
                             fontWeight = FontWeight.Medium,
                             fontSize = 15.sp,
@@ -501,7 +502,7 @@ private fun CalendarCard(
                                         .background(Color((type.dotArgb and 0xFFFFFFFFL).toInt()))
                                 )
                                 Text(
-                                    text = stringResource(type.labelRes),
+                                    text = tr(type.labelRes),
                                     fontFamily = InterFontFamily,
                                     fontWeight = FontWeight.Normal,
                                     fontSize = 10.sp,
@@ -529,7 +530,7 @@ private fun CalendarCard(
                     labels.forEach { id ->
                         Text(
                             modifier = Modifier.weight(1f),
-                            text = stringResource(id),
+                            text = tr(id),
                             fontFamily = InterFontFamily,
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 11.sp,
@@ -623,7 +624,7 @@ private fun UpcomingLeavesCard() {
         Column {
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                text = stringResource(R.string.calendar_mgmt_upcoming_leaves),
+                text = tr(R.string.calendar_mgmt_upcoming_leaves),
                 fontFamily = InterFontFamily,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 17.sp,
@@ -668,8 +669,8 @@ private fun UpcomingLeavesCard() {
             rows.forEachIndexed { index, row ->
                 UpcomingLeaveRow(
                     initials = row.initials,
-                    name = stringResource(row.nameRes),
-                    detail = stringResource(row.detailRes),
+                    name = tr(row.nameRes),
+                    detail = tr(row.detailRes),
                     approved = row.approved
                 )
                 if (index < rows.lastIndex) {
@@ -734,9 +735,9 @@ private fun UpcomingLeaveRow(
             )
         }
         val statusLabel = if (approved) {
-            stringResource(R.string.calendar_mgmt_status_approved)
+            tr(R.string.calendar_mgmt_status_approved)
         } else {
-            stringResource(R.string.calendar_mgmt_status_pending)
+            tr(R.string.calendar_mgmt_status_pending)
         }
         val statusBg = if (approved) ApprovedBg else PendingBg
         val statusFg = if (approved) ApprovedText else PendingText
@@ -794,12 +795,12 @@ private fun FilterLeaveTypePopup(
                         modifier = Modifier.align(Alignment.CenterStart)
                     ) {
                         Text(
-                            text = stringResource(R.string.calendar_mgmt_filter_popup_title),
+                            text = tr(R.string.calendar_mgmt_filter_popup_title),
                             style = txtInterBold24
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = stringResource(R.string.calendar_mgmt_filter_popup_subtitle),
+                            text = tr(R.string.calendar_mgmt_filter_popup_subtitle),
                             style = txtInterRegular14
                         )
                     }
@@ -813,7 +814,7 @@ private fun FilterLeaveTypePopup(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = stringResource(R.string.calendar_mgmt_close_popup),
+                            contentDescription = tr(R.string.calendar_mgmt_close_popup),
                             tint = Color.White
                         )
                     }
@@ -826,14 +827,14 @@ private fun FilterLeaveTypePopup(
                     ) {
                         FilterPopupActionButton(
                             modifier = Modifier.weight(1f),
-                            text = stringResource(R.string.calendar_mgmt_select_all),
+                            text = tr(R.string.calendar_mgmt_select_all),
                             background = Color(0xFFE6F1FF),
                             textColor = StatBlue,
                             onClick = { onPendingChange(LeaveFilterType.All) }
                         )
                         FilterPopupActionButton(
                             modifier = Modifier.weight(1f),
-                            text = stringResource(R.string.calendar_mgmt_clear_all),
+                            text = tr(R.string.calendar_mgmt_clear_all),
                             background = Color(0xFFF3F4F6),
                             textColor = Neutral500,
                             onClick = { onPendingChange(emptySet()) }
@@ -842,7 +843,7 @@ private fun FilterLeaveTypePopup(
                     Spacer(modifier = Modifier.height(8.dp))
                     LeaveFilterType.entries.forEach { type ->
                         FilterPopupCheckboxItem(
-                            label = stringResource(type.labelRes),
+                            label = tr(type.labelRes),
                             checked = pendingSelection.contains(type),
                             onCheckedChange = { checked ->
                                 onPendingChange(
@@ -858,7 +859,7 @@ private fun FilterLeaveTypePopup(
 
 
                 CustomButton(
-                    text = stringResource(R.string.calendar_mgmt_apply_filters),
+                    text = tr(R.string.calendar_mgmt_apply_filters),
                     onClick = onApply,
                     modifier = Modifier
                         .fillMaxWidth()

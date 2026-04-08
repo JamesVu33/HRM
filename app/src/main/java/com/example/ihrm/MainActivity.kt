@@ -1,5 +1,6 @@
 package com.example.ihrm
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -24,6 +26,10 @@ import com.example.ihrm.ui.components.ChangeLanguageDialog
 import com.example.ihrm.ui.components.ComingSoonDialog
 import com.example.ihrm.ui.components.DrawerMenu
 import com.example.ihrm.ui.components.LogoutConfirmDialog
+import com.example.ihrm.ui.localization.AppLanguageController
+import com.example.ihrm.ui.localization.AppLocaleApplier
+import com.example.ihrm.ui.localization.LocalLocalization
+import com.example.ihrm.ui.localization.ProvideLocalization
 import com.example.ihrm.ui.navigation.NavGraph
 import com.example.ihrm.ui.navigation.Screen
 import com.example.ihrm.ui.theme.IHRMTheme
@@ -31,15 +37,26 @@ import com.example.ihrm.util.AuthManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var appLanguageController: AppLanguageController
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(AppLocaleApplier.wrapContextWithStoredLocale(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            IHRMTheme {
-                HRMApp()
+            ProvideLocalization(controller = appLanguageController) {
+                IHRMTheme {
+                    HRMApp()
+                }
             }
         }
     }
@@ -101,6 +118,8 @@ private fun DrawerContent(
     navController: NavHostController
 ) {
     var activeDialog by remember { mutableStateOf<DrawerDialog?>(null) }
+    val localization = LocalLocalization.current
+    val activity = LocalContext.current as ComponentActivity
     val gesturesEnabled = remember(currentRoute) { currentRoute in drawerGestureRoutes }
 
     ModalNavigationDrawer(
@@ -150,10 +169,20 @@ private fun DrawerContent(
             onDismiss = { activeDialog = null }
         )
         DrawerDialog.ChangeLanguage -> ChangeLanguageDialog(
+            initialSelectedCode = localization.selectedLanguageCode,
             onDismiss = { activeDialog = null },
-            onSaveLanguage = { _ ->
-                // TODO: call change-language API with selected code, then apply locale.
+            onSaveLanguage = { code ->
+                val previousCode = localization.selectedLanguageCode
+                localization.setLanguageCode(code)
                 activeDialog = null
+                if (code.lowercase() != previousCode.lowercase()) {
+                    // Post avoids recreate during dialog teardown; attachBaseContext applies new locale.
+                    activity.window.decorView.post {
+                        if (!activity.isFinishing && !activity.isDestroyed) {
+                            activity.recreate()
+                        }
+                    }
+                }
             }
         )
         null -> Unit

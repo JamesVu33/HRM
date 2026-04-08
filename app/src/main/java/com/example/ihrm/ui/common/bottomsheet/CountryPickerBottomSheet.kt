@@ -33,6 +33,7 @@ import com.example.ihrm.R
 import com.example.ihrm.domain.model.Country
 import com.example.ihrm.ui.theme.DashboardFigmaInk
 import com.example.ihrm.ui.theme.InterFontFamily
+import com.example.ihrm.ui.localization.tr
 
 @Composable
 fun CountryPickerBottomSheet(
@@ -84,7 +85,7 @@ fun CountryPickerBottomSheet(
                 }
 
                 Text(
-                    text = stringResource(R.string.my_info_country_picker_title),
+                    text = tr(R.string.my_info_country_picker_title),
                     style = TextStyle(
                         fontFamily = InterFontFamily,
                         fontWeight = FontWeight.SemiBold,

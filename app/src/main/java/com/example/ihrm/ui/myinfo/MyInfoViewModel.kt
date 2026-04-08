@@ -3,7 +3,6 @@ package com.example.ihrm.ui.myinfo
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewModelScope
 import com.example.ihrm.R
 import com.example.ihrm.core.errorHandler.CommonErrorException

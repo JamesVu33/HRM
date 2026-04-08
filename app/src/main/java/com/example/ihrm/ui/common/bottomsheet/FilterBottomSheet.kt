@@ -69,6 +69,7 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import com.example.ihrm.ui.localization.tr
 
 private val FilterSheetInk = DashboardFigmaInk
 val FilterSheetMuted = Color(0xFF6B7280)
@@ -107,8 +108,8 @@ fun SecurityChecksFilterBottomSheet(
     var showToPicker by remember { mutableStateOf(false) }
     var groupMenuExpanded by remember { mutableStateOf(false) }
 
-    val allGroupsLabel = stringResource(R.string.security_checks_filters_all_groups)
-    val selectGroupHint = stringResource(R.string.security_checks_filters_select_group)
+    val allGroupsLabel = tr(R.string.security_checks_filters_all_groups)
+    val selectGroupHint = tr(R.string.security_checks_filters_select_group)
 
     val selectedGroupLabel = draft.groupId?.let { key ->
         groupOptions.firstOrNull { option ->
@@ -161,7 +162,7 @@ fun SecurityChecksFilterBottomSheet(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        text = stringResource(R.string.security_checks_filters_title),
+                        text = tr(R.string.security_checks_filters_title),
                         style = TextStyle(
                             fontFamily = InterFontFamily,
                             fontWeight = FontWeight.SemiBold,
@@ -173,7 +174,7 @@ fun SecurityChecksFilterBottomSheet(
                     IconButton(onClick = onDismiss.singleClick()) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = stringResource(R.string.security_checks_filters_close_cd),
+                            contentDescription = tr(R.string.security_checks_filters_close_cd),
                             tint = FilterSheetMuted,
                         )
                     }
@@ -188,24 +189,24 @@ fun SecurityChecksFilterBottomSheet(
                         .verticalScroll(rememberScrollState())
                         .padding(horizontal = 24.dp, vertical = 16.dp),
                 ) {
-                    FilterSectionLabel(stringResource(R.string.security_checks_filters_date_range))
+                    FilterSectionLabel(tr(R.string.security_checks_filters_date_range))
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         DateFieldChip(
-                            label = stringResource(R.string.security_checks_filters_from),
+                            label = tr(R.string.security_checks_filters_from),
                             valueText = formatMillisToDisplay(draft.dateFromMillis)
-                                .ifEmpty { stringResource(R.string.security_checks_filters_pick_date) },
+                                .ifEmpty { tr(R.string.security_checks_filters_pick_date) },
                             isPlaceholder = draft.dateFromMillis == null,
                             modifier = Modifier.weight(1f),
                             onClick = { showFromPicker = true },
                         )
                         DateFieldChip(
-                            label = stringResource(R.string.security_checks_filters_to),
+                            label = tr(R.string.security_checks_filters_to),
                             valueText = formatMillisToDisplay(draft.dateToMillis)
-                                .ifEmpty { stringResource(R.string.security_checks_filters_pick_date) },
+                                .ifEmpty { tr(R.string.security_checks_filters_pick_date) },
                             isPlaceholder = draft.dateToMillis == null,
                             modifier = Modifier.weight(1f),
                             onClick = { showToPicker = true },
@@ -213,7 +214,7 @@ fun SecurityChecksFilterBottomSheet(
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
-                    FilterSectionLabel(stringResource(R.string.security_checks_filters_search_by))
+                    FilterSectionLabel(tr(R.string.security_checks_filters_search_by))
                     Spacer(modifier = Modifier.height(8.dp))
 
                     SecurityChecksSearchByRow(
@@ -224,7 +225,7 @@ fun SecurityChecksFilterBottomSheet(
                     )
 
                     Spacer(modifier = Modifier.height(20.dp))
-                    FilterSectionLabel(stringResource(R.string.security_checks_filters_group))
+                    FilterSectionLabel(tr(R.string.security_checks_filters_group))
                     Spacer(modifier = Modifier.height(8.dp))
                     ExposedDropdownMenuBox(
                         expanded = groupMenuExpanded,
@@ -335,7 +336,7 @@ fun SecurityChecksFilterBottomSheet(
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = FilterSheetInk),
                     ) {
                         Text(
-                            text = stringResource(R.string.security_checks_filters_clear_all),
+                            text = tr(R.string.security_checks_filters_clear_all),
                             fontFamily = InterFontFamily,
                             fontWeight = FontWeight.SemiBold,
                         )
@@ -347,7 +348,7 @@ fun SecurityChecksFilterBottomSheet(
                         colors = ButtonDefaults.buttonColors(containerColor = FilterPrimaryBlue),
                     ) {
                         Text(
-                            text = stringResource(R.string.security_checks_filters_apply),
+                            text = tr(R.string.security_checks_filters_apply),
                             fontFamily = InterFontFamily,
                             fontWeight = FontWeight.SemiBold,
                             color = Color.White,
@@ -453,11 +454,11 @@ fun SecurityChecksSearchByRow(
 
             val label = when (mode) {
                 SecurityChecksSearchByMode.ALL ->
-                    stringResource(R.string.security_checks_filters_search_all)
+                    tr(R.string.security_checks_filters_search_all)
                 SecurityChecksSearchByMode.EMPLOYEE_ID ->
-                    stringResource(R.string.security_checks_filters_search_employee_id)
+                    tr(R.string.security_checks_filters_search_employee_id)
                 SecurityChecksSearchByMode.NAME ->
-                    stringResource(R.string.security_checks_filters_search_name)
+                    tr(R.string.security_checks_filters_search_name)
             }
 
             Box(

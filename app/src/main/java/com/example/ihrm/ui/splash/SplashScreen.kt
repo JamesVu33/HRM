@@ -39,6 +39,7 @@ import com.example.ihrm.ui.theme.SplashSubtitleBlue
 import com.example.ihrm.ui.theme.SplashTitleBlue
 import com.example.ihrm.util.EmptyFunc
 import kotlinx.coroutines.delay
+import com.example.ihrm.ui.localization.tr
 
 /**
  * Splash screen UI theo [Figma 341-664](https://www.figma.com/design/Q9qmml4Qj4FD73VnYshBsO/HRM-Mobile-App-Ver?node-id=341-664):
@@ -129,7 +130,7 @@ fun SplashScreenContent(
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                text = stringResource(R.string.splash_title),
+                text = tr(R.string.splash_title),
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
                 color = SplashTitleBlue
@@ -138,7 +139,7 @@ fun SplashScreenContent(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = stringResource(R.string.splash_subtitle).uppercase(),
+                text = tr(R.string.splash_subtitle).uppercase(),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = SplashSubtitleBlue,
@@ -157,7 +158,7 @@ fun SplashScreenContent(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 24.dp),
-                text = stringResource(R.string.splash_footer).uppercase(),
+                text = tr(R.string.splash_footer).uppercase(),
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
                 color = Primary200

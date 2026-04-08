@@ -76,6 +76,7 @@ import com.example.ihrm.util.LabelTextStyle13RegularWhite
 import com.example.ihrm.util.formatVNPhoneNumber
 import com.example.ihrm.util.singleClick
 import com.example.ihrm.util.txtInterMedium15
+import com.example.ihrm.ui.localization.tr
 
 @Composable
 fun SecurityChecksScreen(
@@ -134,11 +135,11 @@ fun SecurityChecksScreenContent(
         securityGroupsState.securityGroups
     }
 
-    val labelApproved = stringResource(R.string.security_checks_approved)
-    val labelSubmitted = stringResource(R.string.security_checks_submitted)
-    val labelRejected = stringResource(R.string.security_checks_status_rejected)
-    val labelNotSubmitted = stringResource(R.string.security_checks_status_not_submitted)
-    val dash = stringResource(R.string.security_checks_dash)
+    val labelApproved = tr(R.string.security_checks_approved)
+    val labelSubmitted = tr(R.string.security_checks_submitted)
+    val labelRejected = tr(R.string.security_checks_status_rejected)
+    val labelNotSubmitted = tr(R.string.security_checks_status_not_submitted)
+    val dash = tr(R.string.security_checks_dash)
 
 //    val filteredSubmissions = remember(
 //        submissionsState.submissions,
@@ -223,7 +224,7 @@ fun SecurityChecksScreenContent(
                 modifier = Modifier
                     .padding(paddingValues)
                     .statusBarsPadding(),
-                title = stringResource(R.string.drawer_item_security_checks),
+                title = tr(R.string.drawer_item_security_checks),
                 showNavigationIcon = true,
                 onNavigationClick = onBackClick.singleClick(),
                 containerColor = Color.Transparent,
@@ -267,7 +268,7 @@ fun SecurityChecksScreenContent(
                     if (!showInitialLoading && uiItems.isEmpty() && submissionsState.errorMessage == null) {
                         item {
                             Text(
-                                text = stringResource(R.string.security_checks_empty),
+                                text = tr(R.string.security_checks_empty),
                                 style = LabelTextStyle13RegularWhite,
                                 modifier = Modifier.padding(vertical = 24.dp)
                             )
@@ -343,7 +344,7 @@ private fun SecurityFiltersRow(
                 ) {
                     if (searchQuery.isEmpty()) {
                         Text(
-                            text = stringResource(R.string.security_checks_year),
+                            text = tr(R.string.security_checks_year),
                             style = textStyle,
                             color = Color(0xFF9CA3AF)
                         )
@@ -381,7 +382,7 @@ private fun SecurityFiltersRow(
             ) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_filter),
-                    contentDescription = stringResource(R.string.security_checks_filter_cd),
+                    contentDescription = tr(R.string.security_checks_filter_cd),
                     tint = Color(0xFF6B7280),
                     modifier = Modifier.size(16.dp)
                 )
@@ -420,7 +421,7 @@ private fun SecuritySummaryCards(
             modifier = Modifier
                 .weight(1f),
             value = approved,
-            label = stringResource(R.string.security_checks_approved),
+            label = tr(R.string.security_checks_approved),
             valueColor = Color(0xFF34C759),
             selected = selectedFilter == SecuritySummaryFilter.APPROVED,
             selectedBackgroundColor = Color(0xFFD7F6D6),
@@ -430,7 +431,7 @@ private fun SecuritySummaryCards(
             modifier = Modifier
                 .weight(1f),
             value = submitted,
-            label = stringResource(R.string.security_checks_submitted),
+            label = tr(R.string.security_checks_submitted),
             valueColor = Color(0xFF1970F3),
             selected = selectedFilter == SecuritySummaryFilter.SUBMITTED,
             selectedBackgroundColor = Color(0xFFD2E6FF),
@@ -440,7 +441,7 @@ private fun SecuritySummaryCards(
             modifier = Modifier
                 .weight(1f),
             value = rejected,
-            label = stringResource(R.string.security_checks_rejected),
+            label = tr(R.string.security_checks_rejected),
             valueColor = Color(0xFFFF1515),
             selectedBackgroundColor = Color(0xFFFFD5D5),
             selected = selectedFilter == SecuritySummaryFilter.REJECTED,
@@ -450,7 +451,7 @@ private fun SecuritySummaryCards(
             modifier = Modifier
                 .weight(1f),
             value = total,
-            label = stringResource(R.string.security_checks_not_submitted),
+            label = tr(R.string.security_checks_not_submitted),
             valueColor = Color(0xFFF0B100),
             selected = selectedFilter == SecuritySummaryFilter.NOT_SUBMITTED,
             selectedBackgroundColor = Color(0xFFF0F5D7),
@@ -684,7 +685,7 @@ private fun CardApprovedBy(item: SecurityCheckItemUi) {
         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             if (item.approvedByLabelRes != null) {
                 Text(
-                    text = stringResource(item.approvedByLabelRes),
+                    text = tr(item.approvedByLabelRes),
                     color = SecurityCheckCardMuted,
                     fontFamily = InterFontFamily,
                     fontSize = 13.sp,
@@ -706,12 +707,12 @@ private fun CardApprovedBy(item: SecurityCheckItemUi) {
 private fun CardDates(item: SecurityCheckItemUi) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
         val label = when (item.statusUseApprovedChip) {
-            SecurityCheckStatus.REJECTED -> stringResource(R.string.security_checks_rejected_date)
-            else -> stringResource(R.string.security_checks_approved_date)
+            SecurityCheckStatus.REJECTED -> tr(R.string.security_checks_rejected_date)
+            else -> tr(R.string.security_checks_approved_date)
         }
         DateColumn(
             modifier = Modifier.weight(1f),
-            label = stringResource(R.string.security_checks_submitted_date),
+            label = tr(R.string.security_checks_submitted_date),
             value = item.submittedDate
         )
         DateColumn(

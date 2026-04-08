@@ -41,6 +41,7 @@ import com.example.ihrm.ui.theme.DashboardTabActiveBlue
 import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.ui.common.rememberThrottledClick
 import com.example.ihrm.ui.theme.Primary400
+import com.example.ihrm.ui.localization.tr
 
 /**
  * Home dashboard top row: menu, greeting + date (start-aligned in the flexible middle), bell.
@@ -73,7 +74,7 @@ fun DashboardHomeTopBar(
         ) {
             Icon(
                 imageVector = Icons.Default.Menu,
-                contentDescription = stringResource(R.string.dashboard_cd_open_menu),
+                contentDescription = tr(R.string.dashboard_cd_open_menu),
                 tint = Color.White,
                 modifier = Modifier.size(24.dp)
             )
@@ -133,7 +134,7 @@ fun DashboardBellIconButton(
     ) {
         Icon(
             imageVector = Icons.Default.Notifications,
-            contentDescription = stringResource(R.string.dashboard_cd_notifications),
+            contentDescription = tr(R.string.dashboard_cd_notifications),
             tint = Primary400,
             modifier = Modifier.size(20.dp)
         )
@@ -176,7 +177,7 @@ fun DashboardHomeTabSwitcher(
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         DashboardHomeTabChip(
-            label = stringResource(R.string.dashboard_tab_personal),
+            label = tr(R.string.dashboard_tab_personal),
             icon = {
                 Icon(
                     imageVector = Icons.Default.Person,
@@ -190,7 +191,7 @@ fun DashboardHomeTabSwitcher(
             modifier = Modifier.weight(1f)
         )
         DashboardHomeTabChip(
-            label = stringResource(R.string.dashboard_tab_management),
+            label = tr(R.string.dashboard_tab_management),
             icon = {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_list_person),
@@ -257,8 +258,8 @@ fun DashboardHomeTabSubtitle(
 ) {
     Text(
         text = when (tab) {
-            DashboardHomeTab.Personal -> stringResource(R.string.dashboard_tab_subtitle_personal)
-            DashboardHomeTab.Management -> stringResource(R.string.dashboard_tab_subtitle_management)
+            DashboardHomeTab.Personal -> tr(R.string.dashboard_tab_subtitle_personal)
+            DashboardHomeTab.Management -> tr(R.string.dashboard_tab_subtitle_management)
         },
         modifier = modifier
             .fillMaxWidth()

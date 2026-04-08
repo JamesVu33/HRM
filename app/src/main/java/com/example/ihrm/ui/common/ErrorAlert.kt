@@ -46,6 +46,7 @@ import com.example.ihrm.core.errorHandler.GlobalErrorHandler
 import com.example.ihrm.core.viewmodel.BaseViewmodel
 import com.example.ihrm.ui.theme.InterFontFamily
 import kotlinx.coroutines.flow.conflate
+import com.example.ihrm.ui.localization.tr
 
 private val SheetTopCorner = 28.dp
 private val SheetShadowAmbient = Color.Black.copy(alpha = 0.15f)
@@ -148,7 +149,7 @@ fun ErrorAlert(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = stringResource(R.string.error_alert_close_cd),
+                            contentDescription = tr(R.string.error_alert_close_cd),
                             tint = CloseIconTint,
                             modifier = Modifier.size(20.dp),
                         )
@@ -186,7 +187,7 @@ fun ErrorAlert(
                         ),
                     ) {
                         Text(
-                            text = stringResource(R.string.error_alert_close),
+                            text = tr(R.string.error_alert_close),
                             style = TextStyle(
                                 fontFamily = InterFontFamily,
                                 fontWeight = FontWeight.SemiBold,

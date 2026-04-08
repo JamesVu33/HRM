@@ -44,6 +44,7 @@ import com.example.ihrm.ui.theme.DashboardTabActiveBlue
 import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.util.txtInterBold16
 import com.example.ihrm.util.txtInterRegular12
+import com.example.ihrm.ui.localization.tr
 
 @Composable
 fun DashboardSecurityCardPersonal(
@@ -89,7 +90,7 @@ fun DashboardSecurityCardPersonal(
                 }
                 Column {
                     Text(
-                        text = stringResource(R.string.dashboard_security_title),
+                        text = tr(R.string.dashboard_security_title),
                         style = TextStyle(
                             fontFamily = InterFontFamily,
                             fontWeight = FontWeight.Bold,
@@ -100,7 +101,7 @@ fun DashboardSecurityCardPersonal(
                         )
                     )
                     Text(
-                        text = stringResource(R.string.dashboard_security_subtitle),
+                        text = tr(R.string.dashboard_security_subtitle),
                         style = TextStyle(
                             fontFamily = InterFontFamily,
                             fontWeight = FontWeight.Normal,
@@ -131,12 +132,12 @@ fun DashboardSecurityCardPersonal(
                         .padding(12.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.dashboard_security_in_review_personal),
+                        text = tr(R.string.dashboard_security_in_review_personal),
                         style = txtInterBold16
                     )
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
-                        text = stringResource(R.string.dashboard_security_in_review_body_personal),
+                        text = tr(R.string.dashboard_security_in_review_body_personal),
                         style = txtInterRegular12
                     )
                 }

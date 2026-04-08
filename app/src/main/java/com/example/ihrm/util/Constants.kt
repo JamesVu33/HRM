@@ -1,8 +1,5 @@
 package com.example.ihrm.util
 
-import androidx.compose.ui.res.stringResource
-import com.example.ihrm.R
-
 object Constants {
     const val AUTH_PREFS_NAME = "auth_prefs"
     const val PREF_ACCESS_TOKEN = "access_token"
