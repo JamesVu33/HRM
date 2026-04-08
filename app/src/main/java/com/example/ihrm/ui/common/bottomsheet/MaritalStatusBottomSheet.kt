@@ -1,4 +1,4 @@
-package com.example.ihrm.ui.common
+package com.example.ihrm.ui.common.bottomsheet
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

@@ -69,8 +69,8 @@ import com.example.ihrm.domain.model.MyInfo
 import com.example.ihrm.domain.model.MyProfile
 import com.example.ihrm.ui.common.Avatar
 import com.example.ihrm.ui.common.BaseHRMCompose
-import com.example.ihrm.ui.common.CountryPickerBottomSheet
-import com.example.ihrm.ui.common.MaritalStatusBottomSheet
+import com.example.ihrm.ui.common.bottomsheet.CountryPickerBottomSheet
+import com.example.ihrm.ui.common.bottomsheet.MaritalStatusBottomSheet
 import com.example.ihrm.ui.components.ButtonSize
 import com.example.ihrm.ui.components.ButtonVariant
 import com.example.ihrm.ui.components.CustomButton

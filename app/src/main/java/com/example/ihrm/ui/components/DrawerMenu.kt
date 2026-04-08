@@ -175,6 +175,7 @@ fun DrawerMenu(
     onItemClick: (String) -> Unit,
     onLogoutClick: () -> Unit = {},
     onShowComingSoon: (String) -> Unit = {},
+    onTranslationKeysClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val userRole = AuthManager.getAccountType().toDashboardRole()
@@ -238,11 +239,18 @@ fun DrawerMenu(
                                 label = label,
                                 selected = selected,
                                 onClick = {
-                                    if (item.route in IMPLEMENTED_ROUTES) {
-                                        scope.launch { drawerState.close() }
-                                        onItemClick(item.route)
-                                    } else {
-                                        onShowComingSoon(label)
+                                    when (item.route) {
+                                        "translation_keys",
+                                        "translation_keys_personal" -> {
+                                            scope.launch { drawerState.close() }
+                                            onTranslationKeysClick()
+                                        }
+                                        else -> if (item.route in IMPLEMENTED_ROUTES) {
+                                            scope.launch { drawerState.close() }
+                                            onItemClick(item.route)
+                                        } else {
+                                            onShowComingSoon(label)
+                                        }
                                     }
                                 }.singleClick()
                             )

@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.ihrm.ui.components.ChangeLanguageDialog
 import com.example.ihrm.ui.components.ComingSoonDialog
 import com.example.ihrm.ui.components.DrawerMenu
 import com.example.ihrm.ui.components.LogoutConfirmDialog
@@ -89,6 +90,7 @@ private val drawerGestureRoutes = setOf(
 private sealed class DrawerDialog {
     data object Logout : DrawerDialog()
     data class ComingSoon(val featureName: String) : DrawerDialog()
+    data object ChangeLanguage : DrawerDialog()
 }
 
 @Composable
@@ -118,7 +120,8 @@ private fun DrawerContent(
                             }}
                     },
                     onLogoutClick = { activeDialog = DrawerDialog.Logout },
-                    onShowComingSoon = { activeDialog = DrawerDialog.ComingSoon(it) }
+                    onShowComingSoon = { activeDialog = DrawerDialog.ComingSoon(it) },
+                    onTranslationKeysClick = { activeDialog = DrawerDialog.ChangeLanguage }
                 )
             }
         }
@@ -145,6 +148,13 @@ private fun DrawerContent(
         is DrawerDialog.ComingSoon -> ComingSoonDialog(
             featureName = dialog.featureName,
             onDismiss = { activeDialog = null }
+        )
+        DrawerDialog.ChangeLanguage -> ChangeLanguageDialog(
+            onDismiss = { activeDialog = null },
+            onSaveLanguage = { _ ->
+                // TODO: call change-language API with selected code, then apply locale.
+                activeDialog = null
+            }
         )
         null -> Unit
     }

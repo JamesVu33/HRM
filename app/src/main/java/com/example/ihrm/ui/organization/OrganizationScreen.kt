@@ -25,7 +25,6 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,10 +42,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -60,9 +57,9 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.ihrm.R
 import com.example.ihrm.domain.model.DepartmentMember
+import com.example.ihrm.domain.model.toTreeNodes
 import com.example.ihrm.ui.common.BaseHRMCompose
 import com.example.ihrm.ui.theme.InterFontFamily
-import com.example.ihrm.domain.model.toTreeNodes
 import com.example.ihrm.util.getAvatarById
 
 // --- Design tokens (Figma node 871:41281) ---
@@ -91,6 +88,7 @@ private val OrgScreenGradient = Brush.linearGradient(
 data class OrganizationTreeNode(
     val id: String,
     val title: String,
+    val leaderInfo: DepartmentMember? = null,
     val leaderName: String,
     val memberCount: Int? = null,
     val avatarUrl: String? = null,
@@ -109,7 +107,8 @@ internal sealed class OrganizationVisibleRow {
 
     data class MemberRow(
         val member: DepartmentMember,
-        val depth: Int
+        val depth: Int,
+        val isLeader: Boolean
     ) : OrganizationVisibleRow()
 }
 
@@ -132,9 +131,18 @@ internal fun visibleOrganizationRows(
             if (expanded) {
                 if (node.children.isNotEmpty()) {
                     walk(node.children, depth + 1)
+                } else {
+                    node.leaderInfo?.let { leader ->
+                        out.add(OrganizationVisibleRow.MemberRow(leader, depth + 1, isLeader = true))
+                    }
                 }
+
+
                 node.members.forEach { member ->
-                    out.add(OrganizationVisibleRow.MemberRow(member, depth + 1))
+                    out.add(OrganizationVisibleRow.MemberRow(
+                        member, depth + 1,
+                        isLeader = false,
+                    ))
                 }
             }
         }
@@ -171,32 +179,59 @@ private fun OrganizationScreenContent(
 
     var searchQuery by remember { mutableStateOf("") }
 
-    val rootIds = remember(departments) {
-        departments.filter { it.depth == 0 }.map { it.id }.toSet()
-    }
-    var expandedIds by remember(rootIds) { mutableStateOf(rootIds) }
-
     val treeRoots = remember(departments) {
         departments.toTreeNodes()
     }
 
-    val allRows = remember(treeRoots, expandedIds) {
-        visibleOrganizationRows(treeRoots, expandedIds)
+    val rootIds = remember(treeRoots) {
+        treeRoots.map { it.id }.toSet()
     }
+    var expandedIds by remember(rootIds) { mutableStateOf(rootIds) }
 
-    val filteredRows = remember(allRows, searchQuery) {
+    val filteredRows = remember(treeRoots, searchQuery, expandedIds) {
         val q = searchQuery.trim()
-        if (q.isEmpty()) allRows
-        else allRows.filter { row ->
-            when (row) {
-                is OrganizationVisibleRow.DepartmentRow -> {
-                    row.node.title.contains(q, ignoreCase = true) ||
-                            row.node.leaderName.contains(q, ignoreCase = true)
+        if (q.isEmpty()) {
+            visibleOrganizationRows(treeRoots, expandedIds)
+        } else {
+            val searchExpandedIds = mutableSetOf<String>()
+            
+            fun checkMatchDeep(node: OrganizationTreeNode): Boolean {
+                val matchesSelf = node.title.contains(q, ignoreCase = true) ||
+                                 node.leaderName.contains(q, ignoreCase = true)
+                
+                val hasMatchingMember = node.members.any { 
+                    it.fullName.contains(q, ignoreCase = true) || 
+                    it.email.contains(q, ignoreCase = true) 
                 }
+                
+                val childMatches = node.children.any { checkMatchDeep(it) }
+                
+                val result = matchesSelf || hasMatchingMember || childMatches
+                
+                if (result && (hasMatchingMember || childMatches)) {
+                    searchExpandedIds.add(node.id)
+                }
+                return result
+            }
 
-                is OrganizationVisibleRow.MemberRow -> {
-                    row.member.fullName.contains(q, ignoreCase = true) ||
-                            row.member.email.contains(q, ignoreCase = true)
+            treeRoots.forEach { checkMatchDeep(it) }
+
+            val rows = visibleOrganizationRows(treeRoots, searchExpandedIds)
+            
+            rows.filter { row ->
+                when (row) {
+                    is OrganizationVisibleRow.DepartmentRow -> {
+                        fun hasAnyMatch(n: OrganizationTreeNode): Boolean {
+                            if (n.title.contains(q, ignoreCase = true) || n.leaderName.contains(q, ignoreCase = true)) return true
+                            if (n.members.any { it.fullName.contains(q, ignoreCase = true) || it.email.contains(q, ignoreCase = true) }) return true
+                            return n.children.any { hasAnyMatch(it) }
+                        }
+                        hasAnyMatch(row.node)
+                    }
+                    is OrganizationVisibleRow.MemberRow -> {
+                        row.member.fullName.contains(q, ignoreCase = true) ||
+                        row.member.email.contains(q, ignoreCase = true)
+                    }
                 }
             }
         }
@@ -263,29 +298,38 @@ private fun OrganizationScreenContent(
                             }
                         }
                     ) { index, row ->
-                        when (row) {
-                            is OrganizationVisibleRow.DepartmentRow -> {
-                                if (index == 1 && filteredRows.firstOrNull()
-                                        .let { it is OrganizationVisibleRow.DepartmentRow && it.depth == 0 }
-                                ) {
-                                    HorizontalDivider(thickness = 1.dp, color = OrgDivider)
-                                }
-                                OrganizationTreeRow(
-                                    row = row,
-                                    isRoot = row.depth == 0,
-                                    onToggleExpand = {
-                                        if (!row.hasChildren) return@OrganizationTreeRow
-                                        expandedIds = if (row.isExpanded) {
-                                            expandedIds - row.node.id
-                                        } else {
-                                            expandedIds + row.node.id
-                                        }
+                        Column {
+                            when (row) {
+                                is OrganizationVisibleRow.DepartmentRow -> {
+                                    if (index == 0 && row.depth == 0) {
+                                        Spacer(modifier = Modifier.height(16.dp))
                                     }
-                                )
+                                    
+                                    OrganizationTreeRow(
+                                        row = row,
+                                        isRoot = row.depth == 0,
+                                        onToggleExpand = {
+                                            if (!row.hasChildren) return@OrganizationTreeRow
+                                            expandedIds = if (row.isExpanded) {
+                                                expandedIds - row.node.id
+                                            } else {
+                                                expandedIds + row.node.id
+                                            }
+                                        }
+                                    )
+                                }
+
+                                is OrganizationVisibleRow.MemberRow -> {
+                                    OrganizationMemberRow(row = row)
+                                }
                             }
 
-                            is OrganizationVisibleRow.MemberRow -> {
-                                OrganizationMemberRow(row = row)
+                            if (index < filteredRows.lastIndex) {
+                                HorizontalDivider(
+                                    thickness = 0.5.dp,
+                                    color = OrgDivider,
+                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                )
                             }
                         }
                     }
@@ -451,21 +495,26 @@ private fun OrganizationTreeRow(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = node.leaderName,
-                style = leaderStyle,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Spacer(modifier = Modifier.height(2.dp))
 
-            Text(
-                text = node.roleName,
-                style = leaderStyle,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            if (node.leaderName.isNotBlank()) {
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = node.leaderName,
+                    style = leaderStyle,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            if (node.roleName.isNotBlank()) {
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = node.roleName,
+                    style = leaderStyle,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
 
         node.memberCount?.let { count ->
@@ -474,7 +523,7 @@ private fun OrganizationTreeRow(
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_employees),
+                    imageVector = androidx.compose.ui.graphics.vector.ImageVector.vectorResource(R.drawable.ic_employees),
                     contentDescription = stringResource(R.string.organization_cd_member_count),
                     tint = OrgLeaderMuted2,
                     modifier = Modifier.size(16.dp)
@@ -526,7 +575,7 @@ private fun OrganizationMemberRow(row: OrganizationVisibleRow.MemberRow) {
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            member.titleName?.let {
+            member.roleName?.let {
                 Text(
                     text = it,
                     fontFamily = InterFontFamily,

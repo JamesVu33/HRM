@@ -225,6 +225,19 @@
     <string name="coming_soon_message">The \"%1$s\" feature is currently under development and will be available soon.</string>
     <string name="coming_soon_got_it">Got it</string>
     <string name="coming_soon_close">Close</string>
+    <!-- Change language dialog (Figma 871:32097) -->
+    <string name="change_language_title">Change Language</string>
+    <string name="change_language_subtitle">Select your preferred language</string>
+    <string name="change_language_section_label">SELECT LANGUAGE *</string>
+    <string name="language_english_name">English</string>
+    <string name="language_english_native">English</string>
+    <string name="language_vietnamese_name">Vietnamese</string>
+    <string name="language_vietnamese_native">Tiếng Việt</string>
+    <string name="language_korean_name">Korean</string>
+    <string name="language_korean_native">한국어</string>
+    <string name="change_language_save">Save Language</string>
+    <string name="change_language_cd_close">Close change language</string>
+    <string name="change_language_option_cd">Language %1$s</string>
     <string name="error_alert_close">Close</string>
     <string name="error_alert_close_cd">Dismiss error</string>
 

@@ -99,6 +99,7 @@ fun List<Department>.toTreeNodes(): List<OrganizationTreeNode> {
         id = id,
         title = name,
         roleName = leader?.roleName.orEmpty(),
+        leaderInfo = leader,
         leaderName = leader?.fullName.orEmpty(),
         memberCount = memberCount.takeIf { it > 0 },
         avatarUrl = leader?.avatarUrl,
