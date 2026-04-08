@@ -51,7 +51,7 @@ import com.example.ihrm.ui.theme.TextSecondary
 import com.example.ihrm.util.singleClick
 
 /**
- * Employee card matching [Figma HRM EmployeeCard](https://www.figma.com/design/Q9qmml4Qj4FD73VnYshBsO/HRM-Mobile-App-Ver?node-id=255-11482).
+ * EmployeeDepartmentResponse card matching [Figma HRM EmployeeCard](https://www.figma.com/design/Q9qmml4Qj4FD73VnYshBsO/HRM-Mobile-App-Ver?node-id=255-11482).
  * Shows avatar (initials), name, position, badge, ID, email, phone, and View Details / Delete actions.
  */
 @Composable

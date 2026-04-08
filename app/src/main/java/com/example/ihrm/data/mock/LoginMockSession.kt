@@ -11,7 +11,7 @@ import com.example.ihrm.domain.model.AppFeature
  */
 object LoginMockSession {
 
-    /** Employee IDs treated as **Extra** when API omits `accountType`. */
+    /** EmployeeDepartmentResponse IDs treated as **Extra** when API omits `accountType`. */
     private val mockExtraEmployeeIds: Set<String> = setOf(
         "00000001",
         "12345678",

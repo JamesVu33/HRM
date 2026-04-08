@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/** UI state cho màn danh sách nhân viên: Employee + Level (gộp từ 2 API). */
+/** UI state cho màn danh sách nhân viên: EmployeeDepartmentResponse + Level (gộp từ 2 API). */
 data class EmployeeListUiState(
     val employeeUiModels: List<EmployeeUiModel> = emptyList(),
     val isLoading: Boolean = false,
@@ -76,7 +76,7 @@ class EmployeeListViewModel @Inject constructor(
     }
 
     /**
-     * Gộp danh sách Employee với Level: chỉ gọi getLevelById cho levelId chưa có trong cache,
+     * Gộp danh sách EmployeeDepartmentResponse với Level: chỉ gọi getLevelById cho levelId chưa có trong cache,
      * gọi song song (async) để tối ưu performance.
      */
     private suspend fun mergeEmployeesWithLevels(employees: List<Employee>): List<EmployeeUiModel> =
@@ -119,7 +119,7 @@ class EmployeeListViewModel @Inject constructor(
 }
 
 /**
- * Gộp danh sách Employee với levelMap (levelId -> Level). Pure function để dễ unit test.
+ * Gộp danh sách EmployeeDepartmentResponse với levelMap (levelId -> Level). Pure function để dễ unit test.
  */
 internal fun buildEmployeeUiModels(
     employees: List<Employee>,

@@ -1,7 +1,7 @@
 package com.example.ihrm.domain.model
 
 /**
- * UI model: Employee + Level (gộp từ getAllEmployees + getLevelById).
+ * UI model: EmployeeDepartmentResponse + Level (gộp từ getAllEmployees + getLevelById).
  * Dùng cho màn danh sách nhân viên để hiển thị badge/level mà không gọi API trùng.
  */
 data class EmployeeUiModel(

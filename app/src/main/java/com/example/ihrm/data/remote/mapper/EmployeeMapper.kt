@@ -50,7 +50,7 @@ private fun UserResponseDto.resolvePositionName(meta: UserMetaResponseDto?): Str
     return meta?.roles?.find { it.code == role.code }?.name ?: role.name
 }
 
-/** Map GET /employees API item to domain Employee. levelId is for UI to call GET /levels/{id} for badge. */
+/** Map GET /employees API item to domain EmployeeDepartmentResponse. levelId is for UI to call GET /levels/{id} for badge. */
 fun UserResponseDto.toEmployee(meta: UserMetaResponseDto? = null): Employee {
     return Employee(
         id = employeeId,
