@@ -85,7 +85,6 @@
     <string name="dashboard_mock_email">brninh343456@company.com</string>
     <string name="dashboard_mock_phone">0901234672</string>
     <string name="dashboard_mock_joined">2024년 1월</string>
-    <string name="dashboard_mock_date">2025년 3월 19일 목요일</string>
     <string name="dashboard_profile_email_label">이메일</string>
     <string name="dashboard_profile_phone_label">전화번호</string>
     <string name="dashboard_profile_joined_label">입사일</string>

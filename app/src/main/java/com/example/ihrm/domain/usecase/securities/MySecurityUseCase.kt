@@ -41,6 +41,7 @@ class MySecurityUseCase @Inject constructor(
     ): MySecurityCheckUiState {
         val status = legendByKey(detail.status ?: "")
         return MySecurityCheckUiState(
+            id = detail.id.toString(),
             userName = detail.user?.fullName ?: DASH,
             employeeId = detail.user?.employeeId ?: DASH,
             status = status,

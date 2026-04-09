@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 data class MySecurityCheckUiState(
+    val id: String = "",
     val employeeId: String = "",
     val userName: String = "",
     val status: SecurityLegendMeta = DEFAULT,

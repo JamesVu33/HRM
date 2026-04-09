@@ -41,4 +41,13 @@ class DashboardManagementCalendarDateTest {
         val ko = formatManagementCalendarDate(fixed, "ko")
         assertNotEquals(en.monthLabel, ko.monthLabel)
     }
+
+    @Test
+    fun formatDashboardHomeDateLine_fullStyle_nonBlankPerLanguage() {
+        val fixed = LocalDate.of(2026, 4, 9)
+        listOf("en", "vi", "ko").forEach { code ->
+            val line = formatDashboardHomeDateLine(fixed, code)
+            assertTrue(line.isNotBlank())
+        }
+    }
 }

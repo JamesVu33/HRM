@@ -283,7 +283,7 @@ fun MySecurityCheckScreenContent(
                 items(uiState) { item ->
                     ChecklistCard(
                         item = item,
-                        onClick = { onChecklistClick(item.status.label.lowercase()) }
+                        onClick = { onChecklistClick(item.id) }
                     )
                 }
                 item { Spacer(modifier = Modifier.height(8.dp)) }

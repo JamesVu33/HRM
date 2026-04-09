@@ -84,7 +84,6 @@
     <string name="dashboard_mock_email">brninh343456@company.com</string>
     <string name="dashboard_mock_phone">0901234672</string>
     <string name="dashboard_mock_joined">Jan 2024</string>
-    <string name="dashboard_mock_date">Thursday, 19 March 2025</string>
     <string name="dashboard_profile_email_label">Email Address</string>
     <string name="dashboard_profile_phone_label">Phone Number</string>
     <string name="dashboard_profile_joined_label">Joined</string>

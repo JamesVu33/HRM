@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +43,8 @@ import com.example.ihrm.ui.theme.DashboardGradientSoft
 import com.example.ihrm.ui.theme.DashboardGradientTop
 import com.example.ihrm.ui.theme.IHRMTheme
 import com.example.ihrm.util.AuthManager
+import com.example.ihrm.ui.localization.LocalLocalization
+import com.example.ihrm.ui.localization.LocalizationState
 import com.example.ihrm.ui.localization.tr
 
 @Composable
@@ -115,6 +118,8 @@ fun DashboardScreenContent(
         )
     }
     var selectedTab by remember { mutableStateOf(DashboardHomeTab.Personal) }
+    val languageCode = LocalLocalization.current.selectedLanguageCode
+    val dashboardDateText = remember(languageCode) { formatDashboardHomeDateToday(languageCode) }
 
     Scaffold(
         modifier = Modifier
@@ -127,7 +132,7 @@ fun DashboardScreenContent(
             ){
                 DashboardHomeTopBar(
                     greeting = tr(R.string.dashboard_good_morning),
-                    dateText = tr(R.string.dashboard_mock_date),
+                    dateText = dashboardDateText,
                     onMenuClick = onMenuClick,
                     onBellClick = onBellClick,
                     showBellBadge = true
@@ -248,11 +253,18 @@ private fun DashboardPersonalRoleSection(
 @Composable
 private fun DashboardScreenPreview() {
     IHRMTheme {
-        DashboardScreen(
-            onMenuClick = {},
-            onProfileClick = {},
-            onCalendarManagement = {},
-            onViewStats = {}
-        )
+        CompositionLocalProvider(
+            LocalLocalization provides LocalizationState(
+                selectedLanguageCode = "en",
+                setLanguageCode = {}
+            )
+        ) {
+            DashboardScreen(
+                onMenuClick = {},
+                onProfileClick = {},
+                onCalendarManagement = {},
+                onViewStats = {}
+            )
+        }
     }
 }

@@ -54,7 +54,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
@@ -80,6 +79,7 @@ import com.example.ihrm.ui.localization.tr
 
 @Composable
 fun SecurityChecksScreen(
+    onMenuClick: () -> Unit,
     onBackClick: () -> Unit,
     onSeeChartClick: () -> Unit,
     onSecurityCheckClick: (String) -> Unit,
@@ -89,7 +89,7 @@ fun SecurityChecksScreen(
     BaseHRMCompose(
         content = {
             SecurityChecksScreenContent(
-                onBackClick = onBackClick,
+                onMenuClick = onMenuClick,
                 onSeeChartClick = onSeeChartClick,
                 onSecurityCheckClick = onSecurityCheckClick,
                 modifier = modifier,
@@ -110,7 +110,7 @@ enum class SecuritySummaryFilter {
 
 @Composable
 fun SecurityChecksScreenContent(
-    onBackClick: () -> Unit,
+    onMenuClick: () -> Unit,
     onSeeChartClick: () -> Unit,
     onSecurityCheckClick: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -226,7 +226,7 @@ fun SecurityChecksScreenContent(
                     .statusBarsPadding(),
                 title = tr(R.string.drawer_item_security_checks),
                 showNavigationIcon = true,
-                onNavigationClick = onBackClick.singleClick(),
+                onNavigationClick = onMenuClick.singleClick(),
                 containerColor = Color.Transparent,
                 navigationIcon = {
                     Icon(

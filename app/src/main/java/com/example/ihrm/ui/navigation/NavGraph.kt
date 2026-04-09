@@ -132,6 +132,7 @@ fun NavGraph(
 
         composable(Screen.SecurityChecks.route) {
             SecurityChecksScreen(
+                onMenuClick = { scope.launch { drawerState?.open() } },
                 onBackClick = { navController.popBackStackIfPossible() },
                 onSeeChartClick = { navController.navigate(Screen.SecurityChecksAnalytics.route) },
                 onSecurityCheckClick = { legendKey ->
