@@ -38,6 +38,7 @@ internal fun mapMeEmployeeToDashboardProfile(
     val joined = formatOnBoardAt(me.onBoardAt) ?: fallback.joined
 
     return DashboardProfileModel(
+        roleName = roleName,
         displayName = name,
         employeeId = empId,
         departmentBadge = badge,

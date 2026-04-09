@@ -6,6 +6,7 @@ import com.example.ihrm.data.remote.dto.LevelResponseDto
 import com.example.ihrm.data.remote.dto.MeEmployeeResponse
 import com.example.ihrm.data.remote.dto.UserMetaResponseDto
 import com.example.ihrm.data.remote.dto.UserResponseDto
+import com.example.ihrm.data.remote.employee.EmployeeProfileResponse
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -26,7 +27,7 @@ interface EmployeeApiService {
     @GET("employees/meta")
     suspend fun getEmployeesMeta(): Response<ApiSuccessResponse<UserMetaResponseDto>>
 
-    /** GET /me/employee-info - current user's level, title, roles. */
+    /** GET /me/employee-info - current user's level, level, roles. */
     @GET("me/employee-info")
     suspend fun getMeEmployeeInfo(): Response<ApiSuccessResponse<MeEmployeeResponse>>
 
@@ -39,8 +40,11 @@ interface EmployeeApiService {
     suspend fun getLevelById(@Path("id") id: Int): Response<ApiSuccessResponse<LevelResponseDto>>
 
     /** GET /employees/{id} - response: { statusCode, message, data: { ..., level?: { id, code, name, ... } } }. */
-    @GET("employees/{id}")
-    suspend fun getEmployeeById(@Path("id") id: String): Response<ApiSuccessResponse<EmployeeDto>>
+    @GET("employees/{employeeId}")
+    suspend fun getEmployeeById(@Path("employeeId") id: String): Response<ApiSuccessResponse<EmployeeDto>>
+
+    @GET("/employees/{employeeId}/profile")
+    suspend fun getEmployeeProfileById(@Path("employeeId") id: String): Response<ApiSuccessResponse<EmployeeProfileResponse>>
 
     @POST("employees")
     suspend fun createEmployee(@Body employee: EmployeeDto): Response<ApiSuccessResponse<EmployeeDto>>

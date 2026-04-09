@@ -317,7 +317,7 @@
 
     <!-- EmployeeDepartmentResponse Detail -->
     <string name="employee_detail_title">Member Information</string>
-    <string name="employee_detail_subtitle_format">%1$s | ID: %2$s</string>
+    <string name="employee_detail_subtitle_format">ID: %1$s</string>
     <string name="employee_detail_tab_basic_info">Basic Info</string>
     <string name="employee_detail_tab_employee_info">Employee Info</string>
     <string name="employee_detail_tab_emergency_contact">Emergency Contact</string>
@@ -450,7 +450,7 @@
     <!-- Role options -->
     <string name="employee_info_role1">Role1</string>
     <string name="employee_info_role2">Role2</string>
-    <!-- Job title options -->
+    <!-- Job level options -->
     <string name="employee_info_job_accounting">Accounting Officer</string>
     <string name="employee_info_job_ga">GA Officer</string>
     <string name="employee_info_job_hr">HR Officer</string>
@@ -528,7 +528,7 @@
     <string name="marital_married">Married</string>
     <string name="marital_divorced">Divorced</string>
     <string name="marital_widowed">Widowed</string>
-    <!-- Job title (Add form) -->
+    <!-- Job level (Add form) -->
     <string name="job_title_account">Account Officer</string>
     <string name="job_title_ga">GA Officer</string>
     <string name="job_title_contract">Contract Officer</string>

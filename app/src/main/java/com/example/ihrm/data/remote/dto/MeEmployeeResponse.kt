@@ -15,7 +15,7 @@ data class MeEmployeeResponse(
     @SerializedName("resignedAt")
     val resignedAt: String? = null,
 
-    @SerializedName("title")
+    @SerializedName("level")
     val title: TitleShortDto? = null,
 
     @SerializedName("level")
@@ -32,25 +32,4 @@ data class MeEmployeeResponse(
 
     @SerializedName("educations")
     val educations: List<Any> = emptyList()
-)
-
-data class CertificationDto(
-    @SerializedName("id")
-    val id: Int,
-    @SerializedName("name")
-    val name: String,
-    @SerializedName("issuer")
-    val issuer: String? = null,
-    @SerializedName("issueDate")
-    val issueDate: String? = null,
-    @SerializedName("expiryDate")
-    val expiryDate: String? = null,
-    @SerializedName("url")
-    val url: String? = null,
-    @SerializedName("userId")
-    val userId: Int? = null,
-    @SerializedName("createdAt")
-    val createdAt: String? = null,
-    @SerializedName("updatedAt")
-    val updatedAt: String? = null
 )

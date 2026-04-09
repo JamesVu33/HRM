@@ -114,7 +114,7 @@ fun DashboardProfileCardManagement(
                             .padding(horizontal = 8.dp, vertical = 2.dp)
                     ) {
                         Text(
-                            text = profile.departmentBadge,
+                            text = "${profile.roleName}",
                             style = TextStyle(
                                 fontFamily = InterFontFamily,
                                 fontWeight = FontWeight.Medium,

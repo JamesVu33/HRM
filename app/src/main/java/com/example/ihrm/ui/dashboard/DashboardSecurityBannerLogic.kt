@@ -41,7 +41,7 @@ internal fun aggregateSecuritySubmissions(list: List<MySecurityCheckResponse>): 
 }
 
 /**
- * Resolves banner title/subtitle in the same order as the iOS dashboard security banner.
+ * Resolves banner level/subtitle in the same order as the iOS dashboard security banner.
  */
 internal fun resolveDashboardSecurityBanner(
     counts: SecuritySubmissionCounts,
@@ -74,7 +74,7 @@ internal fun resolveDashboardSecurityBanner(
             subtitleRes = R.string.dashboard_security_banner_empty_subtitle
         )
     }
-    // Subtitle-only branch on iOS: rejected > 0 uses resubmit copy even when title is "All caught up"
+    // Subtitle-only branch on iOS: rejected > 0 uses resubmit copy even when level is "All caught up"
     // (e.g. some approved, still have rejections).
     if (counts.rejected > 0) {
         return DashboardSecurityBannerModel(

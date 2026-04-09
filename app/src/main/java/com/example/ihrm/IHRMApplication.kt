@@ -12,6 +12,8 @@ class IHRMApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         AuthManager.init(this)
+        // Mỗi lần process mới (cold start, user swipe kill app): không khôi phục phiên từ disk — bắt buộc đăng nhập lại.
+        AuthManager.clearTokens()
         applyStoredAppLocale()
     }
 

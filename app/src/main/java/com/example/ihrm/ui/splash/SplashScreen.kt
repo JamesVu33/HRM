@@ -43,7 +43,7 @@ import com.example.ihrm.ui.localization.tr
 
 /**
  * Splash screen UI theo [Figma 341-664](https://www.figma.com/design/Q9qmml4Qj4FD73VnYshBsO/HRM-Mobile-App-Ver?node-id=341-664):
- * Gradient trắng -> xanh, logo Shinhan DS trong ô trắng bo góc, title + subtitle, footer "Digital Solutions".
+ * Gradient trắng -> xanh, logo Shinhan DS trong ô trắng bo góc, level + subtitle, footer "Digital Solutions".
  */
 @Composable
 fun SplashScreen(

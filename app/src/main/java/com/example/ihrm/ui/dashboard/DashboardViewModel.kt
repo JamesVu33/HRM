@@ -12,11 +12,9 @@ import com.example.ihrm.data.remote.dto.MeEmployeeResponse
 import com.example.ihrm.data.remote.dto.UserMetaResponseDto
 import com.example.ihrm.data.remote.securities.SecurityCheckDashboardResponse
 import com.example.ihrm.domain.model.Employee
-import com.example.ihrm.domain.model.Level
 import com.example.ihrm.domain.usecase.employees.DeleteEmployeeUseCase
 import com.example.ihrm.domain.usecase.employees.GetEmployeesMetaUseCase
 import com.example.ihrm.domain.usecase.employees.GetEmployeesUseCase
-import com.example.ihrm.domain.usecase.employees.GetLevelByEmployeeIdUseCase
 import com.example.ihrm.domain.usecase.employees.GetMeEmployeeInfoUseCase
 import com.example.ihrm.domain.usecase.employees.SyncEmployeesUseCase
 import com.example.ihrm.domain.usecase.securities.SecuritiesUseCase
@@ -40,7 +38,6 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
-import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 
@@ -65,7 +62,6 @@ data class DashboardUiState(
 class DashboardViewModel @Inject constructor(
     private val getEmployeesUseCase: GetEmployeesUseCase,
     private val syncEmployeesUseCase: SyncEmployeesUseCase,
-    private val getLevelByEmployeeIdUseCase: GetLevelByEmployeeIdUseCase,
     private val getMeEmployeeInfoUseCase: GetMeEmployeeInfoUseCase,
     private val getEmployeesMetaUseCase: GetEmployeesMetaUseCase,
     private val deleteEmployeeUseCase: DeleteEmployeeUseCase,
@@ -126,7 +122,6 @@ class DashboardViewModel @Inject constructor(
     init {
         updateGreetingAndDate()
         loadEmployees()
-        loadLevelCodesWhenEmployeesChange()
         loadMeEmployeeInfo()
         loadDashboardSecurityCheck()
     }
@@ -212,28 +207,6 @@ class DashboardViewModel @Inject constructor(
         }
     }
 
-    /** Khi danh sách employees đổi, gọi GET /employees/{id} cho từng id (chưa cache) để lấy level code. */
-    private fun loadLevelCodesWhenEmployeesChange() {
-        viewModelScope.launch(Dispatchers.IO) {
-            employeesWithRefresh.collect { employees ->
-                val ids = employees.map { it.id }.distinct()
-                val missing = ids.filter { it !in levelCodeCache }
-                for (id in missing) {
-                    fetchData(
-                        fetching = { getLevelByEmployeeIdUseCase(id) },
-                        callbackWrapper = object : CallbackWrapper<Level?> {
-                            override fun onSuccess(data: Level?) {
-                                data?.code?.let { code ->
-                                    levelCodeCache[id] = code
-                                }
-                                levelCodeByEmployeeId.value = levelCodeCache.toMap()
-                            }
-                        },
-                    )
-                }
-            }
-        }
-    }
 
     /** If current user level is S1 or S2, fetches and returns employees meta for mapping; otherwise returns null. */
     private suspend fun getMetaIfS1OrS2(): UserMetaResponseDto? {
@@ -241,10 +214,6 @@ class DashboardViewModel @Inject constructor(
         val levelCode = meResult.level?.code ?: return null
         if (levelCode != "S1" && levelCode != "S2") return null
         return getEmployeesMetaUseCase().getOrNull()
-    }
-
-    fun updateSearchQuery(query: String) {
-        searchQuery.value = query
     }
 
     fun deleteEmployee(id: String) {

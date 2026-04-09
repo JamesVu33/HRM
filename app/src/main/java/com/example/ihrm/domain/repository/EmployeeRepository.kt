@@ -2,7 +2,9 @@ package com.example.ihrm.domain.repository
 
 import com.example.ihrm.data.remote.dto.MeEmployeeResponse
 import com.example.ihrm.data.remote.base.NetworkResult
+import com.example.ihrm.data.remote.dto.EmployeeDto
 import com.example.ihrm.data.remote.dto.UserMetaResponseDto
+import com.example.ihrm.data.remote.employee.EmployeeProfileResponse
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.model.Level
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +23,8 @@ interface EmployeeRepository {
     /** Fetches one level by id (GET /levels/{id}). Dùng để gộp với EmployeeDepartmentResponse mà không gọi trùng. */
     suspend fun getLevelById(id: Int): NetworkResult<Level?>
     /** Lấy level theo employee id: gọi GET /employees/{id}, trả về level từ response. */
-    suspend fun getLevelByEmployeeId(employeeId: String): NetworkResult<Level?>
+    suspend fun getEmployeeDetailById(employeeId: String): NetworkResult<EmployeeDto>
+    suspend fun getEmployeeProfileById(employeeId: String): NetworkResult<EmployeeProfileResponse>
     suspend fun getMeEmployeeInfo(): NetworkResult<MeEmployeeResponse>
     suspend fun getEmployeesMeta(): NetworkResult<UserMetaResponseDto>
     suspend fun changeAvatar(avatar: MultipartBody.Part): NetworkResult<Unit>

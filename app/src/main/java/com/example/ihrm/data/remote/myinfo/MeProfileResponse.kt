@@ -60,7 +60,7 @@ data class MeProfileResponse(
     @SerializedName("level")
     val level: LevelResponse? = null,
 
-    @SerializedName("title")
+    @SerializedName("level")
     val title: TitleResponse? = null,
 ) : ResponseToInfoMapper<MyProfile> {
     override fun fromResponseToInfo(): MyProfile {

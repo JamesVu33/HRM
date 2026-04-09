@@ -318,7 +318,7 @@
 
     <!-- EmployeeDepartmentResponse Detail -->
     <string name="employee_detail_title">Thông tin thành viên</string>
-    <string name="employee_detail_subtitle_format">%1$s | ID: %2$s</string>
+    <string name="employee_detail_subtitle_format">ID: %1$s</string>
     <string name="employee_detail_tab_basic_info">Thông tin cơ bản</string>
     <string name="employee_detail_tab_employee_info">Thông tin nhân viên</string>
     <string name="employee_detail_tab_emergency_contact">Liên hệ khẩn cấp</string>
@@ -451,7 +451,7 @@
     <!-- Role options -->
     <string name="employee_info_role1">Vai trò 1</string>
     <string name="employee_info_role2">Vai trò 2</string>
-    <!-- Job title options -->
+    <!-- Job level options -->
     <string name="employee_info_job_accounting">Nhân viên kế toán</string>
     <string name="employee_info_job_ga">Nhân viên GA</string>
     <string name="employee_info_job_hr">Nhân viên nhân sự</string>
@@ -529,7 +529,7 @@
     <string name="marital_married">Đã kết hôn</string>
     <string name="marital_divorced">Ly hôn</string>
     <string name="marital_widowed">Góa</string>
-    <!-- Job title (Add form) -->
+    <!-- Job level (Add form) -->
     <string name="job_title_account">Nhân viên tài khoản</string>
     <string name="job_title_ga">Nhân viên GA</string>
     <string name="job_title_contract">Nhân viên hợp đồng</string>

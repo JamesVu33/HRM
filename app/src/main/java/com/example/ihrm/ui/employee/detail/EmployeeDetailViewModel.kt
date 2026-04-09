@@ -1,8 +1,11 @@
 package com.example.ihrm.ui.employee.detail
 
 import androidx.lifecycle.viewModelScope
+import com.example.ihrm.core.errorHandler.CommonErrorException
 import com.example.ihrm.core.viewmodel.BaseViewmodel
 import com.example.ihrm.core.viewmodel.CallbackWrapper
+import com.example.ihrm.data.remote.base.NetworkResult
+import com.example.ihrm.data.remote.mapper.toEmployee
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.usecase.employees.DeleteEmployeeUseCase
 import com.example.ihrm.domain.usecase.employees.GetEmployeeByIdUseCase
@@ -25,7 +28,7 @@ data class EmployeeDetailUiState(
 class EmployeeDetailViewModel @Inject constructor(
     private val getEmployeeByIdUseCase: GetEmployeeByIdUseCase,
     private val deleteEmployeeUseCase: DeleteEmployeeUseCase,
-    private val updateEmployeeUseCase: UpdateEmployeeUseCase
+    private val updateEmployeeUseCase: UpdateEmployeeUseCase,
 ) : BaseViewmodel() {
 
     private val _uiState = MutableStateFlow(EmployeeDetailUiState())
@@ -34,23 +37,38 @@ class EmployeeDetailViewModel @Inject constructor(
     fun loadEmployee(employeeId: String) {
         viewModelScope.launch {
             val preserveSuccess = _uiState.value.updateSuccess
-            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-            try {
-                getEmployeeByIdUseCase(employeeId).collect { employee ->
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null, employee = null)
+            when (val result = getEmployeeByIdUseCase(employeeId)) {
+                is NetworkResult.Success -> {
                     _uiState.value = _uiState.value.copy(
-                        employee = employee,
+                        employee = result.data,
                         isLoading = false,
                         updateSuccess = preserveSuccess
                     )
                 }
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    error = e.message ?: "Failed to load employee"
-                )
+                is NetworkResult.Failure -> {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = employeeLoadErrorMessage(result.error),
+                        employee = null
+                    )
+                }
+                is NetworkResult.Exception -> {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = employeeLoadErrorMessage(result.e),
+                        employee = null
+                    )
+                }
             }
         }
     }
+
+    private fun employeeLoadErrorMessage(e: CommonErrorException): String =
+        e.errorMsg?.takeIf { it.isNotBlank() }
+            ?: e.message?.takeIf { !it.isNullOrBlank() }
+            ?: e.errorKey.takeIf { it.isNotBlank() }
+            ?: "Failed to load employee"
 
     fun deleteEmployee(employeeId: String, onSuccess: () -> Unit) {
         fetchData(

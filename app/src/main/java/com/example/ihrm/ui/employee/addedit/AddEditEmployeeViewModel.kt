@@ -4,10 +4,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.ihrm.core.errorHandler.CommonErrorException
 import com.example.ihrm.core.viewmodel.BaseViewmodel
 import com.example.ihrm.core.viewmodel.CallbackWrapper
+import com.example.ihrm.data.remote.base.NetworkResult
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.usecase.employees.AddEmployeeUseCase
 import com.example.ihrm.domain.usecase.employees.GetEmployeeByIdUseCase
 import com.example.ihrm.domain.usecase.employees.UpdateEmployeeUseCase
+import com.example.ihrm.util.Constants.DASH
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -42,22 +44,37 @@ class AddEditEmployeeViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-            try {
-                getEmployeeByIdUseCase(employeeId).collect { employee ->
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null, employee = null)
+            when (val result = getEmployeeByIdUseCase(employeeId)) {
+                is NetworkResult.Success -> {
                     _uiState.value = _uiState.value.copy(
-                        employee = employee,
+                        employee = result.data,
                         isLoading = false
                     )
                 }
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    error = e.message ?: "Failed to load employee"
-                )
+                is NetworkResult.Failure -> {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = employeeLoadErrorMessage(result.error),
+                        employee = null
+                    )
+                }
+                is NetworkResult.Exception -> {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = employeeLoadErrorMessage(result.e),
+                        employee = null
+                    )
+                }
             }
         }
     }
+
+    private fun employeeLoadErrorMessage(e: CommonErrorException): String =
+        e.errorMsg?.takeIf { it.isNotBlank() }
+            ?: e.message?.takeIf { !it.isNullOrBlank() }
+            ?: e.errorKey.takeIf { it.isNotBlank() }
+            ?: "Failed to load employee"
 
     fun saveEmployee(
         name: String,
@@ -84,9 +101,9 @@ class AddEditEmployeeViewModel @Inject constructor(
                     name = name,
                     email = email,
                     phone = phone,
-                    department = department,
-                    position = position,
-                    hireDate = hireDate,
+                    department = department ?: DASH,
+                    position = position ?: DASH,
+                    statusWorking = hireDate ?: DASH,
                     salary = salary,
                     address = address,
                     englishName = englishName,
@@ -102,9 +119,9 @@ class AddEditEmployeeViewModel @Inject constructor(
                     name = name,
                     email = email,
                     phone = phone,
-                    department = department,
-                    position = position,
-                    hireDate = hireDate,
+                    department = department ?: DASH,
+                    position = position ?: DASH,
+                    statusWorking = hireDate ?: DASH,
                     salary = salary,
                     address = address,
                     englishName = englishName,
@@ -112,7 +129,10 @@ class AddEditEmployeeViewModel @Inject constructor(
                     personalId = personalId,
                     idIssueDate = idIssueDate,
                     createdAt = currentTime,
-                    updatedAt = currentTime
+                    updatedAt = currentTime,
+                    levelId = 1,
+                    role = DASH,
+                    level =DASH
                 )
             }
 

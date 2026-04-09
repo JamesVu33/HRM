@@ -20,13 +20,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -72,7 +70,7 @@ fun EmployeeCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = androidx.compose.ui.graphics.Color.White),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -224,11 +222,20 @@ private fun EmployeeCardPreview() {
                 name = "Nguyen Van A",
                 email = "example@gmail.com",
                 phone = "0123456789",
-                department = null,
+                department = "null",
                 position = "Developer",
-                hireDate = null,
+                statusWorking = "null",
                 salary = null,
-                address = null
+                address = null,
+                levelId = 2,
+                role = "TODO()",
+                level = "TODO()",
+                englishName = "TODO()",
+                gender = "TODO()",
+                personalId = "TODO()",
+                idIssueDate = "TODO()",
+                createdAt = 0L,
+                updatedAt = 0L
             ),
             levelCode = "S1",
             onViewDetails = {},

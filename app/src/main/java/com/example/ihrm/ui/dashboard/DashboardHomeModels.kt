@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import com.example.ihrm.domain.model.Employee
 
 data class DashboardProfileModel(
+    val roleName: String?,
     val displayName: String,
     val employeeId: String,
     val departmentBadge: String,

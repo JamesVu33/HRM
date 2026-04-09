@@ -13,6 +13,7 @@ import java.util.Locale
 class DashboardMeProfileMapperTest {
 
     private val fallback = DashboardProfileModel(
+        roleName = null,
         displayName = "Mock",
         employeeId = "00000000",
         departmentBadge = "Dept",
@@ -45,7 +46,7 @@ class DashboardMeProfileMapperTest {
         assertEquals("12345678", out.employeeId)
         assertEquals("real@test", out.email)
         assertEquals("+1", out.phone)
-        assertEquals("Engineer · Senior", out.departmentDetail)
+        assertEquals("Senior", out.departmentDetail)
         val expectedJoined = LocalDate.parse("2024-06-01").format(
             DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.getDefault())
         )
