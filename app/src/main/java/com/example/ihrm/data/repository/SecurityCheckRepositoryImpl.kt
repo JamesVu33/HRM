@@ -7,6 +7,7 @@ import com.example.ihrm.data.remote.base.safeApiCall
 import com.example.ihrm.data.remote.base.safeApiCallPaginated
 import com.example.ihrm.data.remote.mapper.toDomain
 import com.example.ihrm.data.remote.mapper.toSubmissionPaginationMeta
+import com.example.ihrm.data.remote.securities.SecurityCheckDashboardResponse
 import com.example.ihrm.data.remote.securities.SecurityGroupsResponse
 import com.example.ihrm.di.NetworkModule
 import com.example.ihrm.domain.model.SecurityCheckSubmissionsPage
@@ -104,4 +105,9 @@ class SecurityCheckRepositoryImpl @Inject constructor(
         }
         return test
     }
+
+    override suspend fun getDashboardSecurityCheck(): NetworkResult<SecurityCheckDashboardResponse> =
+        safeApiCall(retrofit) {
+            apiService.getDashboardSecurityCheck()
+        }
 }

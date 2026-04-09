@@ -10,6 +10,7 @@ import com.example.ihrm.core.viewmodel.CallbackWrapper
 import com.example.ihrm.data.remote.base.NetworkResult
 import com.example.ihrm.data.remote.dto.MeEmployeeResponse
 import com.example.ihrm.data.remote.dto.UserMetaResponseDto
+import com.example.ihrm.data.remote.securities.SecurityCheckDashboardResponse
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.model.Level
 import com.example.ihrm.domain.usecase.employees.DeleteEmployeeUseCase
@@ -18,8 +19,7 @@ import com.example.ihrm.domain.usecase.employees.GetEmployeesUseCase
 import com.example.ihrm.domain.usecase.employees.GetLevelByEmployeeIdUseCase
 import com.example.ihrm.domain.usecase.employees.GetMeEmployeeInfoUseCase
 import com.example.ihrm.domain.usecase.employees.SyncEmployeesUseCase
-import com.example.ihrm.util.Constants.DEFAULT_LIMIT
-import com.example.ihrm.util.Constants.DEFAULT_PAGE
+import com.example.ihrm.domain.usecase.securities.SecuritiesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +39,6 @@ import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import java.time.Year
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -70,6 +69,7 @@ class DashboardViewModel @Inject constructor(
     private val getMeEmployeeInfoUseCase: GetMeEmployeeInfoUseCase,
     private val getEmployeesMetaUseCase: GetEmployeesMetaUseCase,
     private val deleteEmployeeUseCase: DeleteEmployeeUseCase,
+    private val securityCheckUseCase: SecuritiesUseCase,
     @ApplicationContext private val appContext: Context,
 ) : BaseViewmodel() {
 
@@ -93,16 +93,24 @@ class DashboardViewModel @Inject constructor(
     val meEmployeeInfo: StateFlow<MeEmployeeResponse?> = _meEmployeeInfo.asStateFlow()
 
     private val _securityCardState = MutableStateFlow(
-        buildDashboardSecurityCardState(
-            counts = SecuritySubmissionCounts(0, 0, 0, 0, 0),
+        mapSecurityCheckDashboardToCardState(
+            response = SecurityCheckDashboardResponse(),
             isLoading = true,
             errorMessage = null
         )
     )
 
-    /** Security submissions + banner copy for dashboard cards (Personal + Extra). */
+    /** Security card (this month + banner) từ GET /dashboard/security-check. */
     val dashboardSecurityCardState: StateFlow<DashboardSecurityCardState> =
         _securityCardState.asStateFlow()
+
+    private val _managementSecurityState = MutableStateFlow(
+        ManagementSecurityUiModel(0, 0, 0, 0, 0)
+    )
+
+    /** Tổng quan security tab Management (submitted / pending / …) từ cùng API dashboard. */
+    val managementSecurityState: StateFlow<ManagementSecurityUiModel> =
+        _managementSecurityState.asStateFlow()
 
     private val employeesFlow = getEmployeesUseCase()
 
@@ -120,7 +128,7 @@ class DashboardViewModel @Inject constructor(
         loadEmployees()
         loadLevelCodesWhenEmployeesChange()
         loadMeEmployeeInfo()
-        loadDashboardSecuritySubmissions()
+        loadDashboardSecurityCheck()
     }
 
     private fun loadMeEmployeeInfo() {
@@ -300,54 +308,40 @@ class DashboardViewModel @Inject constructor(
         return filterEmployeesByQuery(employees, query)
     }
 
-    /**
-     * Loads self security submissions for [year] and updates [dashboardSecurityCardState]
-     * (monthly counts + banner title/subtitle per iOS rules).
-     */
-    fun loadDashboardSecuritySubmissions(
-        year: Int? = null,
-        page: Int = DEFAULT_PAGE,
-        limit: Int = DEFAULT_LIMIT,
-        orderBy: String? = null,
-        sortBy: String? = null,
-        status: String? = null,
-    ) {
-        val y = year ?: Year.now().value
+    private fun loadDashboardSecurityCheck() {
         viewModelScope.launch(Dispatchers.IO) {
-            _securityCardState.value = _securityCardState.value.copy(isLoading = true)
-            when (
-                val result = getMeEmployeeInfoUseCase.getMySecurityCheck(
-                    year = y,
-                    page = page,
-                    limit = limit,
-                    orderBy = orderBy,
-                    sortBy = sortBy,
-                    status = status
-                )
-            ) {
+            _securityCardState.value = mapSecurityCheckDashboardToCardState(
+                response = SecurityCheckDashboardResponse(),
+                isLoading = true,
+                errorMessage = null
+            )
+            when (val result = securityCheckUseCase.getDashboardSecurityCheck()) {
                 is NetworkResult.Success -> {
-                    val counts = aggregateSecuritySubmissions(result.data)
-                    _securityCardState.value = buildDashboardSecurityCardState(
-                        counts = counts,
+                    val data = result.data
+                    _securityCardState.value = mapSecurityCheckDashboardToCardState(
+                        response = data,
                         isLoading = false,
                         errorMessage = null
                     )
+                    _managementSecurityState.value = mapSecurityCheckDashboardToManagementSecurity(data)
                 }
 
                 is NetworkResult.Failure -> {
-                    _securityCardState.value = buildDashboardSecurityCardState(
-                        counts = SecuritySubmissionCounts(0, 0, 0, 0, 0),
+                    _securityCardState.value = mapSecurityCheckDashboardToCardState(
+                        response = SecurityCheckDashboardResponse(),
                         isLoading = false,
                         errorMessage = securityErrorDisplayMessage(result.error)
                     )
+                    _managementSecurityState.value = ManagementSecurityUiModel(0, 0, 0, 0, 0)
                 }
 
                 is NetworkResult.Exception -> {
-                    _securityCardState.value = buildDashboardSecurityCardState(
-                        counts = SecuritySubmissionCounts(0, 0, 0, 0, 0),
+                    _securityCardState.value = mapSecurityCheckDashboardToCardState(
+                        response = SecurityCheckDashboardResponse(),
                         isLoading = false,
                         errorMessage = securityErrorDisplayMessage(result.e)
                     )
+                    _managementSecurityState.value = ManagementSecurityUiModel(0, 0, 0, 0, 0)
                 }
             }
         }
@@ -355,9 +349,14 @@ class DashboardViewModel @Inject constructor(
 
     private fun securityErrorDisplayMessage(e: CommonErrorException): String =
         e.errorMsg?.takeIf { it.isNotBlank() }
-            ?: e.message?.takeIf { !it.isNullOrBlank() }
+            ?: e.message?.takeIf { it.isNotBlank() }
             ?: e.errorKey.takeIf { it.isNotBlank() }
             ?: appContext.getString(R.string.dashboard_security_error_fallback)
+
+    /** Gọi lại GET /dashboard/security-check (pull-to-refresh / sau khi submit). */
+    fun getDashboardSecurityCheck() {
+        loadDashboardSecurityCheck()
+    }
 }
 
 /**

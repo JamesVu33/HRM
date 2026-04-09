@@ -4,6 +4,7 @@ import com.example.ihrm.data.remote.base.ApiSuccessResponse
 import com.example.ihrm.data.remote.dto.ChecksSecuritySubmissionResponse
 import com.example.ihrm.data.remote.employee.EmployeeResponse
 import com.example.ihrm.data.remote.securities.MySecurityCheckResponse
+import com.example.ihrm.data.remote.securities.SecurityCheckDashboardResponse
 import com.example.ihrm.data.remote.securities.SecurityCheckDetailResponse
 import com.example.ihrm.data.remote.securities.SecurityGroupsResponse
 import com.example.ihrm.data.remote.securities.SecurityTemplateResponse
@@ -68,4 +69,7 @@ interface SecurityCheckApiService {
         @Query("sortBy") sortBy: String? = null,
         @Query("status") status: String? = null,
     ): Response<ApiSuccessResponse<List<MySecurityCheckResponse>>>
+
+    @GET("/dashboard/security-check")
+    suspend fun getDashboardSecurityCheck(): Response<ApiSuccessResponse<SecurityCheckDashboardResponse>>
 }

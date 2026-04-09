@@ -67,9 +67,6 @@ data class DashboardManagementUiModel(
 )
 
 data class ManagementCalendarUiModel(
-    val dayOfMonth: String,
-    val monthLabel: String,
-    val weekdayLabel: String,
     val presentCount: Int,
     val absentCount: Int,
     val totalHeadcount: Int,

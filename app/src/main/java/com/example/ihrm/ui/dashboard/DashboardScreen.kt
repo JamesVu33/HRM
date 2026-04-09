@@ -100,16 +100,18 @@ fun DashboardScreenContent(
     val accountType = AuthManager.getAccountType()
     val role = remember(accountType) { accountType.toDashboardRole() }
     val securityCard by viewmodel.dashboardSecurityCardState.collectAsStateWithLifecycle()
+    val managementSecurity by viewmodel.managementSecurityState.collectAsStateWithLifecycle()
     val personalUi = remember(homeModel, securityCard) {
         buildPersonalRoleUi(homeModel).copy(
             securityMonthly = securityCard.monthly,
             securityBanner = securityCard.banner
         )
     }
-    val extraUi = remember(homeModel, securityCard) {
+    val extraUi = remember(homeModel, securityCard, managementSecurity) {
         buildExtraRoleUi(homeModel).copy(
             securityMonthly = securityCard.monthly,
-            securityBanner = securityCard.banner
+            securityBanner = securityCard.banner,
+            management = homeModel.management.copy(security = managementSecurity)
         )
     }
     var selectedTab by remember { mutableStateOf(DashboardHomeTab.Personal) }

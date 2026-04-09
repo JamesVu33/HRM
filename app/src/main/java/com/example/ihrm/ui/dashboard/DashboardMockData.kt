@@ -60,28 +60,15 @@ object DashboardMockData {
                         accent = LeaveStatAccent.Green
                     )
                 ),
-                securityMonthly = SecurityMonthlyModel(
-                    approved = 0,
-                    rechecking = 1,
-                    rejected = 3
-                ),
+                securityMonthly = SecurityMonthlyModel(approved = 0, rechecking = 0, rejected = 0),
                 management = DashboardManagementUiModel(
                     calendar = ManagementCalendarUiModel(
-                        dayOfMonth = "19",
-                        monthLabel = "Mar",
-                        weekdayLabel = "Thu",
                         presentCount = 38,
                         absentCount = 7,
                         totalHeadcount = 45,
                         attendanceRatePercent = 84
                     ),
-                    security = ManagementSecurityUiModel(
-                        totalUsers = 45,
-                        submissionsCount = 20,
-                        submitted = 20,
-                        pending = 5,
-                        notSubmitted = 20
-                    )
+                    security = ManagementSecurityUiModel(0, 0, 0, 0, 0)
                 )
             )
         }

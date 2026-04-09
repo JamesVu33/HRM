@@ -3,6 +3,7 @@ package com.example.ihrm.domain.usecase.securities
 import com.example.ihrm.core.usecase.BaseUseCase
 import com.example.ihrm.data.remote.base.NetworkResult
 import com.example.ihrm.data.remote.dto.ChecksSecuritySubmissionResponse
+import com.example.ihrm.data.remote.securities.SecurityCheckDashboardResponse
 import com.example.ihrm.domain.model.SecurityCheckSubmissionsPage
 import com.example.ihrm.domain.model.SecurityGroups
 import com.example.ihrm.domain.repository.LanguageRepository
@@ -75,6 +76,11 @@ class SecuritiesUseCase @Inject constructor(
 
     suspend fun getGroups(): NetworkResult<List<SecurityGroups>> {
         val result = securityCheckRepository.getGroups()
+        return translateResponse(result)
+    }
+
+    suspend fun getDashboardSecurityCheck(): NetworkResult<SecurityCheckDashboardResponse> {
+        val result = securityCheckRepository.getDashboardSecurityCheck()
         return translateResponse(result)
     }
 }

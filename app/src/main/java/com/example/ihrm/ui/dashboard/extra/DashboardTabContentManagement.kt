@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,6 +42,7 @@ import com.example.ihrm.R
 import com.example.ihrm.ui.dashboard.DashboardManagementUiModel
 import com.example.ihrm.ui.dashboard.ManagementCalendarUiModel
 import com.example.ihrm.ui.dashboard.ManagementSecurityUiModel
+import com.example.ihrm.ui.dashboard.formatManagementCalendarToday
 import com.example.ihrm.ui.theme.DashboardFigmaInk
 import com.example.ihrm.ui.theme.DashboardFigmaMuted
 import com.example.ihrm.ui.theme.DashboardLeaveBlueEnd
@@ -50,6 +52,7 @@ import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.ui.common.DonutChartTriple
 import com.example.ihrm.ui.theme.Primary400
 import com.example.ihrm.util.singleClick
+import com.example.ihrm.ui.localization.LocalLocalization
 import com.example.ihrm.ui.localization.tr
 
 private val MgmtPresentGreen = Color(0xFF00BC7D)
@@ -88,6 +91,8 @@ private fun ManagementCalendarCard(
     data: ManagementCalendarUiModel,
     onChevronClick: () -> Unit
 ) {
+    val languageCode = LocalLocalization.current.selectedLanguageCode
+    val todayLabels = remember(languageCode) { formatManagementCalendarToday(languageCode) }
     val presentPct = data.attendanceRatePercent.coerceIn(0, 100)
     val absentPct = (100 - presentPct).coerceIn(0, 100)
     val fPresent = data.presentCount.toFloat() / data.totalHeadcount
@@ -175,7 +180,7 @@ private fun ManagementCalendarCard(
                 Row(verticalAlignment = Alignment.Bottom) {
                     Text(
                         modifier = Modifier.offset(y= (-8).dp),
-                        text = data.dayOfMonth,
+                        text = todayLabels.dayOfMonth,
                         style = TextStyle(
                             fontFamily = InterFontFamily,
                             fontWeight = FontWeight.Bold,
@@ -186,7 +191,7 @@ private fun ManagementCalendarCard(
                     Spacer(modifier = Modifier.width(8.dp))
                     Column {
                         Text(
-                            text = data.monthLabel,
+                            text = todayLabels.monthLabel,
                             style = TextStyle(
                                 fontFamily = InterFontFamily,
                                 fontWeight = FontWeight.SemiBold,
@@ -195,7 +200,7 @@ private fun ManagementCalendarCard(
                             )
                         )
                         Text(
-                            text = data.weekdayLabel,
+                            text = todayLabels.weekdayLabel,
                             style = TextStyle(
                                 fontFamily = InterFontFamily,
                                 fontWeight = FontWeight.Normal,
