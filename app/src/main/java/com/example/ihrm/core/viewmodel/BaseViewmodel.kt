@@ -8,7 +8,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.ihrm.core.errorHandler.CommonErrorException
 import com.example.ihrm.core.errorHandler.GlobalErrorHandler
 import com.example.ihrm.data.remote.base.NetworkResult
+import com.example.ihrm.ui.common.toast.ToastPosition
 import com.example.ihrm.ui.common.toast.ToastState
+import com.example.ihrm.ui.common.toast.ToastType
 import com.example.ihrm.util.EmptyFunc
 import com.example.ihrm.util.ParamFunc
 import com.example.ihrm.util.SupEmptyFunc
@@ -68,6 +70,16 @@ abstract class BaseViewmodel : ViewModel() {
             delay(toast.timeout)
             _showToast.emit(null)
         }
+    }
+
+    fun showToastMessage(message: String, type: ToastType) {
+        showToast(
+            ToastState(
+                message = message,
+                type = type,
+                position = ToastPosition.BOTTOM
+            )
+        )
     }
 
     // a common way to wrap all thing in one UI class

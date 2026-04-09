@@ -285,7 +285,7 @@ fun SecurityChecksScreenContent(
                             SecurityCheckCard(
                                 item = check,
                                 onClick = {
-                                    onSecurityCheckClick(check.submissionId.toString())
+                                    onSecurityCheckClick(check.userId)
                                 }.singleClick()
                             )
                         }

@@ -1,11 +1,14 @@
 package com.example.ihrm.ui.security.mysecurity
 
 import android.util.Log
+import com.example.ihrm.R
 import com.example.ihrm.core.errorHandler.CommonErrorException
 import com.example.ihrm.core.viewmodel.BaseViewmodel
 import com.example.ihrm.core.viewmodel.CallbackWrapper
 import com.example.ihrm.data.remote.securities.MySecurityCheckResponse
+import com.example.ihrm.data.remote.securities.SecurityCheckStatusResponse
 import com.example.ihrm.domain.usecase.securities.MySecurityUseCase
+import com.example.ihrm.ui.common.toast.ToastType
 import com.example.ihrm.util.Constants.DEFAULT_LIMIT
 import com.example.ihrm.util.Constants.DEFAULT_PAGE
 import com.example.ihrm.util.SecurityLegendMeta
@@ -31,6 +34,8 @@ class MySecurityCheckViewModel @Inject constructor(
 ) : BaseViewmodel() {
     private val _uiState = MutableStateFlow<List<MySecurityCheckUiState>>(emptyList())
     val uiState: StateFlow<List<MySecurityCheckUiState>> = _uiState.asStateFlow()
+    private val _isSubmitted = MutableStateFlow(true)
+    val isSubmitted: StateFlow<Boolean> = _isSubmitted.asStateFlow()
 
     init {
         getMySecurityCheck()
@@ -69,6 +74,33 @@ class MySecurityCheckViewModel @Inject constructor(
                 override fun onFail(e: CommonErrorException) {
                     super.onFail(e)
                     Log.d("MySecurityCheckViewModel", "onFail: $e")
+                }
+            },
+        )
+    }
+
+    fun getHasSubmitted() {
+        fetchData(
+            fetching = { mySecurityUseCase.getHasSubmitted() },
+            callbackWrapper = object : CallbackWrapper<SecurityCheckStatusResponse> {
+                override fun onSuccess(data: SecurityCheckStatusResponse) {
+                    super.onSuccess(data)
+                    _isSubmitted.value = data.hasSubmitted ?: false
+                    if (data.hasSubmitted == true) {
+                        showToastMessage(
+                            message = "The current user has already submitted a security check this month.",
+                            type = ToastType.ERROR,
+                        )
+                    }
+                }
+
+                override fun onFail(e: CommonErrorException) {
+                    super.onFail(e)
+                    _isSubmitted.value = false
+                    showToastMessage(
+                        message = e.errorMsg?: e.message?:"Unknown error",
+                        type = ToastType.ERROR,
+                    )
                 }
             },
         )

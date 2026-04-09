@@ -202,14 +202,4 @@ class MyInfoViewModel @Inject constructor(
             }
         )
     }
-
-    private fun showToastMessage(message: String, type: ToastType) {
-        showToast(
-            ToastState(
-                message = message,
-                type = type,
-                position = ToastPosition.BOTTOM
-            )
-        )
-    }
 }

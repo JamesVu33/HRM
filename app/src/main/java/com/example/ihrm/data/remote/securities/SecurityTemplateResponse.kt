@@ -2,27 +2,20 @@ package com.example.ihrm.data.remote.securities
 
 import com.example.ihrm.data.remote.base.ResponseToInfoMapper
 import com.example.ihrm.domain.model.securitycheck.SecurityTemplate
+import com.example.ihrm.domain.model.securitycheck.TemplateDivision
 import com.example.ihrm.domain.model.securitycheck.TemplateItem
 import com.example.ihrm.domain.model.securitycheck.UserInfo
 import com.google.gson.annotations.SerializedName
 
 data class SecurityTemplateResponse(
-    @SerializedName("id")
-    val id: Int?,
-    @SerializedName("name")
-    val name: String?,
-    @SerializedName("isCurrent")
-    val isCurrent: Boolean?,
-    @SerializedName("createdAt")
-    val createdAt: String?,
-    @SerializedName("updatedAt")
-    val updatedAt: String?,
-    @SerializedName("createdBy")
-    val createdBy: UserInfoResponse?,
-    @SerializedName("items")
-    val items: List<TemplateItemResponse>?,
-    @SerializedName("divisions")
-    val divisions: List<Any>?
+    @SerializedName("id") val id: Int?,
+    @SerializedName("name") val name: String?,
+    @SerializedName("isCurrent") val isCurrent: Boolean?,
+    @SerializedName("createdAt") val createdAt: String?,
+    @SerializedName("updatedAt") val updatedAt: String?,
+    @SerializedName("createdBy") val createdBy: UserInfoResponse?,
+    @SerializedName("items") val items: List<TemplateItemResponse>?,
+    @SerializedName("divisions") val divisions: List<TemplateDivisionResponse>? // Đã cập nhật từ List<Any>
 ): ResponseToInfoMapper<SecurityTemplate> {
     override fun fromResponseToInfo(): SecurityTemplate {
         return SecurityTemplate(
@@ -32,14 +25,26 @@ data class SecurityTemplateResponse(
             createdAt = createdAt ?: "",
             updatedAt = updatedAt ?: "",
             items = items?.map { it.fromResponseToInfo() } ?: emptyList(),
-            divisions = divisions ?: emptyList(),
-            createdBy = createdBy?.fromResponseToInfo() ?: UserInfo(
-                id = id ?: 0,
-                employeeId = "",
-                fullName = "",
-                email = "",
-                phoneNumber = ""
-            )
+            divisions = divisions?.map { it.fromResponseToInfo() } ?: emptyList(),
+            createdBy = createdBy?.fromResponseToInfo() ?: UserInfo(0, "", "", "", "")
+        )
+    }
+}
+
+data class TemplateDivisionResponse(
+    @SerializedName("id") val id: Int?,
+    @SerializedName("titleEn") val titleEn: String?,
+    @SerializedName("titleVi") val titleVi: String?,
+    @SerializedName("order") val order: Int?,
+    @SerializedName("items") val items: List<TemplateItemResponse>?
+): ResponseToInfoMapper<TemplateDivision> {
+    override fun fromResponseToInfo(): TemplateDivision {
+        return TemplateDivision(
+            id = id ?: 0,
+            titleEn = titleEn ?: "",
+            titleVi = titleVi ?: "",
+            order = order ?: 0,
+            items = items?.map { it.fromResponseToInfo() } ?: emptyList()
         )
     }
 }

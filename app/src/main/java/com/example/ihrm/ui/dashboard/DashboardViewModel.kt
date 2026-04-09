@@ -2,6 +2,7 @@ package com.example.ihrm.ui.dashboard
 
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.ihrm.R
 import com.example.ihrm.core.errorHandler.CommonErrorException
@@ -12,6 +13,7 @@ import com.example.ihrm.data.remote.dto.MeEmployeeResponse
 import com.example.ihrm.data.remote.dto.UserMetaResponseDto
 import com.example.ihrm.data.remote.securities.SecurityCheckDashboardResponse
 import com.example.ihrm.domain.model.Employee
+import com.example.ihrm.domain.model.securitycheck.SecurityTemplate
 import com.example.ihrm.domain.usecase.employees.DeleteEmployeeUseCase
 import com.example.ihrm.domain.usecase.employees.GetEmployeesMetaUseCase
 import com.example.ihrm.domain.usecase.employees.GetEmployeesUseCase
@@ -127,9 +129,19 @@ class DashboardViewModel @Inject constructor(
     }
 
     private fun loadMeEmployeeInfo() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _meEmployeeInfo.value = getMeEmployeeInfoUseCase().getOrNull()
-        }
+        fetchData(
+            fetching = { getMeEmployeeInfoUseCase() },
+            callbackWrapper = object : CallbackWrapper<MeEmployeeResponse> {
+                override fun onSuccess(data: MeEmployeeResponse) {
+                    super.onSuccess(data)
+                    _meEmployeeInfo.value = data
+                }
+                override fun onFail(e: CommonErrorException) {
+                    super.onFail(e)
+                    Log.d("DashboardViewModel", "onFail: $e")
+                }
+            }
+        )
     }
 
     private fun loadEmployees() {

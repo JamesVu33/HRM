@@ -4,8 +4,12 @@ import com.example.ihrm.core.usecase.BaseUseCase
 import com.example.ihrm.data.remote.base.NetworkResult
 import com.example.ihrm.data.remote.dto.ChecksSecuritySubmissionResponse
 import com.example.ihrm.data.remote.securities.SecurityCheckDashboardResponse
+import com.example.ihrm.data.remote.securities.SecuritySubmissionRequest
+import com.example.ihrm.data.remote.securities.SecurityTemplateResponse
 import com.example.ihrm.domain.model.SecurityCheckSubmissionsPage
 import com.example.ihrm.domain.model.SecurityGroups
+import com.example.ihrm.domain.model.securitycheck.SecuritySubmission
+import com.example.ihrm.domain.model.securitycheck.SecurityTemplate
 import com.example.ihrm.domain.repository.LanguageRepository
 import com.example.ihrm.domain.repository.SecurityCheckRepository
 import javax.inject.Inject
@@ -82,5 +86,21 @@ class SecuritiesUseCase @Inject constructor(
     suspend fun getDashboardSecurityCheck(): NetworkResult<SecurityCheckDashboardResponse> {
         val result = securityCheckRepository.getDashboardSecurityCheck()
         return translateResponse(result)
+    }
+
+    suspend fun getCurrentSecurityTemplate(): NetworkResult<SecurityTemplate> {
+        val result = securityCheckRepository.getCurrentSecurityTemplate()
+        return translateResponse(result).map {
+            it.fromResponseToInfo()
+        }
+    }
+
+    suspend fun postSubmission(
+        request: SecuritySubmissionRequest
+    ): NetworkResult<SecuritySubmission> {
+        val result = securityCheckRepository.postSubmission(request)
+        return translateResponse(result).map {
+            it.fromResponseToInfo()
+        }
     }
 }

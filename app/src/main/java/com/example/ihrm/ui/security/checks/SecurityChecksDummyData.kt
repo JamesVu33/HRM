@@ -9,6 +9,7 @@ enum class SecurityCheckStatus {
 
 data class SecurityCheckItemUi(
     /** Id bản ghi API; dùng làm key LazyColumn. */
+    val userId: String,
     val submissionId: Int = 0,
     val employeeId: String = "",
     val teamIndex: Int,

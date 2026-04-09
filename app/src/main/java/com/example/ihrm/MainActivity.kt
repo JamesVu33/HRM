@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.DrawerState
 import androidx.compose.ui.Modifier
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalDrawerSheet
@@ -74,82 +75,34 @@ fun HRMApp() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: Screen.Splash.route
 
-    val showDrawer = currentRoute != Screen.Splash.route &&
-        currentRoute != Screen.Login.route
+    val drawerScreens = setOf(
+        Screen.Dashboard.route,
+        Screen.EmployeeList.route,
+        Screen.SecurityChecks.route,
+        Screen.MyInfo.route,
+        Screen.MySecurityCheck.route,
+        Screen.Organization.route
+    )
 
-    val gesturesEnabled = showDrawer && currentRoute in drawerGestureRoutes
+    val showDrawer = currentRoute in drawerScreens
 
     Box {
-        // Một NavHost duy nhất suốt vòng đời Activity: tránh dispose NavHost khi chuyển login → home (mất saveState / remember).
-        ModalNavigationDrawer(
-            drawerState = drawerState,
-            gesturesEnabled = gesturesEnabled,
-            drawerContent = {
-                if (showDrawer) {
-                    ModalDrawerSheet(drawerContainerColor = Color.White) {
-                        DrawerMenu(
-                            drawerState = drawerState,
-                            scope = scope,
-                            currentRoute = currentRoute,
-                            onItemClick = { route ->
-                                scope.launch {
-                                    drawerState.close()
-                                    if (currentRoute != route) {
-                                        navigateWithStandardOptions(navController, route)
-                                    }
-                                }
-                            },
-                            onLogoutClick = { activeDialog = DrawerDialog.Logout },
-                            onShowComingSoon = { activeDialog = DrawerDialog.ComingSoon(it) },
-                            onTranslationKeysClick = { activeDialog = DrawerDialog.ChangeLanguage }
-                        )
-                    }
-                } else {
-                    Box(modifier = Modifier)
-                }
-            }
-        ) {
+        // page flow
+        if (showDrawer) {
+            DrawerContent(currentRoute, drawerState, scope, navController)
+        } else {
             NavGraph(
                 navController = navController,
-                drawerState = drawerState.takeIf { showDrawer },
+                drawerState = null,
                 scope = scope
             )
         }
 
-        when (val dialog = activeDialog) {
-            is DrawerDialog.Logout -> LogoutConfirmDialog(
-                onConfirm = {
-                    activeDialog = null
-                    AuthManager.clearTokens()
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(navController.graph.id) { inclusive = true }
-                        launchSingleTop = true
-                    }
-                },
-                onDismiss = { activeDialog = null }
-            )
-            is DrawerDialog.ComingSoon -> ComingSoonDialog(
-                featureName = dialog.featureName,
-                onDismiss = { activeDialog = null }
-            )
-            DrawerDialog.ChangeLanguage -> ChangeLanguageDialog(
-                initialSelectedCode = localization.selectedLanguageCode,
-                onDismiss = { activeDialog = null },
-                onSaveLanguage = { code ->
-                    val previousCode = localization.selectedLanguageCode
-                    localization.setLanguageCode(code)
-                    activeDialog = null
-                    if (code.lowercase() != previousCode.lowercase()) {
-                        activity.window.decorView.post {
-                            if (!activity.isFinishing && !activity.isDestroyed) {
-                                activity.recreate()
-                            }
-                        }
-                    }
-                }
-            )
-            null -> Unit
-        }
+        // global error popup
+        //ErrorAlert()
+
+        // loading
+//        LoadingWidget()
     }
 }
 
@@ -166,6 +119,85 @@ private sealed class DrawerDialog {
     data object Logout : DrawerDialog()
     data class ComingSoon(val featureName: String) : DrawerDialog()
     data object ChangeLanguage : DrawerDialog()
+}
+
+@Composable
+private fun DrawerContent(
+    currentRoute: String,
+    drawerState: DrawerState,
+    scope: CoroutineScope,
+    navController: NavHostController
+) {
+    var activeDialog by remember { mutableStateOf<DrawerDialog?>(null) }
+    val localization = LocalLocalization.current
+    val activity = LocalContext.current as ComponentActivity
+    val gesturesEnabled = remember(currentRoute) { currentRoute in drawerGestureRoutes }
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        gesturesEnabled = gesturesEnabled,
+        drawerContent = {
+            ModalDrawerSheet(drawerContainerColor = Color.White) {
+                DrawerMenu(
+                    drawerState = drawerState,
+                    scope = scope,
+                    currentRoute = currentRoute,
+                    onItemClick = { route ->
+                        scope.launch {
+                            drawerState.close()
+                            if (currentRoute != route) {
+                                navigateWithStandardOptions(navController, route)
+                            }}
+                    },
+                    onLogoutClick = { activeDialog = DrawerDialog.Logout },
+                    onShowComingSoon = { activeDialog = DrawerDialog.ComingSoon(it) },
+                    onTranslationKeysClick = { activeDialog = DrawerDialog.ChangeLanguage }
+                )
+            }
+        }
+    ) {
+        NavGraph(
+            navController = navController,
+            drawerState = drawerState,
+            scope = scope
+        )
+    }
+
+    when (val dialog = activeDialog) {
+        is DrawerDialog.Logout -> LogoutConfirmDialog(
+            onConfirm = {
+                activeDialog = null
+                AuthManager.clearTokens()
+                navController.navigate(Screen.Login.route) {
+                    popUpTo(navController.graph.id) { inclusive = true }
+                    launchSingleTop = true
+                }
+            },
+            onDismiss = { activeDialog = null }
+        )
+        is DrawerDialog.ComingSoon -> ComingSoonDialog(
+            featureName = dialog.featureName,
+            onDismiss = { activeDialog = null }
+        )
+        DrawerDialog.ChangeLanguage -> ChangeLanguageDialog(
+            initialSelectedCode = localization.selectedLanguageCode,
+            onDismiss = { activeDialog = null },
+            onSaveLanguage = { code ->
+                val previousCode = localization.selectedLanguageCode
+                localization.setLanguageCode(code)
+                activeDialog = null
+                if (code.lowercase() != previousCode.lowercase()) {
+                    // Post avoids recreate during dialog teardown; attachBaseContext applies new locale.
+                    activity.window.decorView.post {
+                        if (!activity.isFinishing && !activity.isDestroyed) {
+                            activity.recreate()
+                        }
+                    }
+                }
+            }
+        )
+        null -> Unit
+    }
 }
 private fun navigateWithStandardOptions(navController: NavHostController, route: String) {
     navController.navigate(route) {

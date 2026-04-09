@@ -38,6 +38,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -195,6 +196,13 @@ fun MySecurityCheckScreenContent(
         }
     }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isSubmitted by viewModel.isSubmitted.collectAsState()
+    LaunchedEffect(isSubmitted) {
+        if (!isSubmitted) {
+            onCreateChecklistClick()
+        }
+    }
+
     Scaffold(
         modifier = modifier
             .fillMaxSize()
@@ -207,7 +215,7 @@ fun MySecurityCheckScreenContent(
                     if (hasChecklistInCurrentMonth()) {
                         showCreatedInMonthDialog = true
                     } else {
-                        onCreateChecklistClick()
+                        viewModel.getHasSubmitted()
                     }
                 },
                 modifier = Modifier

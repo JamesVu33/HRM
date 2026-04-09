@@ -229,17 +229,17 @@ private fun LoginContent(
         Spacer(modifier = Modifier.height(32.dp))
 
         if (uiState.isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = Primary400
-                )
-            }
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(48.dp),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                CircularProgressIndicator(
+//                    modifier = Modifier.size(24.dp),
+//                    color = Primary400
+//                )
+//            }
         } else {
             CustomButton(
                 text = tr(R.string.login_test_login_button),

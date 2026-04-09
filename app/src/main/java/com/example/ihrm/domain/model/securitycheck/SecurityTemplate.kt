@@ -8,7 +8,15 @@ data class SecurityTemplate(
     val updatedAt: String,
     val createdBy: UserInfo,
     val items: List<TemplateItem>,
-    val divisions: List<Any>
+    val divisions: List<TemplateDivision>
+)
+
+data class TemplateDivision(
+    val id: Int,
+    val titleEn: String,
+    val titleVi: String,
+    val order: Int,
+    val items: List<TemplateItem>
 )
 
 data class UserInfo(

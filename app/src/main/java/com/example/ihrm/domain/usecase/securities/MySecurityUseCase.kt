@@ -3,6 +3,7 @@ package com.example.ihrm.domain.usecase.securities
 import com.example.ihrm.core.usecase.BaseUseCase
 import com.example.ihrm.data.remote.base.NetworkResult
 import com.example.ihrm.data.remote.securities.MySecurityCheckResponse
+import com.example.ihrm.data.remote.securities.SecurityCheckStatusResponse
 import com.example.ihrm.domain.repository.LanguageRepository
 import com.example.ihrm.domain.repository.MySecurityCheckRepository
 import com.example.ihrm.ui.security.mysecurity.MySecurityCheckUiState
@@ -35,6 +36,12 @@ class MySecurityUseCase @Inject constructor(
         )
         return translateResponse(result)
     }
+
+    suspend fun getHasSubmitted(): NetworkResult<SecurityCheckStatusResponse> {
+        val result = mySecurityCheckRepository.getHasSubmitted()
+        return translateResponse(result)
+    }
+
 
     fun mapToUiState(
         detail: MySecurityCheckResponse,

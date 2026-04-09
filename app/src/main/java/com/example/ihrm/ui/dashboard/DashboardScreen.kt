@@ -162,44 +162,46 @@ fun DashboardScreenContent(
                     )
                 )
         ) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-            ) {
-                if (role == DashboardRole.Personal) {
-                    item {
-                        DashboardPersonalRoleSection(personalUi = personalUi)
-                    }
-                    item { Spacer(modifier = Modifier.height(32.dp)) }
-                } else {
-                    when (selectedTab) {
-                        DashboardHomeTab.Personal -> {
-                            item {
-                                DashboardExtraRoleSection(
-                                    personalUi = DashboardPersonalRoleUi(
-                                        profile = extraUi.profile,
-                                        leaveStats = extraUi.leaveStats,
-                                        securityMonthly = extraUi.securityMonthly,
-                                        securityBanner = extraUi.securityBanner
-                                    )
-                                )
-                            }
+            if (meEmployeeInfo != null) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                ) {
+                    if (role == DashboardRole.Personal) {
+                        item {
+                            DashboardPersonalRoleSection(personalUi = personalUi)
                         }
-
-                        DashboardHomeTab.Management -> {
-                            item {
-                                DashboardManagementTabContent(
-                                    ui = extraUi.management,
-                                    onCalendarNavigate = onCalendarManagement,
-                                    onSecurityNavigate = onViewStats
-                                )
-                            }
-                        }
-                    }
-
-                    if (selectedTab == DashboardHomeTab.Personal) {
                         item { Spacer(modifier = Modifier.height(32.dp)) }
+                    } else {
+                        when (selectedTab) {
+                            DashboardHomeTab.Personal -> {
+                                item {
+                                    DashboardExtraRoleSection(
+                                        personalUi = DashboardPersonalRoleUi(
+                                            profile = extraUi.profile,
+                                            leaveStats = extraUi.leaveStats,
+                                            securityMonthly = extraUi.securityMonthly,
+                                            securityBanner = extraUi.securityBanner
+                                        )
+                                    )
+                                }
+                            }
+
+                            DashboardHomeTab.Management -> {
+                                item {
+                                    DashboardManagementTabContent(
+                                        ui = extraUi.management,
+                                        onCalendarNavigate = onCalendarManagement,
+                                        onSecurityNavigate = onViewStats
+                                    )
+                                }
+                            }
+                        }
+
+                        if (selectedTab == DashboardHomeTab.Personal) {
+                            item { Spacer(modifier = Modifier.height(32.dp)) }
+                        }
                     }
                 }
             }
