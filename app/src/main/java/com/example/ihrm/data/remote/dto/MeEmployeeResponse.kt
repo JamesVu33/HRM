@@ -15,7 +15,7 @@ data class MeEmployeeResponse(
     @SerializedName("resignedAt")
     val resignedAt: String? = null,
 
-    @SerializedName("level")
+    @SerializedName("title")
     val title: TitleShortDto? = null,
 
     @SerializedName("level")
