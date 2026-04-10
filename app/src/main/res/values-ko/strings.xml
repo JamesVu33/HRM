@@ -452,6 +452,9 @@
     <string name="my_security_check_rejecter">반려자</string>
     <string name="my_security_check_approver">승인자</string>
     <string name="my_security_check_filter_cd">체크리스트 필터 열기</string>
+    <string name="my_security_filter_status">상태</string>
+    <string name="my_security_filter_year">연도</string>
+    <string name="my_security_filter_year_all">전체 연도</string>
     <string name="my_security_check_add_cd">체크리스트 만들기</string>
     <string name="my_security_check_exists_dialog_title">체크리스트가 이미 있습니다</string>
     <string name="my_security_check_exists_dialog_message">이번 달에 이미 보안 점검 체크리스트를 작성했습니다.</string>

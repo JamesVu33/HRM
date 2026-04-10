@@ -452,6 +452,9 @@
     <string name="my_security_check_rejecter">Người từ chối</string>
     <string name="my_security_check_approver">Người duyệt</string>
     <string name="my_security_check_filter_cd">Mở bộ lọc danh sách</string>
+    <string name="my_security_filter_status">Trạng thái</string>
+    <string name="my_security_filter_year">Năm</string>
+    <string name="my_security_filter_year_all">Tất cả năm</string>
     <string name="my_security_check_add_cd">Tạo danh sách kiểm tra</string>
     <string name="my_security_check_exists_dialog_title">Đã có danh sách kiểm tra</string>
     <string name="my_security_check_exists_dialog_message">Bạn đã tạo danh sách kiểm tra an ninh trong tháng này.</string>

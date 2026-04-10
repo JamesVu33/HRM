@@ -7,6 +7,7 @@ import com.example.ihrm.data.remote.securities.SecurityCheckStatusResponse
 interface MySecurityCheckRepository {
     suspend fun getMySecurityCheck(
         year: Int?,
+        query: String?,
         page: Int?,
         limit: Int?,
         orderBy: String?,

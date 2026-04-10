@@ -24,12 +24,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -39,7 +36,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,27 +46,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ihrm.R
+import com.example.ihrm.ui.security.SecurityFiltersRow
 import com.example.ihrm.domain.usecase.securities.SecurityStatus
 import com.example.ihrm.ui.common.BaseHRMCompose
 import com.example.ihrm.ui.common.header.BaseHeader
-import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.util.DashboardBrush
 import com.example.ihrm.util.LabelTextStyle13MediumGrey
 import com.example.ihrm.util.LabelTextStyle13RegularGrey
@@ -80,75 +72,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import com.example.ihrm.ui.localization.tr
-
-private enum class MySecurityStatus { PENDING, APPROVED, REJECT }
-
-private data class MySecurityChecklistUi(
-    val title: String,
-    val category: String,
-    val name: String,
-    val template: String,
-    val code: String,
-    val status: MySecurityStatus,
-    val dateLabel: Int,
-    val date: String,
-    val approver: String? = null
-)
-
-private val mySecurityItems = listOf(
-    MySecurityChecklistUi(
-        "#3",
-        "GCD",
-        "Nguyen Van A",
-        "temp-v5",
-        "2503001",
-        MySecurityStatus.PENDING,
-        R.string.my_security_check_submitted,
-        "03/01/2025"
-    ),
-    MySecurityChecklistUi(
-        "#4",
-        "GCD",
-        "Nguyen Van A",
-        "temp-v5",
-        "2503001",
-        MySecurityStatus.PENDING,
-        R.string.my_security_check_submitted,
-        "03/01/2025"
-    ),
-    MySecurityChecklistUi(
-        "#5",
-        "GCD",
-        "Nguyen Van A",
-        "temp-v5",
-        "2503001",
-        MySecurityStatus.PENDING,
-        R.string.my_security_check_submitted,
-        "03/01/2025"
-    ),
-    MySecurityChecklistUi(
-        "#1",
-        "GCD",
-        "Nguyen Van A",
-        "temp-v5",
-        "2503001",
-        MySecurityStatus.APPROVED,
-        R.string.my_security_check_updated,
-        "12/01/2024",
-        "Nguyen Van A"
-    ),
-    MySecurityChecklistUi(
-        "#2",
-        "GCD",
-        "Nguyen Van A",
-        "temp-v5",
-        "2503001",
-        MySecurityStatus.REJECT,
-        R.string.my_security_check_updated,
-        "12/01/2024",
-        "Nguyen Van A"
-    )
-)
+import kotlinx.coroutines.delay
 
 @Composable
 fun MySecurityCheckScreen(
@@ -181,27 +105,57 @@ fun MySecurityCheckScreenContent(
     modifier: Modifier = Modifier,
     viewModel: MySecurityCheckViewModel
 ) {
-    var keyword by remember { mutableStateOf("") }
+    var searchQuery by remember { mutableStateOf("") }
+    var showFilterSheet by remember { mutableStateOf(false) }
+    var appliedFilters by remember { mutableStateOf(MySecurityListFilters.Default) }
+    var draftFilters by remember { mutableStateOf(MySecurityListFilters.Default) }
     var showCreatedInMonthDialog by remember { mutableStateOf(false) }
-    val filtered = remember(keyword) {
-        if (keyword.isBlank()) mySecurityItems
-        else {
-            val q = keyword.trim().lowercase()
-            mySecurityItems.filter { item ->
-                item.title.lowercase().contains(q) ||
-                        item.name.lowercase().contains(q) ||
-                        item.category.lowercase().contains(q) ||
-                        item.template.lowercase().contains(q)
-            }
-        }
-    }
+    var skipInitialSearchEffect by remember { mutableStateOf(true) }
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val isSubmitted by viewModel.isSubmitted.collectAsState()
+    val isSubmitted by viewModel.isSubmitted.collectAsStateWithLifecycle()
+
+    LaunchedEffect(showFilterSheet) {
+        if (showFilterSheet) draftFilters = appliedFilters
+    }
+
     LaunchedEffect(isSubmitted) {
         if (!isSubmitted) {
             onCreateChecklistClick()
         }
     }
+
+    LaunchedEffect(searchQuery) {
+        if (skipInitialSearchEffect) {
+            skipInitialSearchEffect = false
+            return@LaunchedEffect
+        }
+        delay(350)
+        viewModel.getMySecurityCheck(
+            year = appliedFilters.year,
+            query = searchQuery.trim().takeIf { it.isNotEmpty() },
+            status = appliedFilters.status.toApiStatusParam(),
+        )
+    }
+
+    val filterIndicatorActive = appliedFilters.hasActiveFilters()
+
+    MySecurityFilterBottomSheet(
+        visible = showFilterSheet,
+        draft = draftFilters,
+        onDraftChange = { draftFilters = it },
+        onDismiss = { showFilterSheet = false },
+        onClearAll = { draftFilters = MySecurityListFilters.Default },
+        onApply = {
+            appliedFilters = draftFilters
+            showFilterSheet = false
+            viewModel.getMySecurityCheck(
+                year = appliedFilters.year,
+                query = searchQuery.trim().takeIf { it.isNotEmpty() },
+                status = appliedFilters.status.toApiStatusParam(),
+            )
+        },
+    )
 
     Scaffold(
         modifier = modifier
@@ -212,7 +166,7 @@ fun MySecurityCheckScreenContent(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    if (hasChecklistInCurrentMonth()) {
+                    if (hasChecklistInCurrentMonth(uiState)) {
                         showCreatedInMonthDialog = true
                     } else {
                         viewModel.getHasSubmitted()
@@ -263,16 +217,21 @@ fun MySecurityCheckScreenContent(
                     }
                 )
                 Spacer(modifier = Modifier.height(12.dp))
-                SearchBar(
-                    keyword = keyword,
-                    onKeywordChange = { keyword = it }
+                SecurityFiltersRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    searchQuery = searchQuery,
+                    onSearchQueryChange = { searchQuery = it },
+                    filterActive = filterIndicatorActive,
+                    onFilterClick = { showFilterSheet = true },
+                    searchPlaceholder = tr(R.string.my_security_check_search_placeholder),
+                    filterContentDescription = tr(R.string.my_security_check_filter_cd),
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     Text(
                         text = tr(
                             R.string.my_security_check_items_count,
-                            filtered.size
+                            uiState.size
                         ),
                         color = White,
                         fontSize = 14.sp,
@@ -316,64 +275,19 @@ fun MySecurityCheckScreenContent(
     }
 }
 
-private fun hasChecklistInCurrentMonth(): Boolean {
+private fun hasChecklistInCurrentMonth(items: List<MySecurityCheckUiState>): Boolean {
+    if (items.isEmpty()) return false
     val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
     val now = Calendar.getInstance()
     val currentMonth = now.get(Calendar.MONTH)
     val currentYear = now.get(Calendar.YEAR)
-    return mySecurityItems.any { item ->
-        runCatching { formatter.parse(item.date) }.getOrNull()?.let { parsed ->
+    return items.any { item ->
+        runCatching { formatter.parse(item.submittedAt) }.getOrNull()?.let { parsed ->
             Calendar.getInstance().apply { time = parsed }.let { created ->
                 created.get(Calendar.MONTH) == currentMonth &&
-                        created.get(Calendar.YEAR) == currentYear
+                    created.get(Calendar.YEAR) == currentYear
             }
         } == true
-    }
-}
-
-@Composable
-private fun SearchBar(keyword: String, onKeywordChange: (String) -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(44.dp)
-            .clip(RoundedCornerShape(14.dp))
-            .background(Color(0xFFF9FAFB))
-            .border(1.dp, Color(0xFFE5E7EB), RoundedCornerShape(14.dp))
-            .padding(horizontal = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = Icons.Default.Search,
-            contentDescription = null,
-            tint = Color(0xFF6A7282),
-            modifier = Modifier.size(18.dp)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        BasicTextField(
-            value = keyword,
-            onValueChange = onKeywordChange,
-            modifier = Modifier.weight(1f),
-            singleLine = true,
-            textStyle = TextStyle(color = Color(0xFF364153), fontSize = 14.sp),
-            cursorBrush = SolidColor(Color(0xFF155DFC)),
-            decorationBox = { inner ->
-                if (keyword.isBlank()) {
-                    Text(
-                        text = tr(R.string.my_security_check_search_placeholder),
-                        color = Color(0xFF99A1AF),
-                        fontSize = 14.sp
-                    )
-                }
-                inner()
-            }
-        )
-        Icon(
-            painter = painterResource(R.drawable.ic_filter),
-            contentDescription = tr(R.string.my_security_check_filter_cd),
-            tint = Color(0xFF6A7282),
-            modifier = Modifier.size(18.dp)
-        )
     }
 }
 
@@ -473,41 +387,3 @@ private fun ChecklistCard(
     }
 }
 
-@Composable
-private fun StatusChip(status: MySecurityStatus) {
-    val text: String
-    val textColor: Color
-    val bgColor: Color
-    when (status) {
-        MySecurityStatus.PENDING -> {
-            text = "PENDING"
-            textColor = Color(0xFFCA8000)
-            bgColor = Color(0xFFFFEDD4)
-        }
-
-        MySecurityStatus.APPROVED -> {
-            text = "APPROVED"
-            textColor = Color(0xFF008236)
-            bgColor = Color(0xFFDCFCE7)
-        }
-
-        MySecurityStatus.REJECT -> {
-            text = "REJECT"
-            textColor = Color(0xFFF10C00)
-            bgColor = Color(0xFFFFC1C2)
-        }
-    }
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(999.dp))
-            .background(bgColor)
-            .padding(horizontal = 10.dp, vertical = 8.dp)
-    ) {
-        Text(
-            text = text,
-            color = textColor,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-    }
-}

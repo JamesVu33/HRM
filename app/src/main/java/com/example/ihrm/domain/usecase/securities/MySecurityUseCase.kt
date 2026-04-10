@@ -20,6 +20,7 @@ class MySecurityUseCase @Inject constructor(
 
     suspend fun getMySecurityCheck(
         year: Int?,
+        query: String?,
         page: Int?,
         limit: Int?,
         orderBy: String?,
@@ -28,6 +29,7 @@ class MySecurityUseCase @Inject constructor(
     ): NetworkResult<List<MySecurityCheckResponse>> {
         val result = mySecurityCheckRepository.getMySecurityCheck(
             year = year,
+            query = query,
             page = page,
             limit = limit,
             orderBy = orderBy,

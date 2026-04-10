@@ -451,6 +451,9 @@
     <string name="my_security_check_rejecter">Rejecter</string>
     <string name="my_security_check_approver">Approver</string>
     <string name="my_security_check_filter_cd">Open checklist filter</string>
+    <string name="my_security_filter_status">Status</string>
+    <string name="my_security_filter_year">Year</string>
+    <string name="my_security_filter_year_all">All years</string>
     <string name="my_security_check_add_cd">Create checklist</string>
     <string name="my_security_check_exists_dialog_title">Checklist already exists</string>
     <string name="my_security_check_exists_dialog_message">You already created a security checklist this month.</string>

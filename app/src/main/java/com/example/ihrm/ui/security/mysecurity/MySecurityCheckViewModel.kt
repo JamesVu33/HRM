@@ -43,6 +43,7 @@ class MySecurityCheckViewModel @Inject constructor(
 
     fun getMySecurityCheck(
         year: Int? = null,
+        query: String? = null,
         page: Int = DEFAULT_PAGE,
         limit: Int = DEFAULT_LIMIT,
         orderBy: String? = null,
@@ -54,6 +55,7 @@ class MySecurityCheckViewModel @Inject constructor(
             fetching = {
                 mySecurityUseCase.getMySecurityCheck(
                     year = year,
+                    query = query,
                     page = page,
                     limit = limit,
                     orderBy = orderBy,

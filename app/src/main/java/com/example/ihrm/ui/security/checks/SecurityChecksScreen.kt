@@ -26,17 +26,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -55,7 +51,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -67,6 +62,7 @@ import com.example.ihrm.R
 import com.example.ihrm.ui.common.BaseHRMCompose
 import com.example.ihrm.ui.common.bottomsheet.SecurityChecksFilterBottomSheet
 import com.example.ihrm.ui.common.header.BaseHeader
+import com.example.ihrm.ui.security.SecurityFiltersRow
 import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.util.DashboardBrush
 import com.example.ihrm.util.LabelTextStyle13Regular
@@ -164,7 +160,6 @@ fun SecurityChecksScreenContent(
         labelNotSubmitted,
         dash,
     ) {
-        Log.d("Vinh", "selectedSummaryFilter: $selectedSummaryFilter")
         if (selectedSummaryFilter == SecuritySummaryFilter.NOT_SUBMITTED) {
             submissionsState.notSubmission
                 .toSecurityCheckItemUiList(
@@ -239,10 +234,16 @@ fun SecurityChecksScreenContent(
             )
             Spacer(modifier = Modifier.height(12.dp))
             SecurityFiltersRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 14.dp),
                 searchQuery = searchQuery,
                 onSearchQueryChange = { searchQuery = it },
                 filterActive = filterIndicatorActive,
                 onFilterClick = { showFilterSheet = true },
+                searchPlaceholder = tr(R.string.security_checks_year),
+                filterContentDescription = tr(R.string.security_checks_filter_cd),
             )
             Spacer(modifier = Modifier.height(20.dp))
             Spacer(modifier = Modifier.height(20.dp))
@@ -293,109 +294,6 @@ fun SecurityChecksScreenContent(
                     }
                     item { Spacer(modifier = Modifier.height(8.dp)) }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-private fun SecurityFiltersRow(
-    searchQuery: String,
-    onSearchQueryChange: (String) -> Unit,
-    filterActive: Boolean,
-    onFilterClick: () -> Unit,
-) {
-    val textStyle = TextStyle(
-        color = Color.Black,
-        fontSize = 15.sp,
-        fontWeight = FontWeight.Normal,
-        lineHeight = 18.sp,
-        platformStyle = PlatformTextStyle(
-            includeFontPadding = false
-        )
-    )
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .padding(top = 14.dp)
-            .height(44.dp)
-            .clip(RoundedCornerShape(14.dp))
-            .background(Color(0xFFF2F2F7))
-            .padding(horizontal = 14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Icon(
-            imageVector = ImageVector.vectorResource(R.drawable.ic_search),
-            contentDescription = null,
-            tint = Color(0xFF6B7280),
-            modifier = Modifier.size(16.dp)
-        )
-        BasicTextField(
-            value = searchQuery,
-            onValueChange = onSearchQueryChange,
-            modifier = Modifier.weight(1f),
-            singleLine = true,
-            textStyle = textStyle,
-            decorationBox = { innerTextField ->
-                Box(
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    if (searchQuery.isEmpty()) {
-                        Text(
-                            text = tr(R.string.security_checks_year),
-                            style = textStyle,
-                            color = Color(0xFF9CA3AF)
-                        )
-                    }
-                    innerTextField()
-                }
-            }
-        )
-        if (searchQuery.isNotEmpty()) {
-            Box(
-                modifier = Modifier
-                    .size(20.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF969BA4))
-                    .clickable { onSearchQueryChange("") },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = null,
-                    tint = White,
-                    modifier = Modifier.size(10.dp)
-                )
-            }
-        }
-        VerticalDivider(
-            modifier = Modifier.height(20.dp),
-            thickness = 1.dp,
-            color = Color(0xFFE5E7EB)
-        )
-        Box(modifier = Modifier.size(28.dp), contentAlignment = Alignment.Center) {
-            IconButton(
-                onClick = onFilterClick.singleClick(),
-                modifier = Modifier.size(28.dp)
-            ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_filter),
-                    contentDescription = tr(R.string.security_checks_filter_cd),
-                    tint = Color(0xFF6B7280),
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-            if (filterActive) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(top = 4.dp, end = 2.dp)
-                        .size(6.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF2563EB))
-                )
             }
         }
     }

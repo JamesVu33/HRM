@@ -16,6 +16,7 @@ class MySecurityRepositoryImpl @Inject constructor(
 ) : MySecurityCheckRepository {
     override suspend fun getMySecurityCheck(
         year: Int?,
+        query: String?,
         page: Int?,
         limit: Int?,
         orderBy: String?,
@@ -25,6 +26,7 @@ class MySecurityRepositoryImpl @Inject constructor(
         safeApiCall(retrofit) {
             apiService.getMySecurityCheckSubmissions(
                 year = year,
+                query = query?.takeIf { it.isNotBlank() },
                 page = page,
                 limit = limit,
                 orderBy = orderBy,
