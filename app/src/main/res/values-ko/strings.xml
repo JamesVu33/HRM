@@ -251,6 +251,17 @@
     <string name="error_alert_close">닫기</string>
     <string name="error_alert_close_cd">오류 닫기</string>
 
+    <!-- Date picker (My Info, Security checks filters) -->
+    <string name="date_picker_confirm">선택</string>
+    <string name="date_picker_cancel">취소</string>
+    <string name="security_checks_date_picker_title">점검일 선택</string>
+    <string name="security_checks_date_picker_headline">일정</string>
+    <string name="my_info_date_picker_dob_title">생년월일</string>
+    <string name="my_info_date_picker_dob_headline">생년월일을 선택하세요</string>
+    <string name="my_info_date_picker_identity_title">발급일</string>
+    <string name="my_info_date_picker_identity_headline">신분증 발급일을 선택하세요</string>
+    <string name="my_info_select_date">날짜 선택</string>
+
     <!-- My Info (Figma 871:37416) -->
     <string name="my_info_screen_title">내 정보</string>
     <string name="my_info_change_photo">사진 변경</string>
@@ -299,22 +310,26 @@
     <string name="my_info_demo_status">재직</string>
     <string name="change_password_success">비밀번호가 변경되었습니다.</string>
     <string name="change_password_fail">비밀번호를 변경할 수 없습니다. 다시 시도해 주세요.</string>
+    <string name="change_password_title">비밀번호 변경</string>
+    <string name="change_password_subtitle">계정 보안을 업데이트하세요</string>
+    <string name="change_password_field_current">현재 비밀번호 *</string>
+    <string name="change_password_field_new">새 비밀번호 *</string>
+    <string name="change_password_field_confirm">새 비밀번호 확인 *</string>
+    <string name="change_password_placeholder_current">현재 비밀번호 입력</string>
+    <string name="change_password_placeholder_new">새 비밀번호 입력</string>
+    <string name="change_password_placeholder_confirm">새 비밀번호 확인</string>
+    <string name="change_password_action_save">저장</string>
+    <string name="change_password_error_current_required">현재 비밀번호를 입력해 주세요.</string>
+    <string name="change_password_error_new_required">새 비밀번호를 입력해 주세요.</string>
+    <string name="change_password_error_confirm_required">새 비밀번호를 다시 입력해 주세요.</string>
+    <string name="change_password_error_mismatch">새 비밀번호와 확인이 일치하지 않습니다.</string>
+    <string name="change_password_error_policy">비밀번호는 8자 이상이며 대문자, 소문자, 숫자, 특수문자를 각각 1개 이상 포함해야 합니다.</string>
+    <string name="change_password_close_cd">닫기</string>
+    <string name="change_password_toggle_visibility_cd">비밀번호 표시 전환</string>
     <string name="my_information_update_success">정보가 업데이트되었습니다.</string>
     <string name="my_information_update_failed">정보를 업데이트할 수 없습니다. 다시 시도해 주세요.</string>
     <string name="my_information_update_avatar_success">프로필 사진이 업데이트되었습니다.</string>
     <string name="my_information_update_avatar_failed">정보를 업데이트할 수 없습니다. 다시 시도해 주세요.</string>
-
-    <!-- Change password dialog (Figma 871:37357) -->
-    <string name="my_info_change_password_title">비밀번호 변경</string>
-    <string name="my_info_change_password_subtitle">계정 보안을 업데이트하세요</string>
-    <string name="my_info_change_password_current_label">현재 비밀번호 *</string>
-    <string name="my_info_change_password_new_label">새 비밀번호 *</string>
-    <string name="my_info_change_password_confirm_label">새 비밀번호 확인 *</string>
-    <string name="my_info_change_password_current_placeholder">현재 비밀번호 입력</string>
-    <string name="my_info_change_password_new_placeholder">새 비밀번호 입력</string>
-    <string name="my_info_change_password_confirm_placeholder">새 비밀번호 확인</string>
-    <string name="my_info_change_password_close_cd">닫기</string>
-    <string name="my_info_change_password_toggle_visibility_cd">비밀번호 표시 전환</string>
 
     <!-- EmployeeDepartmentResponse Detail -->
     <string name="employee_detail_title">구성원 정보</string>

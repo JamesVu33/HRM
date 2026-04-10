@@ -1,5 +1,6 @@
 package com.example.ihrm.ui.common.bottomsheet
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,28 +18,36 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.ihrm.R
+import com.example.ihrm.ui.localization.tr
 import java.util.Calendar
+
+/** Chỉ cho phép ngày không sau hôm nay (DOB, ngày cấp, filter security checks). */
+fun hrmSelectableDatesUpToToday(): SelectableDates = object : SelectableDates {
+    override fun isSelectableDate(utcTimeMillis: Long): Boolean =
+        utcTimeMillis <= System.currentTimeMillis()
+
+    override fun isSelectableYear(year: Int): Boolean =
+        year <= Calendar.getInstance().get(Calendar.YEAR)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SecurityChecksDatePickerDialog(
+fun HrmDatePickerDialog(
     initialMillis: Long?,
+    @StringRes titleRes: Int,
+    @StringRes headlineRes: Int,
+    @StringRes confirmRes: Int,
+    @StringRes cancelRes: Int,
+    yearRange: IntRange,
+    selectableDates: SelectableDates,
     onDateSelected: (Long) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = initialMillis ?: System.currentTimeMillis(),
-        yearRange = (Calendar.getInstance().get(Calendar.YEAR) - 10)..(Calendar.getInstance()
-            .get(Calendar.YEAR) + 1),
-        selectableDates = object : SelectableDates {
-            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                return utcTimeMillis <= System.currentTimeMillis()
-            }
-
-            override fun isSelectableYear(year: Int): Boolean {
-                return year <= Calendar.getInstance().get(Calendar.YEAR)
-            }
-        }
+        yearRange = yearRange,
+        selectableDates = selectableDates,
     )
 
     DatePickerDialog(
@@ -50,7 +59,7 @@ fun SecurityChecksDatePickerDialog(
                 },
                 contentPadding = PaddingValues(horizontal = 8.dp),
             ) {
-                Text("Chọn", color = FilterPrimaryBlue, fontWeight = FontWeight.Bold)
+                Text(tr(confirmRes), color = FilterPrimaryBlue, fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {
@@ -58,7 +67,7 @@ fun SecurityChecksDatePickerDialog(
                 onClick = onDismiss,
                 contentPadding = PaddingValues(horizontal = 8.dp),
             ) {
-                Text("Hủy", color = FilterSheetMuted)
+                Text(tr(cancelRes), color = FilterSheetMuted)
             }
         },
         shape = RoundedCornerShape(28.dp),
@@ -68,7 +77,7 @@ fun SecurityChecksDatePickerDialog(
             state = datePickerState,
             title = {
                 Text(
-                    text = "CHỌN NGÀY KIỂM TRA",
+                    text = tr(titleRes),
                     modifier = Modifier.padding(start = 24.dp, top = 24.dp),
                     style = MaterialTheme.typography.labelMedium,
                     color = FilterSheetMuted
@@ -76,7 +85,7 @@ fun SecurityChecksDatePickerDialog(
             },
             headline = {
                 Text(
-                    text = "Lịch trình",
+                    text = tr(headlineRes),
                     modifier = Modifier.padding(start = 24.dp, bottom = 8.dp),
                     style = MaterialTheme.typography.headlineSmall,
                     color = Color.Black
@@ -95,4 +104,25 @@ fun SecurityChecksDatePickerDialog(
             showModeToggle = false
         )
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SecurityChecksDatePickerDialog(
+    initialMillis: Long?,
+    onDateSelected: (Long) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val y = Calendar.getInstance().get(Calendar.YEAR)
+    HrmDatePickerDialog(
+        initialMillis = initialMillis,
+        titleRes = R.string.security_checks_date_picker_title,
+        headlineRes = R.string.security_checks_date_picker_headline,
+        confirmRes = R.string.date_picker_confirm,
+        cancelRes = R.string.date_picker_cancel,
+        yearRange = (y - 10)..(y + 1),
+        selectableDates = hrmSelectableDatesUpToToday(),
+        onDateSelected = onDateSelected,
+        onDismiss = onDismiss,
+    )
 }

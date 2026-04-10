@@ -44,9 +44,11 @@ class EmployeeDtoToEmployeeMapperTest {
             levelId = 5,
             department = "IT",
             position = "Lead",
-            statusWorking = null,
+            statusWorking = "-",
             salary = null,
             address = null,
+            role = "-",
+            level = "-",
         )
         val dto = e.toEmployeeDto()
         assertEquals("uuid-1", dto.employeeId)

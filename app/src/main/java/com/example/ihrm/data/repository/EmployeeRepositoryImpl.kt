@@ -17,6 +17,7 @@ import com.example.ihrm.di.NetworkModule
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.model.Level
 import com.example.ihrm.domain.repository.EmployeeRepository
+import com.example.ihrm.domain.usecase.employees.EmployeeListDto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import okhttp3.MultipartBody
@@ -119,6 +120,32 @@ class EmployeeRepositoryImpl @Inject constructor(
     override suspend fun changeAvatar(avatar: MultipartBody.Part): NetworkResult<Unit> {
         val result = safeApiCallRaw { apiService.changeAvatar(avatar) }
         return result.map { Unit }
+    }
+
+    override suspend fun getEmployeesList(
+        search: String?,
+        page: Int?,
+        limit: Int?,
+        orderBy: String?,
+        sortBy: String?,
+        type: String?,
+        groupId: String?,
+        isLeader: Boolean?,
+        status: String?,
+        jobTitles: List<String>?
+    ): NetworkResult<List<EmployeeListDto>> = safeApiCall(retrofit) {
+        apiService.getEmployeesList(
+            search = search,
+            page = page,
+            limit = limit,
+            orderBy = orderBy,
+            sortBy = sortBy,
+            type = type,
+            groupId = groupId,
+            isLeader = isLeader,
+            status = status,
+            jobTitles = jobTitles
+        )
     }
 
     private fun <T, R> NetworkResult<T>.map(transform: (T) -> R): NetworkResult<R> {

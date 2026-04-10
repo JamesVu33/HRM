@@ -58,7 +58,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -69,10 +68,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ihrm.R
 import com.example.ihrm.domain.model.EmployeeListSampleData
 import com.example.ihrm.domain.model.EmployeeUiModel
+import com.example.ihrm.ui.common.BaseHRMCompose
 import com.example.ihrm.ui.common.header.BaseHeader
 import com.example.ihrm.ui.components.CustomButton
 import com.example.ihrm.ui.components.EmployeeCard
-import com.example.ihrm.ui.theme.AppBackground
 import com.example.ihrm.ui.theme.EdittextBg
 import com.example.ihrm.ui.theme.EdittextBg_50
 import com.example.ihrm.ui.theme.EdittextBg_70
@@ -84,10 +83,8 @@ import com.example.ihrm.ui.theme.Neutral200
 import com.example.ihrm.ui.theme.Neutral500
 import com.example.ihrm.ui.theme.Neutral600
 import com.example.ihrm.ui.theme.Neutral700
-import com.example.ihrm.ui.theme.Primary200
 import com.example.ihrm.ui.theme.Primary400
 import com.example.ihrm.ui.theme.Primary50
-import com.example.ihrm.ui.theme.Primary500
 import com.example.ihrm.ui.theme.StrokeColor
 import com.example.ihrm.ui.theme.SuccessGreen
 import com.example.ihrm.ui.theme.SurfaceBorder
@@ -102,23 +99,34 @@ fun EmployeeListScreen(
     onViewStats: () -> Unit = {},
     viewModel: EmployeeListViewModel = hiltViewModel()
 ) {
+    BaseHRMCompose(
+        content = {
+            EmployeeListScreenContent(
+                onEmployeeClick = onEmployeeClick,
+                onAddEmployeeClick = onAddEmployeeClick,
+                onBackClick = onBackClick,
+                onViewStats = onViewStats,
+                viewModel = viewModel
+            )
+        },
+        viewmodel = viewModel,
+        onErrorAlertClose = onBackClick
+    )
+}
+
+@Composable
+fun EmployeeListScreenContent(
+    onEmployeeClick: (String) -> Unit,
+    onAddEmployeeClick: () -> Unit,
+    onBackClick: (() -> Unit)? = null,
+    onViewStats: () -> Unit = {},
+    viewModel: EmployeeListViewModel
+) {
     val uiState by viewModel.uiState.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
-    var employeeToDelete by remember { mutableStateOf<EmployeeUiModel?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.refreshEmployees()
-    }
-
-    employeeToDelete?.let { toDelete ->
-        DeleteConfirmDialog(
-            employeeName = toDelete.employee.name,
-            onDismiss = { employeeToDelete = null },
-            onConfirmDelete = {
-                viewModel.deleteEmployee(toDelete.employee.id)
-                employeeToDelete = null
-            }
-        )
     }
 
     val baseModels = remember(uiState.employeeUiModels, uiState.isLoading, uiState.error) {
@@ -136,9 +144,8 @@ fun EmployeeListScreen(
         else {
             baseModels.filter { m ->
                 val e = m.employee
-                e.name.lowercase().contains(q) ||
-                        (e.position?.lowercase()?.contains(q) == true) ||
-                        e.email.lowercase().contains(q)
+                e.name.lowercase().contains(q) || e.position.lowercase()
+                    .contains(q) || e.email.lowercase().contains(q)
             }
         }
     }
@@ -189,21 +196,6 @@ fun EmployeeListScreen(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                if (uiState.isLoading && uiState.employeeUiModels.isNotEmpty()) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(4.dp)
-                            .background(Neutral200),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        LinearProgressIndicator(
-                            modifier = Modifier.fillMaxWidth(),
-                            color = Primary400,
-                            trackColor = Neutral200
-                        )
-                    }
-                }
 
                 if (uiState.error != null) {
                     Row(
@@ -230,16 +222,6 @@ fun EmployeeListScreen(
                 }
 
                 when {
-                    uiState.isLoading && uiState.employeeUiModels.isEmpty() -> {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
-                        }
-                    }
 
                     uiState.error != null && baseModels.isEmpty() -> {
                         Box(
@@ -264,7 +246,6 @@ fun EmployeeListScreen(
                             onSearchQueryChange = { searchQuery = it },
                             onViewStats = onViewStats,
                             onEmployeeClick = onEmployeeClick,
-                            onDeleteRequest = { employeeToDelete = it },
                             onBackClick = onBackClick,
                             paddingValues = paddingValues
                         )
@@ -283,56 +264,45 @@ private fun EmployeeListScrollContent(
     onSearchQueryChange: (String) -> Unit,
     onViewStats: () -> Unit,
     onEmployeeClick: (String) -> Unit,
-    onDeleteRequest: (EmployeeUiModel) -> Unit,
     onBackClick: (() -> Unit)? = null,
     paddingValues: PaddingValues = PaddingValues()
 ) {
     val totalEmployees = baseModels.size
-    val activeToday = derivedActiveToday(totalEmployees)
-    val noLevelLabel = tr(R.string.dashboard_badge_no_level)
-    Box(modifier = Modifier.fillMaxSize()) {
+    val activeToday = derivedActiveToday(baseModels)
+    Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+        BaseHeader(
+            modifier = Modifier,
+            title = tr(R.string.employee_list_title),
+            showNavigationIcon = onBackClick != null,
+            onNavigationClick = onBackClick,
+            navigationIcon = {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = null,
+                    tint = White
+                )
+            },
+            containerColor = Color.Transparent
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        EmployeeListSearchBar(
+            query = searchQuery,
+            onQueryChange = onSearchQueryChange,
+            placeholder = tr(R.string.dashboard_search_placeholder)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        ManageTeamCard(onViewStats = onViewStats)
+        Spacer(modifier = Modifier.height(16.dp))
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp),
             contentPadding = PaddingValues(
-                top = paddingValues.calculateTopPadding() + WindowInsets.statusBars
-                    .asPaddingValues()
-                    .calculateTopPadding(),
                 bottom = paddingValues.calculateBottomPadding()
             ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             item {
-                BaseHeader(
-                    modifier = Modifier,
-                    title = tr(R.string.employee_list_title),
-                    showNavigationIcon = onBackClick != null,
-                    onNavigationClick = onBackClick,
-                    navigationIcon = {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null,
-                            tint = White
-                        )
-                    },
-                    containerColor = Color.Transparent
-                )
-            }
-            item { Spacer(modifier = Modifier.height(12.dp)) }
-            item {
-                EmployeeListSearchBar(
-                    query = searchQuery,
-                    onQueryChange = onSearchQueryChange,
-                    placeholder = tr(R.string.dashboard_search_placeholder)
-                )
-            }
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-                ManageTeamCard(onViewStats = onViewStats)
-            }
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
                 StatsRow(
                     totalEmployees = totalEmployees,
                     activeToday = activeToday
@@ -365,9 +335,8 @@ private fun EmployeeListScrollContent(
                 ) { model ->
                     EmployeeCard(
                         employee = model.employee,
-                        levelCode = model.levelCode ?: noLevelLabel,
+                        levelCode = model.employee.level,
                         onViewDetails = { onEmployeeClick(model.employee.id) },
-                        onDelete = { onDeleteRequest(model) }
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                 }
@@ -378,9 +347,10 @@ private fun EmployeeListScrollContent(
 }
 
 /** Tỷ lệ gần với mẫu Figma (68 tổng / 57 active). */
-private fun derivedActiveToday(total: Int): Int = when {
-    total <= 0 -> 0
-    else -> ((total * 57 + 34) / 68).coerceAtMost(total)
+private fun derivedActiveToday(total: List<EmployeeUiModel>): Int {
+    return total.count {
+        it.employee.statusWorking.uppercase() == "WORKING"
+    }
 }
 
 private val DeleteRed = Color(0xFFdc2626)
@@ -502,6 +472,7 @@ private fun EmployeeListSearchBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = 16.dp)
             .height(44.dp)
             .border(
                 width = 1.dp,
@@ -603,7 +574,9 @@ private fun StatCard(
 @Composable
 private fun ManageTeamCard(onViewStats: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.Transparent
@@ -702,7 +675,6 @@ private fun EmployeeListScrollContentPreview() {
                         onSearchQueryChange = {},
                         onViewStats = {},
                         onEmployeeClick = {},
-                        onDeleteRequest = {}
                     )
                 }
             }

@@ -199,47 +199,6 @@ class DashboardViewModel @Inject constructor(
                 DashboardUiState(isLoading = true)
             )
 
-    /** Fetches employees from API then refreshes the list and levels map. */
-    fun refreshEmployees() {
-        viewModelScope.launch {
-            syncLoading.value = true
-            syncError.value = null
-            syncErrorUnauthorized.value = false
-            val meta = getMetaIfS1OrS2()
-            
-            fetchData(
-                fetching = { syncEmployeesUseCase(meta) },
-                callbackWrapper = object : CallbackWrapper<Unit> {
-                    override fun onSuccess(data: Unit) {
-                        refreshTrigger.tryEmit(Unit)
-                        syncLoading.value = false
-                    }
-                }
-            )
-        }
-    }
-
-
-    /** If current user level is S1 or S2, fetches and returns employees meta for mapping; otherwise returns null. */
-    private suspend fun getMetaIfS1OrS2(): UserMetaResponseDto? {
-        val meResult = getMeEmployeeInfoUseCase().getOrNull() ?: return null
-        val levelCode = meResult.level?.code ?: return null
-        if (levelCode != "S1" && levelCode != "S2") return null
-        return getEmployeesMetaUseCase().getOrNull()
-    }
-
-    fun deleteEmployee(id: String) {
-        fetchData(
-            fetching = { deleteEmployeeUseCase(id) },
-            callbackWrapper = object : CallbackWrapper<Unit> {
-                override fun onSuccess(data: Unit) {
-                    refreshEmployees()
-                }
-            }
-        )
-    }
-
-
     private fun getGreeting(): String {
         val hour = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             LocalTime.now().hour
@@ -261,11 +220,6 @@ class DashboardViewModel @Inject constructor(
             Locale.getDefault()
         )
         return LocalDate.now().format(formatter)
-    }
-
-    fun clearError() {
-        syncError.value = null
-        syncErrorUnauthorized.value = false
     }
 
     private fun updateGreetingAndDate() {

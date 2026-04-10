@@ -1,6 +1,7 @@
 package com.example.ihrm.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -58,7 +59,6 @@ fun EmployeeCard(
     employee: Employee,
     levelCode: String,
     onViewDetails: () -> Unit,
-    onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val avatarBg = when (employee.id.hashCode() % 3) {
@@ -71,7 +71,8 @@ fun EmployeeCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        onClick = onViewDetails.singleClick()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -86,7 +87,8 @@ fun EmployeeCard(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = employee.name.take(3).uppercase().filter { it.isLetter() }.ifEmpty { "?" },
+                        text = employee.name.take(3).uppercase().filter { it.isLetter() }
+                            .ifEmpty { "?" },
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Neutral700
@@ -166,27 +168,6 @@ fun EmployeeCard(
                     )
                 }
             }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 12.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                FlatButton(
-                    text = tr(R.string.dashboard_view_details),
-                    textColor = Primary400,
-                    backgroundColor = PrimaryTint,
-                    onClick = onViewDetails.singleClick(),
-                    modifier = Modifier.weight(1f)
-                )
-                FlatButton(
-                    text = tr(R.string.dashboard_delete),
-                    textColor = Error,
-                    backgroundColor = ErrorLight,
-                    onClick = onDelete.singleClick(),
-                    modifier = Modifier.weight(1f)
-                )
-            }
         }
     }
 }
@@ -194,7 +175,8 @@ fun EmployeeCard(
 @Composable
 private fun EmployeeCardBadge(text: String) {
     Box(
-        modifier = Modifier.width(65.dp)
+        modifier = Modifier
+            .width(65.dp)
             .height(22.dp)
             .background(color = Color(0xFFF3E8FF), shape = RoundedCornerShape(size = 36369700.dp))
             .padding(start = 8.dp, top = 2.dp, end = 8.dp, bottom = 2.dp),
@@ -239,7 +221,6 @@ private fun EmployeeCardPreview() {
             ),
             levelCode = "S1",
             onViewDetails = {},
-            onDelete = {},
             modifier = Modifier.padding(16.dp)
         )
     }

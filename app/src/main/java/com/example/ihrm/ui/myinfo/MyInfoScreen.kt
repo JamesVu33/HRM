@@ -49,7 +49,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -61,16 +60,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ihrm.R
 import com.example.ihrm.data.remote.myinfo.UpdateProfileRequest
+import com.example.ihrm.domain.model.Country
 import com.example.ihrm.domain.model.MaritalStatus
 import com.example.ihrm.domain.model.MyInfo
 import com.example.ihrm.domain.model.MyProfile
 import com.example.ihrm.ui.common.Avatar
 import com.example.ihrm.ui.common.BaseHRMCompose
 import com.example.ihrm.ui.common.bottomsheet.CountryPickerBottomSheet
+import com.example.ihrm.ui.common.bottomsheet.HrmDatePickerDialog
 import com.example.ihrm.ui.common.bottomsheet.MaritalStatusBottomSheet
+import com.example.ihrm.ui.common.bottomsheet.hrmSelectableDatesUpToToday
 import com.example.ihrm.ui.components.ButtonSize
 import com.example.ihrm.ui.components.ButtonVariant
 import com.example.ihrm.ui.components.CustomButton
@@ -80,9 +84,12 @@ import com.example.ihrm.ui.theme.GenderUnselectedText
 import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.util.DashboardBrush.MyInfoHeaderBrush
 import com.example.ihrm.util.dropShadow
+import com.example.ihrm.util.parseDisplayDateToPickerMillis
 import com.example.ihrm.util.toDisplayDate
+import com.example.ihrm.util.toPickerDisplayDateString
 import com.example.ihrm.util.txtInterMedium14White90Percent
 import com.example.ihrm.ui.localization.tr
+import java.util.Calendar
 
 private val PageBg = Color(0xFFF9FAFB)
 private val CardBorder = Color(0xFFF3F4F6)
@@ -134,6 +141,22 @@ private fun textOrPlaceholder(value: String?): String {
     return value
 }
 
+/** UI shows country name; [selectedCountryCode] and profile nationality stay as API codes. */
+@Composable
+private fun nationalityDisplayLabel(
+    selectedCountryCode: String,
+    countries: List<Country>?,
+    profileNationalityCode: String?,
+): String {
+    val code = selectedCountryCode.trim().ifBlank { profileNationalityCode?.trim().orEmpty() }
+    if (code.isBlank()) return tr(R.string.my_info_not_available)
+    val name = countries.orEmpty()
+        .find { it.code.equals(code, ignoreCase = true) }
+        ?.name?.trim()
+        ?.takeIf { it.isNotEmpty() }
+    return name ?: code
+}
+
 private fun rolesDisplay(info: MyInfo?): String? {
     if (info == null) return null
     val joined = info.roles.map { it.name }.filter { it.isNotBlank() }.joinToString(", ")
@@ -164,6 +187,12 @@ private fun initialsFromName(name: String?): String {
 
 private fun changedOrNull(newValue: String?, oldValue: String?): String? {
     return if (newValue?.trim() == oldValue?.trim()) null else newValue
+}
+
+private fun defaultDobPickerInitialMillis(): Long {
+    val c = Calendar.getInstance()
+    c.add(Calendar.YEAR, -30)
+    return c.timeInMillis
 }
 
 private data class MyInfoFormSaveDelta(
@@ -286,6 +315,8 @@ fun MyInfoScreenContent(
     var showChangePasswordDialog by remember { mutableStateOf(false) }
     var showCountryPicker by remember { mutableStateOf(false) }
     var showMaritalStatusPicker by remember { mutableStateOf(false) }
+    var showDobPicker by remember { mutableStateOf(false) }
+    var showIdentityIssuePicker by remember { mutableStateOf(false) }
 
     var fullNameText by remember { mutableStateOf("") }
     var englishNameText by remember { mutableStateOf("") }
@@ -364,6 +395,41 @@ fun MyInfoScreenContent(
             selectedMaritalStatus = selectedStatus
         },
     )
+
+    val currentYear = remember { Calendar.getInstance().get(Calendar.YEAR) }
+    if (showDobPicker) {
+        HrmDatePickerDialog(
+            initialMillis = dobText.parseDisplayDateToPickerMillis() ?: defaultDobPickerInitialMillis(),
+            titleRes = R.string.my_info_date_picker_dob_title,
+            headlineRes = R.string.my_info_date_picker_dob_headline,
+            confirmRes = R.string.date_picker_confirm,
+            cancelRes = R.string.date_picker_cancel,
+            yearRange = (currentYear - 120)..currentYear,
+            selectableDates = hrmSelectableDatesUpToToday(),
+            onDateSelected = { ms ->
+                dobText = ms.toPickerDisplayDateString()
+                showDobPicker = false
+            },
+            onDismiss = { showDobPicker = false },
+        )
+    }
+    if (showIdentityIssuePicker) {
+        HrmDatePickerDialog(
+            initialMillis = identityIssueDayText.parseDisplayDateToPickerMillis()
+                ?: System.currentTimeMillis(),
+            titleRes = R.string.my_info_date_picker_identity_title,
+            headlineRes = R.string.my_info_date_picker_identity_headline,
+            confirmRes = R.string.date_picker_confirm,
+            cancelRes = R.string.date_picker_cancel,
+            yearRange = (currentYear - 120)..currentYear,
+            selectableDates = hrmSelectableDatesUpToToday(),
+            onDateSelected = { ms ->
+                identityIssueDayText = ms.toPickerDisplayDateString()
+                showIdentityIssuePicker = false
+            },
+            onDismiss = { showIdentityIssuePicker = false },
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -489,9 +555,10 @@ fun MyInfoScreenContent(
                             label = tr(R.string.my_info_label_dob),
                             icon = ImageVector.vectorResource(R.drawable.ic_calendar),
                             content = {
-                                MyInfoValueBox(
-                                    value = dobText,
-                                    onValueChange = { dobText = it },
+                                MyInfoDatePickerRow(
+                                    displayValue = dobText,
+                                    placeholder = tr(R.string.my_info_select_date),
+                                    onClick = { showDobPicker = true },
                                 )
                             },
                         )
@@ -522,9 +589,10 @@ fun MyInfoScreenContent(
                             label = tr(R.string.my_info_label_identity_issue_day),
                             icon = ImageVector.vectorResource(R.drawable.ic_calendar),
                             content = {
-                                MyInfoValueBox(
-                                    value = identityIssueDayText,
-                                    onValueChange = { identityIssueDayText = it },
+                                MyInfoDatePickerRow(
+                                    displayValue = identityIssueDayText,
+                                    placeholder = tr(R.string.my_info_select_date),
+                                    onClick = { showIdentityIssuePicker = true },
                                 )
                             },
                         )
@@ -545,9 +613,11 @@ fun MyInfoScreenContent(
                             icon = ImageVector.vectorResource(R.drawable.ic_location),
                             content = {
                                 MyInfoDropdownRow(
-                                    value = countryCodeText.ifBlank {
-                                        textOrPlaceholder(profile?.nationality)
-                                    },
+                                    value = nationalityDisplayLabel(
+                                        selectedCountryCode = countryCodeText,
+                                        countries = countries,
+                                        profileNationalityCode = profile?.nationality,
+                                    ),
                                     onClick = {
                                         if (!countries.isNullOrEmpty()) {
                                             showCountryPicker = true
@@ -867,6 +937,41 @@ private fun MyInfoLabeledField(
 }
 
 @Composable
+private fun MyInfoDatePickerRow(
+    displayValue: String,
+    placeholder: String,
+    onClick: () -> Unit,
+) {
+    val showText = displayValue.ifBlank { placeholder }
+    val textStyle = if (displayValue.isBlank()) {
+        FieldValueStyle.copy(color = MutedValue)
+    } else {
+        FieldValueStyle
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .border(1.dp, FieldBorder, RoundedCornerShape(12.dp))
+            .background(Color.White)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        Text(text = showText, style = textStyle)
+        Icon(
+            imageVector = ImageVector.vectorResource(R.drawable.ic_calendar),
+            contentDescription = null,
+            tint = DashboardFigmaInk,
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .size(20.dp)
+        )
+    }
+}
+
+@Composable
 private fun MyInfoValueBox(
     value: String,
     onValueChange: (String) -> Unit,
@@ -1055,6 +1160,16 @@ private fun MyInfoReadOnlyEmployeeField(
 }
 
 private val ChangePasswordPlaceholderColor = Color(0xFF101828).copy(alpha = 0.5f)
+private val ChangePasswordErrorColor = Color(0xFFDC2626)
+
+private fun changePasswordValidationIssueStringRes(issue: ChangePasswordValidationIssue): Int =
+    when (issue) {
+        ChangePasswordValidationIssue.CURRENT_REQUIRED -> R.string.change_password_error_current_required
+        ChangePasswordValidationIssue.NEW_REQUIRED -> R.string.change_password_error_new_required
+        ChangePasswordValidationIssue.CONFIRM_REQUIRED -> R.string.change_password_error_confirm_required
+        ChangePasswordValidationIssue.MISMATCH -> R.string.change_password_error_mismatch
+        ChangePasswordValidationIssue.POLICY -> R.string.change_password_error_policy
+    }
 
 @Composable
 private fun ChangePasswordDialog(
@@ -1067,6 +1182,7 @@ private fun ChangePasswordDialog(
     var currentVisible by remember { mutableStateOf(false) }
     var newVisible by remember { mutableStateOf(false) }
     var confirmVisible by remember { mutableStateOf(false) }
+    var validationIssue by remember { mutableStateOf<ChangePasswordValidationIssue?>(null) }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -1103,7 +1219,7 @@ private fun ChangePasswordDialog(
                             verticalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
                             Text(
-                                text = tr(R.string.my_info_change_password_title),
+                                text = tr(R.string.change_password_title),
                                 style = TextStyle(
                                     fontFamily = InterFontFamily,
                                     fontWeight = FontWeight.Bold,
@@ -1114,7 +1230,7 @@ private fun ChangePasswordDialog(
                                 ),
                             )
                             Text(
-                                text = tr(R.string.my_info_change_password_subtitle),
+                                text = tr(R.string.change_password_subtitle),
                                 style = TextStyle(
                                     fontFamily = InterFontFamily,
                                     fontWeight = FontWeight.Normal,
@@ -1135,7 +1251,7 @@ private fun ChangePasswordDialog(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = tr(R.string.my_info_change_password_close_cd),
+                                contentDescription = tr(R.string.change_password_close_cd),
                                 tint = Color.White,
                                 modifier = Modifier.size(20.dp),
                             )
@@ -1150,29 +1266,49 @@ private fun ChangePasswordDialog(
                     verticalArrangement = Arrangement.spacedBy(24.dp),
                 ) {
                     ChangePasswordField(
-                        label = tr(R.string.my_info_change_password_current_label),
+                        label = tr(R.string.change_password_field_current),
                         value = currentPassword,
-                        onValueChange = { currentPassword = it },
-                        placeholder = tr(R.string.my_info_change_password_current_placeholder),
+                        onValueChange = {
+                            currentPassword = it
+                            validationIssue = null
+                        },
+                        placeholder = tr(R.string.change_password_placeholder_current),
                         visible = currentVisible,
                         onToggleVisible = { currentVisible = !currentVisible },
                     )
                     ChangePasswordField(
-                        label = tr(R.string.my_info_change_password_new_label),
+                        label = tr(R.string.change_password_field_new),
                         value = newPassword,
-                        onValueChange = { newPassword = it },
-                        placeholder = tr(R.string.my_info_change_password_new_placeholder),
+                        onValueChange = {
+                            newPassword = it
+                            validationIssue = null
+                        },
+                        placeholder = tr(R.string.change_password_placeholder_new),
                         visible = newVisible,
                         onToggleVisible = { newVisible = !newVisible },
                     )
                     ChangePasswordField(
-                        label = tr(R.string.my_info_change_password_confirm_label),
+                        label = tr(R.string.change_password_field_confirm),
                         value = confirmPassword,
-                        onValueChange = { confirmPassword = it },
-                        placeholder = tr(R.string.my_info_change_password_confirm_placeholder),
+                        onValueChange = {
+                            confirmPassword = it
+                            validationIssue = null
+                        },
+                        placeholder = tr(R.string.change_password_placeholder_confirm),
                         visible = confirmVisible,
                         onToggleVisible = { confirmVisible = !confirmVisible },
                     )
+                    validationIssue?.let { issue ->
+                        Text(
+                            text = tr(changePasswordValidationIssueStringRes(issue)),
+                            style = FieldValueStyle.copy(
+                                color = ChangePasswordErrorColor,
+                                fontSize = 13.sp,
+                                lineHeight = 18.sp,
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                     CustomButton(
                         modifier = Modifier
                             .dropShadow(
@@ -1185,9 +1321,21 @@ private fun ChangePasswordDialog(
                             ),
                         size = ButtonSize.Large,
                         variant = ButtonVariant.Primary,
-                        text = tr(R.string.employee_detail_save),
-                        onClick = { onSave(currentPassword, newPassword, confirmPassword) },
-                        enabled = currentPassword.isNotEmpty() && newPassword.isNotEmpty() && confirmPassword.isNotEmpty(),
+                        text = tr(R.string.change_password_action_save),
+                        onClick = {
+                            val issue = validateChangePasswordInput(
+                                currentPassword,
+                                newPassword,
+                                confirmPassword,
+                            )
+                            if (issue != null) {
+                                validationIssue = issue
+                            } else {
+                                validationIssue = null
+                                onSave(currentPassword, newPassword, confirmPassword)
+                            }
+                        },
+                        enabled = true,
                         fullWidth = true,
                     )
                 }
@@ -1251,7 +1399,7 @@ private fun ChangePasswordField(
                         } else {
                             ImageVector.vectorResource(R.drawable.icon_remember)
                         },
-                        contentDescription = tr(R.string.my_info_change_password_toggle_visibility_cd),
+                        contentDescription = tr(R.string.change_password_toggle_visibility_cd),
                         tint = DashboardFigmaInk,
                         modifier = Modifier.size(20.dp),
                     )

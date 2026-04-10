@@ -10,7 +10,9 @@ import com.example.ihrm.data.remote.dto.LevelShortDto
 import com.example.ihrm.data.remote.dto.UserResponseDto
 import com.example.ihrm.data.remote.employee.EmployeeProfileResponse
 import com.example.ihrm.domain.model.Employee
+import com.example.ihrm.domain.model.EmployeeUiModel
 import com.example.ihrm.domain.model.Level
+import com.example.ihrm.domain.usecase.employees.EmployeeListDto
 import com.example.ihrm.util.Constants.DASH
 import com.example.ihrm.util.formatDateTime
 import java.text.SimpleDateFormat
@@ -36,7 +38,7 @@ private val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.
     timeZone = TimeZone.getTimeZone("UTC")
 }
 
-private fun parseIsoToLong(iso: String?): Long {
+fun parseIsoToLong(iso: String?): Long {
     if (iso.isNullOrBlank()) return System.currentTimeMillis()
     return try {
         Instant.parse(iso).toEpochMilli()
@@ -223,4 +225,28 @@ fun Employee.toEmployeeEntity(): EmployeeEntity {
         createdAt = createdAt,
         updatedAt = updatedAt
     )
+}
+
+fun EmployeeListDto.toEmployeeUiModel(): EmployeeUiModel {
+    val employee = Employee(
+        id = employeeId.toString(),
+        name = fullName.orEmpty(),
+        email = email.orEmpty(),
+        phone = phoneNumber.orEmpty(),
+        levelId = title?.id,
+        department = membershipOf?.firstOrNull()?.name.orEmpty(),
+        position = title?.name.orEmpty(),
+        statusWorking = status.orEmpty(),
+        salary = null,
+        address = null,
+        englishName = null,
+        gender = null,
+        personalId = null,
+        idIssueDate = null,
+        createdAt = parseIsoToLong(createdAt),
+        updatedAt = parseIsoToLong(updatedAt),
+        role = DASH,
+        level = level?.code ?: DASH
+    )
+    return EmployeeUiModel(employee = employee)
 }

@@ -17,8 +17,34 @@ class EmployeeListViewModelTest {
     @Test
     fun buildEmployeeUiModels_withLevelMap_resolvesLevelCode() {
         val employees = listOf(
-            Employee("1", "Alice", "a@b.com", "1", levelId = 10, null, "Dev", null, null, null),
-            Employee("2", "Bob", "b@b.com", "2", levelId = 20, null, "QA", null, null, null)
+            Employee(
+                id = "1",
+                name = "Alice",
+                email = "a@b.com",
+                phone = "1",
+                levelId = 10,
+                department = "-",
+                position = "Dev",
+                statusWorking = "-",
+                salary = null,
+                address = null,
+                role = "-",
+                level = "-",
+            ),
+            Employee(
+                id = "2",
+                name = "Bob",
+                email = "b@b.com",
+                phone = "2",
+                levelId = 20,
+                department = "-",
+                position = "QA",
+                statusWorking = "-",
+                salary = null,
+                address = null,
+                role = "-",
+                level = "-",
+            )
         )
         val levelMap = mapOf(
             10 to Level(10, "S1", "Senior 1"),
@@ -33,7 +59,20 @@ class EmployeeListViewModelTest {
     @Test
     fun buildEmployeeUiModels_missingLevelId_levelCodeNull() {
         val employees = listOf(
-            Employee("1", "Alice", "a@b.com", "1", levelId = 99, null, "Dev", null, null, null)
+            Employee(
+                id = "1",
+                name = "Alice",
+                email = "a@b.com",
+                phone = "1",
+                levelId = 99,
+                department = "-",
+                position = "Dev",
+                statusWorking = "-",
+                salary = null,
+                address = null,
+                role = "-",
+                level = "-",
+            )
         )
         val result = buildEmployeeUiModels(employees, emptyMap())
         assertEquals(1, result.size)
@@ -43,7 +82,20 @@ class EmployeeListViewModelTest {
     @Test
     fun buildEmployeeUiModels_nullLevelId_levelCodeNull() {
         val employees = listOf(
-            Employee("1", "Alice", "a@b.com", "1", levelId = null, null, "Dev", null, null, null)
+            Employee(
+                id = "1",
+                name = "Alice",
+                email = "a@b.com",
+                phone = "1",
+                levelId = null,
+                department = "-",
+                position = "Dev",
+                statusWorking = "-",
+                salary = null,
+                address = null,
+                role = "-",
+                level = "-",
+            )
         )
         val result = buildEmployeeUiModels(employees, mapOf(10 to Level(10, "S1", "Senior")))
         assertEquals(1, result.size)
