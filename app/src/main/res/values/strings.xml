@@ -369,6 +369,7 @@
     <string name="employee_list_title">Employees</string>
     <string name="employee_list_load_error">Could not load employees. Pull to refresh or try again later.</string>
     <string name="employee_list_no_match">No employees match your search.</string>
+    <string name="employee_list_loading_more_cd">Loading more employees</string>
     <!-- Team / statistics screen (Figma 871:34408) -->
     <string name="team_statistics_title">Statistics information</string>
     <string name="team_statistics_active_employees_hint">Active employees</string>

@@ -15,5 +15,11 @@ object Constants {
     const val DEFAULT_PAGE = 1
 
     const val DEFAULT_LIMIT = 100
+
+    /** Page size cho GET employees list + load more trên EmployeeListScreen. */
+    const val EMPLOYEE_LIST_PAGE_LIMIT = 20
+
+    /** Debounce ô tìm kiếm nhân viên trước khi gọi API (tránh giật khi gõ). */
+    const val EMPLOYEE_LIST_SEARCH_DEBOUNCE_MS = 400L
     const val DASH = "-"
 }

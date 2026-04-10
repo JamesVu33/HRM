@@ -370,6 +370,7 @@
     <string name="employee_list_title">Nhân viên</string>
     <string name="employee_list_load_error">Không tải được danh sách. Kéo để làm mới hoặc thử lại sau.</string>
     <string name="employee_list_no_match">Không có nhân viên khớp tìm kiếm.</string>
+    <string name="employee_list_loading_more_cd">Đang tải thêm nhân viên</string>
     <!-- Team / statistics screen (Figma 871:34408) -->
     <string name="team_statistics_title">Thống kê</string>
     <string name="team_statistics_active_employees_hint">Nhân viên đang hoạt động</string>

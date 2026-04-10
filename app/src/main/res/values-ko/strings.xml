@@ -370,6 +370,7 @@
     <string name="employee_list_title">직원</string>
     <string name="employee_list_load_error">직원 목록을 불러올 수 없습니다. 당겨서 새로고침하거나 나중에 다시 시도하세요.</string>
     <string name="employee_list_no_match">검색과 일치하는 직원이 없습니다.</string>
+    <string name="employee_list_loading_more_cd">직원 목록 불러오는 중</string>
     <!-- Team / statistics screen (Figma 871:34408) -->
     <string name="team_statistics_title">통계 정보</string>
     <string name="team_statistics_active_employees_hint">활성 직원</string>

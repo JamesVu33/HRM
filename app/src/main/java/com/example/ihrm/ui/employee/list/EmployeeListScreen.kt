@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -31,6 +32,8 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -40,12 +43,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
@@ -85,6 +92,10 @@ import com.example.ihrm.ui.theme.SurfaceBorder
 import com.example.ihrm.util.DashboardBrush
 import com.example.ihrm.ui.localization.tr
 import com.example.ihrm.util.Constants.DASH
+import com.example.ihrm.util.Constants.EMPLOYEE_LIST_SEARCH_DEBOUNCE_MS
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import com.example.ihrm.util.txtInterBold20
 
 @Composable
@@ -120,27 +131,27 @@ fun EmployeeListScreenContent(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var searchQuery by remember { mutableStateOf("") }
+    /** Chỉ debounce-call API sau khi user đã tương tác ô tìm (tránh trùng với [EmployeeListViewModel] init). */
+    var searchTouched by remember { mutableStateOf(false) }
+
+    /** Debounce: gọi API sau khi user ngừng gõ — danh sách giữ nguyên trong lúc chờ, không filter client. */
+    LaunchedEffect(searchQuery) {
+        if (!searchTouched) return@LaunchedEffect
+        delay(EMPLOYEE_LIST_SEARCH_DEBOUNCE_MS)
+        viewModel.refreshEmployees(search = searchQuery)
+    }
 
     val baseModels = remember(uiState.employeeUiModels, uiState.isLoading, uiState.error) {
         when {
             uiState.employeeUiModels.isNotEmpty() -> uiState.employeeUiModels
             uiState.isLoading -> emptyList()
             uiState.error != null -> emptyList()
-            else -> EmployeeListSampleData.uiModels
+            else -> emptyList()
         }
     }
 
-    val filteredModels = remember(baseModels, searchQuery) {
-        val q = searchQuery.trim().lowercase()
-        if (q.isEmpty()) baseModels
-        else {
-            baseModels.filter { m ->
-                val e = m.employee
-                e.name.lowercase().contains(q) || e.position.lowercase()
-                    .contains(q) || e.email.lowercase().contains(q)
-            }
-        }
-    }
+    val showSearchProgress =
+        uiState.isLoading && uiState.employeeUiModels.isNotEmpty()
 
     Scaffold(
         modifier = Modifier
@@ -214,15 +225,6 @@ fun EmployeeListScreenContent(
                 }
 
                 when {
-                    uiState.isLoading && uiState.employeeUiModels.isEmpty() -> {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                        }
-                    }
                     uiState.error != null && baseModels.isEmpty() -> {
                         Box(
                             modifier = Modifier
@@ -242,13 +244,20 @@ fun EmployeeListScreenContent(
                         EmployeeListScrollContent(
                             baseModels = baseModels,
                             totalEmployees = uiState.listMeta?.total,
-                            filteredModels = filteredModels,
                             searchQuery = searchQuery,
-                            onSearchQueryChange = { searchQuery = it },
+                            onSearchQueryChange = {
+                                searchTouched = true
+                                searchQuery = it
+                            },
+                            showSearchProgress = showSearchProgress,
                             onViewStats = onViewStats,
                             onEmployeeClick = onEmployeeClick,
                             onBackClick = onBackClick,
-                            paddingValues = paddingValues
+                            paddingValues = paddingValues,
+                            hasMorePages = uiState.hasMorePages,
+                            isLoadingMore = uiState.isLoadingMore,
+                            isLoading = uiState.isLoading,
+                            onLoadMore = { viewModel.loadMoreEmployees() },
                         )
                     }
                 }
@@ -260,16 +269,42 @@ fun EmployeeListScreenContent(
 @Composable
 private fun EmployeeListScrollContent(
     baseModels: List<EmployeeUiModel>,
-    filteredModels: List<EmployeeUiModel>,
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
+    showSearchProgress: Boolean,
     onViewStats: () -> Unit,
     onEmployeeClick: (String) -> Unit,
     onBackClick: (() -> Unit)? = null,
     paddingValues: PaddingValues = PaddingValues(),
-    totalEmployees: Int?
+    totalEmployees: Int?,
+    hasMorePages: Boolean,
+    isLoadingMore: Boolean,
+    isLoading: Boolean,
+    onLoadMore: () -> Unit,
 ) {
-    val activeToday = derivedActiveToday(baseModels)
+    val listState = rememberLazyListState()
+    val loadingMoreCd = tr(R.string.employee_list_loading_more_cd)
+
+    LaunchedEffect(listState, hasMorePages, isLoadingMore, isLoading, baseModels.size) {
+        snapshotFlow {
+            val info = listState.layoutInfo
+            val lastVisible = info.visibleItemsInfo.lastOrNull()?.index ?: 0
+            val total = info.totalItemsCount
+            total > 0 && lastVisible >= total - 4
+        }
+            .distinctUntilChanged()
+            .filter { it }
+            .collect {
+                if (baseModels.isNotEmpty() &&
+                    hasMorePages &&
+                    !isLoadingMore &&
+                    !isLoading
+                ) {
+                    onLoadMore()
+                }
+            }
+    }
+
     Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
         BaseHeader(
             modifier = Modifier,
@@ -291,8 +326,20 @@ private fun EmployeeListScrollContent(
             onQueryChange = onSearchQueryChange,
             placeholder = tr(R.string.dashboard_search_placeholder)
         )
+        if (showSearchProgress) {
+            Spacer(modifier = Modifier.height(6.dp))
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .height(2.dp),
+                color = White,
+                trackColor = White.copy(alpha = 0.25f),
+            )
+        }
         Spacer(modifier = Modifier.height(16.dp))
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp),
@@ -329,7 +376,7 @@ private fun EmployeeListScrollContent(
                 }
             }
             item { Spacer(modifier = Modifier.height(12.dp)) }
-            if (filteredModels.isEmpty()) {
+            if (baseModels.isEmpty()) {
                 item {
                     Text(
                         text = tr(R.string.employee_list_no_match),
@@ -340,7 +387,7 @@ private fun EmployeeListScrollContent(
                 }
             } else {
                 items(
-                    items = filteredModels,
+                    items = baseModels,
                     key = { it.employee.id }
                 ) { model ->
                     EmployeeCard(
@@ -351,15 +398,30 @@ private fun EmployeeListScrollContent(
                     Spacer(modifier = Modifier.height(12.dp))
                 }
             }
+            if (baseModels.isNotEmpty() && (isLoadingMore || hasMorePages)) {
+                item(key = "load_more_footer") {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        if (isLoadingMore) {
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .semantics {
+                                        contentDescription = loadingMoreCd
+                                    },
+                                color = White,
+                                strokeWidth = 2.dp,
+                            )
+                        }
+                    }
+                }
+            }
             item { Spacer(modifier = Modifier.height(80.dp)) }
         }
-    }
-}
-
-/** Tỷ lệ gần với mẫu Figma (68 tổng / 57 active). */
-private fun derivedActiveToday(total: List<EmployeeUiModel>): Int {
-    return total.count {
-        it.employee.statusWorking.uppercase() == "WORKING"
     }
 }
 
@@ -679,12 +741,16 @@ private fun EmployeeListScrollContentPreview() {
                 ) {
                     EmployeeListScrollContent(
                         baseModels = EmployeeListSampleData.uiModels,
-                        filteredModels = EmployeeListSampleData.uiModels,
                         searchQuery = "",
                         onSearchQueryChange = {},
+                        showSearchProgress = false,
                         onViewStats = {},
                         onEmployeeClick = {},
-                        totalEmployees = 0
+                        totalEmployees = 0,
+                        hasMorePages = false,
+                        isLoadingMore = false,
+                        isLoading = false,
+                        onLoadMore = {},
                     )
                 }
             }

@@ -1,12 +1,32 @@
 package com.example.ihrm.ui.employee.list
 
+import com.example.ihrm.data.remote.dto.MetaDto
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.model.Level
+import com.example.ihrm.util.Constants.EMPLOYEE_LIST_PAGE_LIMIT
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class EmployeeListViewModelTest {
+
+    @Test
+    fun computeHasMorePages_usesMetaWhenTotalPagesPositive() {
+        assertTrue(
+            computeHasMorePages(MetaDto(page = 1, limit = 20, total = 100, totalPages = 5), 20, EMPLOYEE_LIST_PAGE_LIMIT),
+        )
+        assertFalse(
+            computeHasMorePages(MetaDto(page = 5, limit = 20, total = 100, totalPages = 5), 5, EMPLOYEE_LIST_PAGE_LIMIT),
+        )
+    }
+
+    @Test
+    fun computeHasMorePages_withoutMeta_usesFetchedCountVsLimit() {
+        assertTrue(computeHasMorePages(null, 20, 20))
+        assertFalse(computeHasMorePages(null, 19, 20))
+    }
 
     @Test
     fun buildEmployeeUiModels_emptyList_returnsEmpty() {
