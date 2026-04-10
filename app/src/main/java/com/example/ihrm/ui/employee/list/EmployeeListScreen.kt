@@ -9,14 +9,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -34,18 +32,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ihrm.R
 import com.example.ihrm.domain.model.EmployeeListSampleData
 import com.example.ihrm.domain.model.EmployeeUiModel
@@ -79,7 +74,6 @@ import com.example.ihrm.ui.theme.Error
 import com.example.ihrm.ui.theme.FABGradientEnd
 import com.example.ihrm.ui.theme.FABGradientStart
 import com.example.ihrm.ui.theme.IHRMTheme
-import com.example.ihrm.ui.theme.Neutral200
 import com.example.ihrm.ui.theme.Neutral500
 import com.example.ihrm.ui.theme.Neutral600
 import com.example.ihrm.ui.theme.Neutral700
@@ -90,6 +84,8 @@ import com.example.ihrm.ui.theme.SuccessGreen
 import com.example.ihrm.ui.theme.SurfaceBorder
 import com.example.ihrm.util.DashboardBrush
 import com.example.ihrm.ui.localization.tr
+import com.example.ihrm.util.Constants.DASH
+import com.example.ihrm.util.txtInterBold20
 
 @Composable
 fun EmployeeListScreen(
@@ -122,12 +118,8 @@ fun EmployeeListScreenContent(
     onViewStats: () -> Unit = {},
     viewModel: EmployeeListViewModel
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var searchQuery by remember { mutableStateOf("") }
-
-    LaunchedEffect(Unit) {
-        viewModel.refreshEmployees()
-    }
 
     val baseModels = remember(uiState.employeeUiModels, uiState.isLoading, uiState.error) {
         when {
@@ -222,7 +214,15 @@ fun EmployeeListScreenContent(
                 }
 
                 when {
-
+                    uiState.isLoading && uiState.employeeUiModels.isEmpty() -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                        }
+                    }
                     uiState.error != null && baseModels.isEmpty() -> {
                         Box(
                             modifier = Modifier
@@ -241,6 +241,7 @@ fun EmployeeListScreenContent(
                     else -> {
                         EmployeeListScrollContent(
                             baseModels = baseModels,
+                            totalEmployees = uiState.listMeta?.total,
                             filteredModels = filteredModels,
                             searchQuery = searchQuery,
                             onSearchQueryChange = { searchQuery = it },
@@ -265,9 +266,9 @@ private fun EmployeeListScrollContent(
     onViewStats: () -> Unit,
     onEmployeeClick: (String) -> Unit,
     onBackClick: (() -> Unit)? = null,
-    paddingValues: PaddingValues = PaddingValues()
+    paddingValues: PaddingValues = PaddingValues(),
+    totalEmployees: Int?
 ) {
-    val totalEmployees = baseModels.size
     val activeToday = derivedActiveToday(baseModels)
     Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
         BaseHeader(
@@ -291,8 +292,6 @@ private fun EmployeeListScrollContent(
             placeholder = tr(R.string.dashboard_search_placeholder)
         )
         Spacer(modifier = Modifier.height(16.dp))
-        ManageTeamCard(onViewStats = onViewStats)
-        Spacer(modifier = Modifier.height(16.dp))
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -303,20 +302,31 @@ private fun EmployeeListScrollContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             item {
-                StatsRow(
-                    totalEmployees = totalEmployees,
-                    activeToday = activeToday
-                )
-            }
-            item {
+                ManageTeamCard(onViewStats = onViewStats)
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(
+            }
+//            item {
+//                StatsRow(
+//                    totalEmployees = totalEmployees,
+//                    activeToday = activeToday
+//                )
+//            }
+            item {
+                Row(
                     modifier = Modifier.fillMaxWidth(),
-                    text = tr(R.string.dashboard_team_members),
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Neutral700
-                )
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = tr(R.string.dashboard_team_members),
+                        color = White,
+                        style = txtInterBold20
+                    )
+                    Text(
+                        text = tr(R.string.dashboard_team_members_total, totalEmployees?:DASH),
+                        color = White,
+                        style = txtInterBold20
+                    )
+                }
             }
             item { Spacer(modifier = Modifier.height(12.dp)) }
             if (filteredModels.isEmpty()) {
@@ -575,8 +585,7 @@ private fun StatCard(
 private fun ManageTeamCard(onViewStats: () -> Unit) {
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.Transparent
@@ -675,6 +684,7 @@ private fun EmployeeListScrollContentPreview() {
                         onSearchQueryChange = {},
                         onViewStats = {},
                         onEmployeeClick = {},
+                        totalEmployees = 0
                     )
                 }
             }

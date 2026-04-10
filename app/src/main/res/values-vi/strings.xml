@@ -59,6 +59,7 @@
     <string name="dashboard_manage_team_subtitle">Theo dõi nhân viên và giữ mọi thứ ngăn nắp</string>
     <string name="dashboard_view_stats">Xem thống kê</string>
     <string name="dashboard_team_members">Thành viên nhóm</string>
+    <string name="dashboard_team_members_total">%1$s thành viên</string>
     <string name="dashboard_view_details">Xem chi tiết</string>
     <string name="dashboard_delete">Xóa</string>
     <string name="dashboard_delete_dialog_title">Xóa thành viên?</string>

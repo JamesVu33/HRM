@@ -58,6 +58,7 @@
     <string name="dashboard_manage_team_subtitle">Keep track of your employees and stay organized</string>
     <string name="dashboard_view_stats">View Stats</string>
     <string name="dashboard_team_members">Team Members</string>
+    <string name="dashboard_team_members_total">%1$s members</string>
     <string name="dashboard_view_details">View Details</string>
     <string name="dashboard_delete">Delete</string>
     <string name="dashboard_delete_dialog_title">Delete Member?</string>

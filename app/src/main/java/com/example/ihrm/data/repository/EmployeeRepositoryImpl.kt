@@ -2,7 +2,9 @@ package com.example.ihrm.data.repository
 
 import com.example.ihrm.data.local.dao.EmployeeDao
 import com.example.ihrm.data.remote.api.EmployeeApiService
+import com.example.ihrm.data.remote.base.PaginatedApiData
 import com.example.ihrm.data.remote.base.safeApiCall
+import com.example.ihrm.data.remote.base.safeApiCallPaginated
 import com.example.ihrm.data.remote.base.safeApiCallRaw
 import com.example.ihrm.data.remote.dto.MeEmployeeResponse
 import com.example.ihrm.data.remote.base.NetworkResult
@@ -133,7 +135,7 @@ class EmployeeRepositoryImpl @Inject constructor(
         isLeader: Boolean?,
         status: String?,
         jobTitles: List<String>?
-    ): NetworkResult<List<EmployeeListDto>> = safeApiCall(retrofit) {
+    ): NetworkResult<PaginatedApiData<List<EmployeeListDto>>> = safeApiCallPaginated(retrofit) {
         apiService.getEmployeesList(
             search = search,
             page = page,

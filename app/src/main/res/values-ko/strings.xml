@@ -59,6 +59,7 @@
     <string name="dashboard_manage_team_subtitle">직원을 추적하고 체계적으로 관리하세요</string>
     <string name="dashboard_view_stats">통계 보기</string>
     <string name="dashboard_team_members">팀 구성원</string>
+    <string name="dashboard_team_members_total">%1$s 회원</string>
     <string name="dashboard_view_details">상세 보기</string>
     <string name="dashboard_delete">삭제</string>
     <string name="dashboard_delete_dialog_title">구성원을 삭제할까요?</string>

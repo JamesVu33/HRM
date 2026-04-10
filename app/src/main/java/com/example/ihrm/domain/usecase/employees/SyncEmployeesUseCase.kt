@@ -2,6 +2,7 @@ package com.example.ihrm.domain.usecase.employees
 
 import com.example.ihrm.core.usecase.BaseUseCase
 import com.example.ihrm.data.remote.base.NetworkResult
+import com.example.ihrm.data.remote.base.PaginatedApiData
 import com.example.ihrm.data.remote.dto.UserMetaResponseDto
 import com.example.ihrm.data.remote.mapper.parseIsoToLong
 import com.example.ihrm.domain.model.Employee
@@ -29,7 +30,7 @@ class SyncEmployeesUseCase @Inject constructor(
         isLeader: Boolean?,
         status: String?,
         jobTitles: List<String>?,
-    ): NetworkResult<List<EmployeeListDto>> {
+    ): NetworkResult<PaginatedApiData<List<EmployeeListDto>>> {
         val result = repository.getEmployeesList(
             search = search,
             page = page,

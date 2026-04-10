@@ -2,6 +2,7 @@ package com.example.ihrm.domain.repository
 
 import com.example.ihrm.data.remote.dto.MeEmployeeResponse
 import com.example.ihrm.data.remote.base.NetworkResult
+import com.example.ihrm.data.remote.base.PaginatedApiData
 import com.example.ihrm.data.remote.dto.EmployeeDto
 import com.example.ihrm.data.remote.dto.UserMetaResponseDto
 import com.example.ihrm.data.remote.employee.EmployeeProfileResponse
@@ -42,5 +43,5 @@ interface EmployeeRepository {
         isLeader: Boolean?,
         status: String?,
         jobTitles: List<String>?,
-    ): NetworkResult<List<EmployeeListDto>>
+    ): NetworkResult<PaginatedApiData<List<EmployeeListDto>>>
 }

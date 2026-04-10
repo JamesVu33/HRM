@@ -7,10 +7,9 @@ import com.example.ihrm.data.remote.mapper.toEmployeeUiModel
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.model.EmployeeUiModel
 import com.example.ihrm.domain.model.Level
-import com.example.ihrm.domain.usecase.employees.DeleteEmployeeUseCase
+import com.example.ihrm.data.remote.base.PaginatedApiData
+import com.example.ihrm.data.remote.dto.MetaDto
 import com.example.ihrm.domain.usecase.employees.EmployeeListDto
-import com.example.ihrm.domain.usecase.employees.GetEmployeesUseCase
-import com.example.ihrm.domain.usecase.employees.GetLevelByIdUseCase
 import com.example.ihrm.domain.usecase.employees.SyncEmployeesUseCase
 import com.example.ihrm.util.Constants.DEFAULT_LIMIT
 import com.example.ihrm.util.Constants.DEFAULT_PAGE
@@ -24,6 +23,8 @@ import javax.inject.Inject
 /** UI state cho màn danh sách nhân viên: EmployeeDepartmentResponse + Level (gộp từ 2 API). */
 data class EmployeeListUiState(
     val employeeUiModels: List<EmployeeUiModel> = emptyList(),
+    /** Phân trang từ `meta` của GET employees list (null nếu API không gửi). */
+    val listMeta: MetaDto? = null,
     val isLoading: Boolean = false,
     val error: String? = null,
     val isRefreshing: Boolean = false
@@ -33,10 +34,11 @@ data class EmployeeListUiState(
 class EmployeeListViewModel @Inject constructor(
     private val syncEmployeesUseCase: SyncEmployeesUseCase
 ) : BaseViewmodel() {
-
     private val _uiState = MutableStateFlow(EmployeeListUiState())
     val uiState: StateFlow<EmployeeListUiState> = _uiState.asStateFlow()
-
+    init {
+        refreshEmployees()
+    }
     fun refreshEmployees() {
         _uiState.update { it.copy(isLoading = true, error = null) }
         fetchData(
@@ -52,12 +54,14 @@ class EmployeeListViewModel @Inject constructor(
                 status = null,
                 jobTitles = null
             ) },
-            callbackWrapper = object : CallbackWrapper<List<EmployeeListDto>> {
-                override fun onSuccess(data: List<EmployeeListDto>) {
+            callbackWrapper = object : CallbackWrapper<PaginatedApiData<List<EmployeeListDto>>> {
+                override fun onSuccess(data: PaginatedApiData<List<EmployeeListDto>>) {
                     super.onSuccess(data)
+                    val rows = data.data.orEmpty()
                     _uiState.update {
                         it.copy(
-                            employeeUiModels = data.map { dto -> dto.toEmployeeUiModel() },
+                            employeeUiModels = rows.map { dto -> dto.toEmployeeUiModel() },
+                            listMeta = data.meta,
                             isLoading = false,
                             isRefreshing = false
                         )
