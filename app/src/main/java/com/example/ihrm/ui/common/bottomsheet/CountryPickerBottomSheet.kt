@@ -1,7 +1,8 @@
-package com.example.ihrm.ui.common
+package com.example.ihrm.ui.common.bottomsheet
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,6 +34,7 @@ import com.example.ihrm.R
 import com.example.ihrm.domain.model.Country
 import com.example.ihrm.ui.theme.DashboardFigmaInk
 import com.example.ihrm.ui.theme.InterFontFamily
+import com.example.ihrm.ui.localization.tr
 
 @Composable
 fun CountryPickerBottomSheet(
@@ -58,7 +60,12 @@ fun CountryPickerBottomSheet(
         ),
     ) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) { onDismiss() },
             contentAlignment = Alignment.BottomCenter,
         ) {
             Column(
@@ -84,7 +91,7 @@ fun CountryPickerBottomSheet(
                 }
 
                 Text(
-                    text = stringResource(R.string.my_info_country_picker_title),
+                    text = tr(R.string.my_info_country_picker_title),
                     style = TextStyle(
                         fontFamily = InterFontFamily,
                         fontWeight = FontWeight.SemiBold,

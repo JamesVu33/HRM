@@ -10,8 +10,10 @@ import androidx.compose.ui.graphics.Color
 import com.example.ihrm.data.remote.base.NetworkResult
 import java.text.Normalizer
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 typealias EmptyFunc = () -> Unit
 typealias ParamFunc<T> = (data: T) -> Unit
@@ -29,6 +31,31 @@ fun String?.toDisplayDate(): String {
         ""
     }
 }
+
+/** `dd/MM/yyyy` (giống [toDisplayDate]) → millis cho Material DatePicker. */
+fun String?.parseDisplayDateToPickerMillis(): Long? {
+    if (isNullOrBlank()) return null
+    return try {
+        val parts = trim().split("/")
+        if (parts.size != 3) return null
+        val day = parts[0].toInt()
+        val month = parts[1].toInt()
+        val year = parts[2].toInt()
+        LocalDate.of(year, month, day)
+            .atStartOfDay(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
+    } catch (_: Exception) {
+        null
+    }
+}
+
+/** Millis từ DatePicker → `dd/MM/yyyy` để đồng bộ form My Info / PATCH. */
+fun Long.toPickerDisplayDateString(): String =
+    Instant.ofEpochMilli(this)
+        .atZone(ZoneId.systemDefault())
+        .toLocalDate()
+        .format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
 
 inline fun <A, B, R> combineResult(
     a: NetworkResult<A>,
@@ -103,6 +130,14 @@ fun String.formatVNPhoneNumber(): String {
         }
         else -> this
     }
+}
+
+fun String.getTodayDate(): String {
+    val formatter = DateTimeFormatter.ofPattern(
+        "EEEE, dd MMM yyyy",
+        Locale.getDefault()
+    )
+    return LocalDate.now().format(formatter)
 }
 
 data class SecurityLegendMeta(

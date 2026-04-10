@@ -58,6 +58,7 @@
     <string name="dashboard_manage_team_subtitle">Keep track of your employees and stay organized</string>
     <string name="dashboard_view_stats">View Stats</string>
     <string name="dashboard_team_members">Team Members</string>
+    <string name="dashboard_team_members_total">%1$s members</string>
     <string name="dashboard_view_details">View Details</string>
     <string name="dashboard_delete">Delete</string>
     <string name="dashboard_delete_dialog_title">Delete Member?</string>
@@ -84,11 +85,10 @@
     <string name="dashboard_mock_email">brninh343456@company.com</string>
     <string name="dashboard_mock_phone">0901234672</string>
     <string name="dashboard_mock_joined">Jan 2024</string>
-    <string name="dashboard_mock_date">Thursday, 19 March 2025</string>
     <string name="dashboard_profile_email_label">Email Address</string>
     <string name="dashboard_profile_phone_label">Phone Number</string>
     <string name="dashboard_profile_joined_label">Joined</string>
-    <string name="dashboard_profile_department_label">Role</string>
+    <string name="dashboard_profile_department_label">Level</string>
     <string name="dashboard_leave_section_title">Leave Management</string>
     <string name="dashboard_leave_total_title">Total Allowance</string>
     <string name="dashboard_leave_total_desc">Annual leave days granted for current year</string>
@@ -108,6 +108,16 @@
     <string name="dashboard_security_approved">Approved</string>
     <string name="dashboard_security_rechecking">Re-checking</string>
     <string name="dashboard_security_rejected">Rejected</string>
+    <string name="dashboard_security_banner_error_title">Unable to load</string>
+    <string name="dashboard_security_banner_review_title">Submission in review</string>
+    <string name="dashboard_security_banner_action_title">Action required</string>
+    <string name="dashboard_security_banner_empty_title">No submissions yet</string>
+    <string name="dashboard_security_banner_all_good_title">All caught up</string>
+    <string name="dashboard_security_banner_review_subtitle">Your security check is being reviewed. Please wait for the approval status.</string>
+    <string name="dashboard_security_banner_rejected_subtitle">Review rejected items and resubmit if needed.</string>
+    <string name="dashboard_security_banner_empty_subtitle">You have no security check submissions for this year.</string>
+    <string name="dashboard_security_banner_default_subtitle">Latest status is reflected below.</string>
+    <string name="dashboard_security_error_fallback">Couldn\'t load security data. Try again later.</string>
     <string name="dashboard_management_section_title">Team overview</string>
     <string name="dashboard_management_section_body">Review employees, add new hires, and open the full directory.</string>
     <string name="dashboard_management_team_title">Team members</string>
@@ -225,8 +235,32 @@
     <string name="coming_soon_message">The \"%1$s\" feature is currently under development and will be available soon.</string>
     <string name="coming_soon_got_it">Got it</string>
     <string name="coming_soon_close">Close</string>
+    <!-- Change language dialog (Figma 871:32097) -->
+    <string name="change_language_title">Change Language</string>
+    <string name="change_language_subtitle">Select your preferred language</string>
+    <string name="change_language_section_label">SELECT LANGUAGE *</string>
+    <string name="language_english_name">English</string>
+    <string name="language_english_native">English</string>
+    <string name="language_vietnamese_name">Vietnamese</string>
+    <string name="language_vietnamese_native">Tiếng Việt</string>
+    <string name="language_korean_name">Korean</string>
+    <string name="language_korean_native">한국어</string>
+    <string name="change_language_save">Save Language</string>
+    <string name="change_language_cd_close">Close change language</string>
+    <string name="change_language_option_cd">Language %1$s</string>
     <string name="error_alert_close">Close</string>
     <string name="error_alert_close_cd">Dismiss error</string>
+
+    <!-- Date picker (My Info, Security checks filters) -->
+    <string name="date_picker_confirm">OK</string>
+    <string name="date_picker_cancel">Cancel</string>
+    <string name="security_checks_date_picker_title">Select check date</string>
+    <string name="security_checks_date_picker_headline">Schedule</string>
+    <string name="my_info_date_picker_dob_title">Date of birth</string>
+    <string name="my_info_date_picker_dob_headline">Select date of birth</string>
+    <string name="my_info_date_picker_identity_title">ID issue date</string>
+    <string name="my_info_date_picker_identity_headline">Select ID issue date</string>
+    <string name="my_info_select_date">Select date</string>
 
     <!-- My Info (Figma 871:37416) -->
     <string name="my_info_screen_title">My Information</string>
@@ -276,26 +310,30 @@
     <string name="my_info_demo_status">Working</string>
     <string name="change_password_success">Password updated successfully.</string>
     <string name="change_password_fail">Failed to update new password. Please try again.</string>
+    <string name="change_password_title">Change Password</string>
+    <string name="change_password_subtitle">Update your account security</string>
+    <string name="change_password_field_current">Current password *</string>
+    <string name="change_password_field_new">New password *</string>
+    <string name="change_password_field_confirm">Confirm new password *</string>
+    <string name="change_password_placeholder_current">Enter current password</string>
+    <string name="change_password_placeholder_new">Enter new password</string>
+    <string name="change_password_placeholder_confirm">Confirm new password</string>
+    <string name="change_password_action_save">Save</string>
+    <string name="change_password_error_current_required">Please enter your current password.</string>
+    <string name="change_password_error_new_required">Please enter a new password.</string>
+    <string name="change_password_error_confirm_required">Please confirm your new password.</string>
+    <string name="change_password_error_mismatch">New password and confirmation do not match.</string>
+    <string name="change_password_error_policy">Password must be at least 8 characters and include 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.</string>
+    <string name="change_password_close_cd">Close</string>
+    <string name="change_password_toggle_visibility_cd">Toggle password visibility</string>
     <string name="my_information_update_success">My information updated successfully.</string>
     <string name="my_information_update_failed">Failed to update my information. Please try again.</string>
     <string name="my_information_update_avatar_success">Ava updated successfully.</string>
     <string name="my_information_update_avatar_failed">Failed to update my information. Please try again.</string>
 
-    <!-- Change password dialog (Figma 871:37357) -->
-    <string name="my_info_change_password_title">Change Password</string>
-    <string name="my_info_change_password_subtitle">Update your account security</string>
-    <string name="my_info_change_password_current_label">CURRENT PASSWORD *</string>
-    <string name="my_info_change_password_new_label">NEW PASSWORD *</string>
-    <string name="my_info_change_password_confirm_label">CONFIRM NEW PASSWORD *</string>
-    <string name="my_info_change_password_current_placeholder">Enter current password</string>
-    <string name="my_info_change_password_new_placeholder">Enter new password</string>
-    <string name="my_info_change_password_confirm_placeholder">Confirm new password</string>
-    <string name="my_info_change_password_close_cd">Close</string>
-    <string name="my_info_change_password_toggle_visibility_cd">Toggle password visibility</string>
-
     <!-- EmployeeDepartmentResponse Detail -->
     <string name="employee_detail_title">Member Information</string>
-    <string name="employee_detail_subtitle_format">%1$s | ID: %2$s</string>
+    <string name="employee_detail_subtitle_format">ID: %1$s</string>
     <string name="employee_detail_tab_basic_info">Basic Info</string>
     <string name="employee_detail_tab_employee_info">Employee Info</string>
     <string name="employee_detail_tab_emergency_contact">Emergency Contact</string>
@@ -331,6 +369,7 @@
     <string name="employee_list_title">Employees</string>
     <string name="employee_list_load_error">Could not load employees. Pull to refresh or try again later.</string>
     <string name="employee_list_no_match">No employees match your search.</string>
+    <string name="employee_list_loading_more_cd">Loading more employees</string>
     <!-- Team / statistics screen (Figma 871:34408) -->
     <string name="team_statistics_title">Statistics information</string>
     <string name="team_statistics_active_employees_hint">Active employees</string>
@@ -414,6 +453,9 @@
     <string name="my_security_check_rejecter">Rejecter</string>
     <string name="my_security_check_approver">Approver</string>
     <string name="my_security_check_filter_cd">Open checklist filter</string>
+    <string name="my_security_filter_status">Status</string>
+    <string name="my_security_filter_year">Year</string>
+    <string name="my_security_filter_year_all">All years</string>
     <string name="my_security_check_add_cd">Create checklist</string>
     <string name="my_security_check_exists_dialog_title">Checklist already exists</string>
     <string name="my_security_check_exists_dialog_message">You already created a security checklist this month.</string>
@@ -428,7 +470,7 @@
     <!-- Role options -->
     <string name="employee_info_role1">Role1</string>
     <string name="employee_info_role2">Role2</string>
-    <!-- Job title options -->
+    <!-- Job level options -->
     <string name="employee_info_job_accounting">Accounting Officer</string>
     <string name="employee_info_job_ga">GA Officer</string>
     <string name="employee_info_job_hr">HR Officer</string>
@@ -506,7 +548,7 @@
     <string name="marital_married">Married</string>
     <string name="marital_divorced">Divorced</string>
     <string name="marital_widowed">Widowed</string>
-    <!-- Job title (Add form) -->
+    <!-- Job level (Add form) -->
     <string name="job_title_account">Account Officer</string>
     <string name="job_title_ga">GA Officer</string>
     <string name="job_title_contract">Contract Officer</string>

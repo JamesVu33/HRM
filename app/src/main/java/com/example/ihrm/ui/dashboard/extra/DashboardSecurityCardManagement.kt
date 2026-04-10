@@ -27,7 +27,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -35,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import com.example.ihrm.R
 import com.example.ihrm.ui.common.Avatar
 import com.example.ihrm.ui.dashboard.DashboardProfileModel
+import com.example.ihrm.ui.dashboard.DashboardSecurityBannerModel
 import com.example.ihrm.ui.dashboard.SecurityMonthlyModel
 import com.example.ihrm.ui.dashboard.dashboardSections.SecurityCheckThisMonthProgressSection
 import com.example.ihrm.ui.theme.DashboardFigmaInk
@@ -44,11 +44,13 @@ import com.example.ihrm.ui.theme.DashboardTabActiveBlue
 import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.util.txtInterBold16
 import com.example.ihrm.util.txtInterRegular12
+import com.example.ihrm.ui.localization.tr
 
 @Composable
 fun DashboardSecurityCardManagement(
     monthly: SecurityMonthlyModel,
     profile: DashboardProfileModel,
+    banner: DashboardSecurityBannerModel,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -89,7 +91,7 @@ fun DashboardSecurityCardManagement(
                 }
                 Column {
                     Text(
-                        text = stringResource(R.string.dashboard_security_title),
+                        text = tr(R.string.dashboard_security_title),
                         style = TextStyle(
                             fontFamily = InterFontFamily,
                             fontWeight = FontWeight.Bold,
@@ -100,7 +102,7 @@ fun DashboardSecurityCardManagement(
                         )
                     )
                     Text(
-                        text = stringResource(R.string.dashboard_security_subtitle),
+                        text = tr(R.string.dashboard_security_subtitle),
                         style = TextStyle(
                             fontFamily = InterFontFamily,
                             fontWeight = FontWeight.Normal,
@@ -147,12 +149,12 @@ fun DashboardSecurityCardManagement(
                         .padding(12.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.dashboard_security_in_review),
+                        text = tr(banner.titleRes),
                         style = txtInterBold16
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = stringResource(R.string.dashboard_security_in_review_body),
+                        text = banner.subtitleOverride ?: tr(banner.subtitleRes),
                         style = txtInterRegular12
                     )
                 }

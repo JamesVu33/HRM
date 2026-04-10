@@ -43,6 +43,7 @@ import com.example.ihrm.ui.theme.DashboardLeaveGreenStart
 import com.example.ihrm.ui.theme.DashboardLeaveRedEnd
 import com.example.ihrm.ui.theme.DashboardLeaveRedStart
 import com.example.ihrm.ui.theme.InterFontFamily
+import com.example.ihrm.ui.localization.tr
 
 @Composable
 fun DashboardLeaveSection(
@@ -51,7 +52,7 @@ fun DashboardLeaveSection(
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
-            text = stringResource(R.string.dashboard_leave_section_title),
+            text = tr(R.string.dashboard_leave_section_title),
             style = TextStyle(
                 fontFamily = InterFontFamily,
                 fontWeight = FontWeight.Bold,
@@ -118,7 +119,7 @@ private fun LeaveStatCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(stat.titleRes),
+                    text = tr(stat.titleRes),
                     style = TextStyle(
                         fontFamily = InterFontFamily,
                         fontWeight = FontWeight.Medium,
@@ -159,7 +160,7 @@ private fun LeaveStatCard(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = stringResource(stat.descriptionRes),
+                text = tr(stat.descriptionRes),
                 style = TextStyle(
                     fontFamily = InterFontFamily,
                     fontWeight = FontWeight.Normal,

@@ -49,7 +49,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -61,16 +60,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ihrm.R
 import com.example.ihrm.data.remote.myinfo.UpdateProfileRequest
+import com.example.ihrm.domain.model.Country
 import com.example.ihrm.domain.model.MaritalStatus
 import com.example.ihrm.domain.model.MyInfo
 import com.example.ihrm.domain.model.MyProfile
 import com.example.ihrm.ui.common.Avatar
 import com.example.ihrm.ui.common.BaseHRMCompose
-import com.example.ihrm.ui.common.CountryPickerBottomSheet
-import com.example.ihrm.ui.common.MaritalStatusBottomSheet
+import com.example.ihrm.ui.common.bottomsheet.CountryPickerBottomSheet
+import com.example.ihrm.ui.common.bottomsheet.HrmDatePickerDialog
+import com.example.ihrm.ui.common.bottomsheet.MaritalStatusBottomSheet
+import com.example.ihrm.ui.common.bottomsheet.hrmSelectableDatesUpToToday
 import com.example.ihrm.ui.components.ButtonSize
 import com.example.ihrm.ui.components.ButtonVariant
 import com.example.ihrm.ui.components.CustomButton
@@ -80,8 +84,12 @@ import com.example.ihrm.ui.theme.GenderUnselectedText
 import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.util.DashboardBrush.MyInfoHeaderBrush
 import com.example.ihrm.util.dropShadow
+import com.example.ihrm.util.parseDisplayDateToPickerMillis
 import com.example.ihrm.util.toDisplayDate
+import com.example.ihrm.util.toPickerDisplayDateString
 import com.example.ihrm.util.txtInterMedium14White90Percent
+import com.example.ihrm.ui.localization.tr
+import java.util.Calendar
 
 private val PageBg = Color(0xFFF9FAFB)
 private val CardBorder = Color(0xFFF3F4F6)
@@ -129,8 +137,24 @@ private val SectionSubtitleStyle = TextStyle(
 
 @Composable
 private fun textOrPlaceholder(value: String?): String {
-    if (value.isNullOrBlank()) return stringResource(R.string.my_info_not_available)
+    if (value.isNullOrBlank()) return tr(R.string.my_info_not_available)
     return value
+}
+
+/** UI shows country name; [selectedCountryCode] and profile nationality stay as API codes. */
+@Composable
+private fun nationalityDisplayLabel(
+    selectedCountryCode: String,
+    countries: List<Country>?,
+    profileNationalityCode: String?,
+): String {
+    val code = selectedCountryCode.trim().ifBlank { profileNationalityCode?.trim().orEmpty() }
+    if (code.isBlank()) return tr(R.string.my_info_not_available)
+    val name = countries.orEmpty()
+        .find { it.code.equals(code, ignoreCase = true) }
+        ?.name?.trim()
+        ?.takeIf { it.isNotEmpty() }
+    return name ?: code
 }
 
 private fun rolesDisplay(info: MyInfo?): String? {
@@ -141,13 +165,13 @@ private fun rolesDisplay(info: MyInfo?): String? {
 
 @Composable
 private fun maritalStatusLabel(status: MaritalStatus?): String {
-    if (status == null) return stringResource(R.string.my_info_not_available)
+    if (status == null) return tr(R.string.my_info_not_available)
     return when (status) {
-        MaritalStatus.SINGLE -> stringResource(R.string.marital_single)
-        MaritalStatus.MARRIED -> stringResource(R.string.marital_married)
-        MaritalStatus.DIVORCED -> stringResource(R.string.marital_divorced)
-        MaritalStatus.WIDOWED -> stringResource(R.string.marital_widowed)
-        MaritalStatus.UNKNOWN -> stringResource(R.string.my_info_not_available)
+        MaritalStatus.SINGLE -> tr(R.string.marital_single)
+        MaritalStatus.MARRIED -> tr(R.string.marital_married)
+        MaritalStatus.DIVORCED -> tr(R.string.marital_divorced)
+        MaritalStatus.WIDOWED -> tr(R.string.marital_widowed)
+        MaritalStatus.UNKNOWN -> tr(R.string.my_info_not_available)
     }
 }
 
@@ -163,6 +187,12 @@ private fun initialsFromName(name: String?): String {
 
 private fun changedOrNull(newValue: String?, oldValue: String?): String? {
     return if (newValue?.trim() == oldValue?.trim()) null else newValue
+}
+
+private fun defaultDobPickerInitialMillis(): Long {
+    val c = Calendar.getInstance()
+    c.add(Calendar.YEAR, -30)
+    return c.timeInMillis
 }
 
 private data class MyInfoFormSaveDelta(
@@ -285,6 +315,8 @@ fun MyInfoScreenContent(
     var showChangePasswordDialog by remember { mutableStateOf(false) }
     var showCountryPicker by remember { mutableStateOf(false) }
     var showMaritalStatusPicker by remember { mutableStateOf(false) }
+    var showDobPicker by remember { mutableStateOf(false) }
+    var showIdentityIssuePicker by remember { mutableStateOf(false) }
 
     var fullNameText by remember { mutableStateOf("") }
     var englishNameText by remember { mutableStateOf("") }
@@ -353,16 +385,51 @@ fun MyInfoScreenContent(
     MaritalStatusBottomSheet(
         isVisible = showMaritalStatusPicker,
         statuses = listOf(
-            MaritalStatus.SINGLE to stringResource(R.string.marital_single),
-            MaritalStatus.MARRIED to stringResource(R.string.marital_married),
-            MaritalStatus.DIVORCED to stringResource(R.string.marital_divorced),
-            MaritalStatus.WIDOWED to stringResource(R.string.marital_widowed),
+            MaritalStatus.SINGLE to tr(R.string.marital_single),
+            MaritalStatus.MARRIED to tr(R.string.marital_married),
+            MaritalStatus.DIVORCED to tr(R.string.marital_divorced),
+            MaritalStatus.WIDOWED to tr(R.string.marital_widowed),
         ),
         onDismiss = { showMaritalStatusPicker = false },
         onStatusSelected = { selectedStatus ->
             selectedMaritalStatus = selectedStatus
         },
     )
+
+    val currentYear = remember { Calendar.getInstance().get(Calendar.YEAR) }
+    if (showDobPicker) {
+        HrmDatePickerDialog(
+            initialMillis = dobText.parseDisplayDateToPickerMillis() ?: defaultDobPickerInitialMillis(),
+            titleRes = R.string.my_info_date_picker_dob_title,
+            headlineRes = R.string.my_info_date_picker_dob_headline,
+            confirmRes = R.string.date_picker_confirm,
+            cancelRes = R.string.date_picker_cancel,
+            yearRange = (currentYear - 120)..currentYear,
+            selectableDates = hrmSelectableDatesUpToToday(),
+            onDateSelected = { ms ->
+                dobText = ms.toPickerDisplayDateString()
+                showDobPicker = false
+            },
+            onDismiss = { showDobPicker = false },
+        )
+    }
+    if (showIdentityIssuePicker) {
+        HrmDatePickerDialog(
+            initialMillis = identityIssueDayText.parseDisplayDateToPickerMillis()
+                ?: System.currentTimeMillis(),
+            titleRes = R.string.my_info_date_picker_identity_title,
+            headlineRes = R.string.my_info_date_picker_identity_headline,
+            confirmRes = R.string.date_picker_confirm,
+            cancelRes = R.string.date_picker_cancel,
+            yearRange = (currentYear - 120)..currentYear,
+            selectableDates = hrmSelectableDatesUpToToday(),
+            onDateSelected = { ms ->
+                identityIssueDayText = ms.toPickerDisplayDateString()
+                showIdentityIssuePicker = false
+            },
+            onDismiss = { showIdentityIssuePicker = false },
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -410,7 +477,7 @@ fun MyInfoScreenContent(
                     ) {
                         Icon(
                             imageVector = ImageVector.vectorResource(R.drawable.ic_upload),
-                            contentDescription = stringResource(R.string.my_info_change_photo),
+                            contentDescription = tr(R.string.my_info_change_photo),
                             tint = Color(0xFF155DFC),
                             modifier = Modifier.size(20.dp)
                         )
@@ -418,7 +485,7 @@ fun MyInfoScreenContent(
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = stringResource(R.string.my_info_change_photo),
+                    text = tr(R.string.my_info_change_photo),
                     style = txtInterMedium14White90Percent,
                 )
             }
@@ -435,11 +502,11 @@ fun MyInfoScreenContent(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     MyInfoFormCard(
-                        title = stringResource(R.string.my_info_section_basic_title),
-                        subtitle = stringResource(R.string.my_info_section_basic_subtitle),
+                        title = tr(R.string.my_info_section_basic_title),
+                        subtitle = tr(R.string.my_info_section_basic_subtitle),
                     ) {
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_full_name),
+                            label = tr(R.string.my_info_label_full_name),
                             icon = ImageVector.vectorResource(R.drawable.ic_person),
                             content = {
                                 MyInfoValueBox(
@@ -450,7 +517,7 @@ fun MyInfoScreenContent(
                         )
                         MyInfoDivider()
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_english_name),
+                            label = tr(R.string.my_info_label_english_name),
                             icon = ImageVector.vectorResource(R.drawable.ic_person),
                             content = {
                                 MyInfoValueBox(
@@ -461,7 +528,7 @@ fun MyInfoScreenContent(
                         )
                         MyInfoDivider()
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_email),
+                            label = tr(R.string.my_info_label_email),
                             icon = ImageVector.vectorResource(R.drawable.ic_email),
                             content = {
                                 MyInfoValueBox(
@@ -473,7 +540,7 @@ fun MyInfoScreenContent(
                         )
                         MyInfoDivider()
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_phone),
+                            label = tr(R.string.my_info_label_phone),
                             icon = ImageVector.vectorResource(R.drawable.ic_cellphone),
                             content = {
                                 MyInfoValueBox(
@@ -485,18 +552,19 @@ fun MyInfoScreenContent(
                         )
                         MyInfoDivider()
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_dob),
+                            label = tr(R.string.my_info_label_dob),
                             icon = ImageVector.vectorResource(R.drawable.ic_calendar),
                             content = {
-                                MyInfoValueBox(
-                                    value = dobText,
-                                    onValueChange = { dobText = it },
+                                MyInfoDatePickerRow(
+                                    displayValue = dobText,
+                                    placeholder = tr(R.string.my_info_select_date),
+                                    onClick = { showDobPicker = true },
                                 )
                             },
                         )
                         MyInfoDivider()
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_gender),
+                            label = tr(R.string.my_info_label_gender),
                             icon = ImageVector.vectorResource(R.drawable.ic_person),
                             content = {
                                 MyInfoGenderRow(
@@ -507,7 +575,7 @@ fun MyInfoScreenContent(
                         )
                         MyInfoDivider()
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_identity_id),
+                            label = tr(R.string.my_info_label_identity_id),
                             icon = ImageVector.vectorResource(R.drawable.ic_calendar),
                             content = {
                                 MyInfoValueBox(
@@ -518,18 +586,19 @@ fun MyInfoScreenContent(
                         )
                         MyInfoDivider()
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_identity_issue_day),
+                            label = tr(R.string.my_info_label_identity_issue_day),
                             icon = ImageVector.vectorResource(R.drawable.ic_calendar),
                             content = {
-                                MyInfoValueBox(
-                                    value = identityIssueDayText,
-                                    onValueChange = { identityIssueDayText = it },
+                                MyInfoDatePickerRow(
+                                    displayValue = identityIssueDayText,
+                                    placeholder = tr(R.string.my_info_select_date),
+                                    onClick = { showIdentityIssuePicker = true },
                                 )
                             },
                         )
                         MyInfoDivider()
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_identity_issue_place),
+                            label = tr(R.string.my_info_label_identity_issue_place),
                             icon = ImageVector.vectorResource(R.drawable.ic_location),
                             content = {
                                 MyInfoValueBox(
@@ -540,13 +609,15 @@ fun MyInfoScreenContent(
                         )
                         MyInfoDivider()
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_nationality),
+                            label = tr(R.string.my_info_label_nationality),
                             icon = ImageVector.vectorResource(R.drawable.ic_location),
                             content = {
                                 MyInfoDropdownRow(
-                                    value = countryCodeText.ifBlank {
-                                        textOrPlaceholder(profile?.nationality)
-                                    },
+                                    value = nationalityDisplayLabel(
+                                        selectedCountryCode = countryCodeText,
+                                        countries = countries,
+                                        profileNationalityCode = profile?.nationality,
+                                    ),
                                     onClick = {
                                         if (!countries.isNullOrEmpty()) {
                                             showCountryPicker = true
@@ -557,7 +628,7 @@ fun MyInfoScreenContent(
                         )
                         MyInfoDivider()
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_marital_status),
+                            label = tr(R.string.my_info_label_marital_status),
                             icon = ImageVector.vectorResource(R.drawable.ic_person),
                             content = {
                                 MyInfoDropdownRow(
@@ -574,7 +645,7 @@ fun MyInfoScreenContent(
                         )
                         MyInfoDivider()
                         MyInfoLabeledField(
-                            label = stringResource(R.string.my_info_label_address),
+                            label = tr(R.string.my_info_label_address),
                             icon = ImageVector.vectorResource(R.drawable.ic_location),
                             content = {
                                 MyInfoAddressBox(
@@ -586,31 +657,31 @@ fun MyInfoScreenContent(
                     }
 
                     MyInfoFormCard(
-                        title = stringResource(R.string.my_info_section_employee_title),
+                        title = tr(R.string.my_info_section_employee_title),
                         subtitle = null,
                     ) {
                         MyInfoReadOnlyEmployeeField(
-                            label = stringResource(R.string.my_info_label_role),
+                            label = tr(R.string.my_info_label_role),
                             value = textOrPlaceholder(rolesDisplay(myInfo)),
                         )
                         MyInfoDivider()
                         MyInfoReadOnlyEmployeeField(
-                            label = stringResource(R.string.my_info_label_job_title),
+                            label = tr(R.string.my_info_label_job_title),
                             value = textOrPlaceholder(profile?.title?.name),
                         )
                         MyInfoDivider()
                         MyInfoReadOnlyEmployeeField(
-                            label = stringResource(R.string.my_info_label_level),
+                            label = tr(R.string.my_info_label_level),
                             value = textOrPlaceholder(profile?.level?.name),
                         )
                         MyInfoDivider()
                         MyInfoReadOnlyEmployeeField(
-                            label = stringResource(R.string.my_info_label_department),
-                            value = stringResource(R.string.my_info_not_available),
+                            label = tr(R.string.my_info_label_department),
+                            value = tr(R.string.my_info_not_available),
                         )
                         MyInfoDivider()
                         MyInfoReadOnlyEmployeeField(
-                            label = stringResource(R.string.my_info_label_status),
+                            label = tr(R.string.my_info_label_status),
                             value = textOrPlaceholder(myInfo?.status),
                         )
                     }
@@ -705,7 +776,7 @@ fun MyInfoScreenContent(
                             )
                             Spacer(modifier = Modifier.size(8.dp))
                             Text(
-                                text = stringResource(R.string.my_info_change_info),
+                                text = tr(R.string.my_info_change_info),
                                 style = TextStyle(
                                     fontFamily = InterFontFamily,
                                     fontWeight = FontWeight.Medium,
@@ -744,13 +815,13 @@ private fun MyInfoHeader(
             ) {
                 Icon(
                     imageVector = Icons.Default.Menu,
-                    contentDescription = stringResource(R.string.my_info_menu_cd),
+                    contentDescription = tr(R.string.my_info_menu_cd),
                     tint = Color.White,
                     modifier = Modifier.size(24.dp)
                 )
             }
             Text(
-                text = stringResource(R.string.my_info_screen_title),
+                text = tr(R.string.my_info_screen_title),
                 style = TextStyle(
                     fontFamily = InterFontFamily,
                     fontWeight = FontWeight.SemiBold,
@@ -772,7 +843,7 @@ private fun MyInfoHeader(
             ) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_key),
-                    contentDescription = stringResource(R.string.my_info_key_cd),
+                    contentDescription = tr(R.string.my_info_key_cd),
                     tint = Color.White,
                     modifier = Modifier.size(22.dp)
                 )
@@ -862,6 +933,41 @@ private fun MyInfoLabeledField(
             Text(text = label, style = LabelStyle)
         }
         content()
+    }
+}
+
+@Composable
+private fun MyInfoDatePickerRow(
+    displayValue: String,
+    placeholder: String,
+    onClick: () -> Unit,
+) {
+    val showText = displayValue.ifBlank { placeholder }
+    val textStyle = if (displayValue.isBlank()) {
+        FieldValueStyle.copy(color = MutedValue)
+    } else {
+        FieldValueStyle
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .border(1.dp, FieldBorder, RoundedCornerShape(12.dp))
+            .background(Color.White)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        Text(text = showText, style = textStyle)
+        Icon(
+            imageVector = ImageVector.vectorResource(R.drawable.ic_calendar),
+            contentDescription = null,
+            tint = DashboardFigmaInk,
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .size(20.dp)
+        )
     }
 }
 
@@ -977,8 +1083,8 @@ private fun MyInfoGenderRow(
         GenderOption.entries.forEach { option ->
             val isSelected = option == selected
             val label = when (option) {
-                GenderOption.Male -> stringResource(R.string.my_info_gender_male)
-                GenderOption.Female -> stringResource(R.string.my_info_gender_female)
+                GenderOption.Male -> tr(R.string.my_info_gender_male)
+                GenderOption.Female -> tr(R.string.my_info_gender_female)
             }
             Box(
                 modifier = Modifier
@@ -1054,6 +1160,16 @@ private fun MyInfoReadOnlyEmployeeField(
 }
 
 private val ChangePasswordPlaceholderColor = Color(0xFF101828).copy(alpha = 0.5f)
+private val ChangePasswordErrorColor = Color(0xFFDC2626)
+
+private fun changePasswordValidationIssueStringRes(issue: ChangePasswordValidationIssue): Int =
+    when (issue) {
+        ChangePasswordValidationIssue.CURRENT_REQUIRED -> R.string.change_password_error_current_required
+        ChangePasswordValidationIssue.NEW_REQUIRED -> R.string.change_password_error_new_required
+        ChangePasswordValidationIssue.CONFIRM_REQUIRED -> R.string.change_password_error_confirm_required
+        ChangePasswordValidationIssue.MISMATCH -> R.string.change_password_error_mismatch
+        ChangePasswordValidationIssue.POLICY -> R.string.change_password_error_policy
+    }
 
 @Composable
 private fun ChangePasswordDialog(
@@ -1066,6 +1182,7 @@ private fun ChangePasswordDialog(
     var currentVisible by remember { mutableStateOf(false) }
     var newVisible by remember { mutableStateOf(false) }
     var confirmVisible by remember { mutableStateOf(false) }
+    var validationIssue by remember { mutableStateOf<ChangePasswordValidationIssue?>(null) }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -1102,7 +1219,7 @@ private fun ChangePasswordDialog(
                             verticalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
                             Text(
-                                text = stringResource(R.string.my_info_change_password_title),
+                                text = tr(R.string.change_password_title),
                                 style = TextStyle(
                                     fontFamily = InterFontFamily,
                                     fontWeight = FontWeight.Bold,
@@ -1113,7 +1230,7 @@ private fun ChangePasswordDialog(
                                 ),
                             )
                             Text(
-                                text = stringResource(R.string.my_info_change_password_subtitle),
+                                text = tr(R.string.change_password_subtitle),
                                 style = TextStyle(
                                     fontFamily = InterFontFamily,
                                     fontWeight = FontWeight.Normal,
@@ -1134,7 +1251,7 @@ private fun ChangePasswordDialog(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = stringResource(R.string.my_info_change_password_close_cd),
+                                contentDescription = tr(R.string.change_password_close_cd),
                                 tint = Color.White,
                                 modifier = Modifier.size(20.dp),
                             )
@@ -1149,29 +1266,49 @@ private fun ChangePasswordDialog(
                     verticalArrangement = Arrangement.spacedBy(24.dp),
                 ) {
                     ChangePasswordField(
-                        label = stringResource(R.string.my_info_change_password_current_label),
+                        label = tr(R.string.change_password_field_current),
                         value = currentPassword,
-                        onValueChange = { currentPassword = it },
-                        placeholder = stringResource(R.string.my_info_change_password_current_placeholder),
+                        onValueChange = {
+                            currentPassword = it
+                            validationIssue = null
+                        },
+                        placeholder = tr(R.string.change_password_placeholder_current),
                         visible = currentVisible,
                         onToggleVisible = { currentVisible = !currentVisible },
                     )
                     ChangePasswordField(
-                        label = stringResource(R.string.my_info_change_password_new_label),
+                        label = tr(R.string.change_password_field_new),
                         value = newPassword,
-                        onValueChange = { newPassword = it },
-                        placeholder = stringResource(R.string.my_info_change_password_new_placeholder),
+                        onValueChange = {
+                            newPassword = it
+                            validationIssue = null
+                        },
+                        placeholder = tr(R.string.change_password_placeholder_new),
                         visible = newVisible,
                         onToggleVisible = { newVisible = !newVisible },
                     )
                     ChangePasswordField(
-                        label = stringResource(R.string.my_info_change_password_confirm_label),
+                        label = tr(R.string.change_password_field_confirm),
                         value = confirmPassword,
-                        onValueChange = { confirmPassword = it },
-                        placeholder = stringResource(R.string.my_info_change_password_confirm_placeholder),
+                        onValueChange = {
+                            confirmPassword = it
+                            validationIssue = null
+                        },
+                        placeholder = tr(R.string.change_password_placeholder_confirm),
                         visible = confirmVisible,
                         onToggleVisible = { confirmVisible = !confirmVisible },
                     )
+                    validationIssue?.let { issue ->
+                        Text(
+                            text = tr(changePasswordValidationIssueStringRes(issue)),
+                            style = FieldValueStyle.copy(
+                                color = ChangePasswordErrorColor,
+                                fontSize = 13.sp,
+                                lineHeight = 18.sp,
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                     CustomButton(
                         modifier = Modifier
                             .dropShadow(
@@ -1184,9 +1321,21 @@ private fun ChangePasswordDialog(
                             ),
                         size = ButtonSize.Large,
                         variant = ButtonVariant.Primary,
-                        text = stringResource(R.string.employee_detail_save),
-                        onClick = { onSave(currentPassword, newPassword, confirmPassword) },
-                        enabled = currentPassword.isNotEmpty() && newPassword.isNotEmpty() && confirmPassword.isNotEmpty(),
+                        text = tr(R.string.change_password_action_save),
+                        onClick = {
+                            val issue = validateChangePasswordInput(
+                                currentPassword,
+                                newPassword,
+                                confirmPassword,
+                            )
+                            if (issue != null) {
+                                validationIssue = issue
+                            } else {
+                                validationIssue = null
+                                onSave(currentPassword, newPassword, confirmPassword)
+                            }
+                        },
+                        enabled = true,
                         fullWidth = true,
                     )
                 }
@@ -1250,7 +1399,7 @@ private fun ChangePasswordField(
                         } else {
                             ImageVector.vectorResource(R.drawable.icon_remember)
                         },
-                        contentDescription = stringResource(R.string.my_info_change_password_toggle_visibility_cd),
+                        contentDescription = tr(R.string.change_password_toggle_visibility_cd),
                         tint = DashboardFigmaInk,
                         modifier = Modifier.size(20.dp),
                     )

@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,6 +42,7 @@ import com.example.ihrm.R
 import com.example.ihrm.ui.dashboard.DashboardManagementUiModel
 import com.example.ihrm.ui.dashboard.ManagementCalendarUiModel
 import com.example.ihrm.ui.dashboard.ManagementSecurityUiModel
+import com.example.ihrm.ui.dashboard.formatManagementCalendarToday
 import com.example.ihrm.ui.theme.DashboardFigmaInk
 import com.example.ihrm.ui.theme.DashboardFigmaMuted
 import com.example.ihrm.ui.theme.DashboardLeaveBlueEnd
@@ -50,6 +52,8 @@ import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.ui.common.DonutChartTriple
 import com.example.ihrm.ui.theme.Primary400
 import com.example.ihrm.util.singleClick
+import com.example.ihrm.ui.localization.LocalLocalization
+import com.example.ihrm.ui.localization.tr
 
 private val MgmtPresentGreen = Color(0xFF00BC7D)
 private val MgmtAbsentRed = Color(0xFFFF6467)
@@ -87,6 +91,8 @@ private fun ManagementCalendarCard(
     data: ManagementCalendarUiModel,
     onChevronClick: () -> Unit
 ) {
+    val languageCode = LocalLocalization.current.selectedLanguageCode
+    val todayLabels = remember(languageCode) { formatManagementCalendarToday(languageCode) }
     val presentPct = data.attendanceRatePercent.coerceIn(0, 100)
     val absentPct = (100 - presentPct).coerceIn(0, 100)
     val fPresent = data.presentCount.toFloat() / data.totalHeadcount
@@ -134,7 +140,7 @@ private fun ManagementCalendarCard(
                     }
                     Column {
                         Text(
-                            text = stringResource(R.string.dashboard_mgmt_calendar_title),
+                            text = tr(R.string.dashboard_mgmt_calendar_title),
                             style = TextStyle(
                                 fontFamily = InterFontFamily,
                                 fontWeight = FontWeight.Bold,
@@ -144,7 +150,7 @@ private fun ManagementCalendarCard(
                             )
                         )
                         Text(
-                            text = stringResource(R.string.dashboard_mgmt_calendar_subtitle),
+                            text = tr(R.string.dashboard_mgmt_calendar_subtitle),
                             style = TextStyle(
                                 fontFamily = InterFontFamily,
                                 fontWeight = FontWeight.Normal,
@@ -157,7 +163,7 @@ private fun ManagementCalendarCard(
                 IconButton(onClick = onChevronClick.singleClick()) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = stringResource(R.string.dashboard_cd_navigate_forward),
+                        contentDescription = tr(R.string.dashboard_cd_navigate_forward),
                         tint = DashboardFigmaMuted,
                         modifier = Modifier.size(20.dp)
                     )
@@ -174,7 +180,7 @@ private fun ManagementCalendarCard(
                 Row(verticalAlignment = Alignment.Bottom) {
                     Text(
                         modifier = Modifier.offset(y= (-8).dp),
-                        text = data.dayOfMonth,
+                        text = todayLabels.dayOfMonth,
                         style = TextStyle(
                             fontFamily = InterFontFamily,
                             fontWeight = FontWeight.Bold,
@@ -185,7 +191,7 @@ private fun ManagementCalendarCard(
                     Spacer(modifier = Modifier.width(8.dp))
                     Column {
                         Text(
-                            text = data.monthLabel,
+                            text = todayLabels.monthLabel,
                             style = TextStyle(
                                 fontFamily = InterFontFamily,
                                 fontWeight = FontWeight.SemiBold,
@@ -194,7 +200,7 @@ private fun ManagementCalendarCard(
                             )
                         )
                         Text(
-                            text = data.weekdayLabel,
+                            text = todayLabels.weekdayLabel,
                             style = TextStyle(
                                 fontFamily = InterFontFamily,
                                 fontWeight = FontWeight.Normal,
@@ -210,7 +216,7 @@ private fun ManagementCalendarCard(
                 ) {
                     MiniStatPill(
                         modifier = Modifier.weight(1f),
-                        label = stringResource(R.string.dashboard_mgmt_present),
+                        label = tr(R.string.dashboard_mgmt_present),
                         value = data.presentCount,
                         tint = MgmtPresentGreen,
                         iconTint = MgmtPresentGreen,
@@ -220,7 +226,7 @@ private fun ManagementCalendarCard(
                     )
                     MiniStatPill(
                         modifier = Modifier.weight(1f),
-                        label = stringResource(R.string.dashboard_mgmt_absent),
+                        label = tr(R.string.dashboard_mgmt_absent),
                         value = data.absentCount,
                         tint = MgmtAbsentRed,
                         iconTint = MgmtAbsentRed,
@@ -253,7 +259,7 @@ private fun ManagementCalendarCard(
                 ) {
                     Column {
                         Text(
-                            text = stringResource(R.string.dashboard_mgmt_team_attendance),
+                            text = tr(R.string.dashboard_mgmt_team_attendance),
                             style = TextStyle(
                                 fontFamily = InterFontFamily,
                                 fontWeight = FontWeight.SemiBold,
@@ -262,7 +268,7 @@ private fun ManagementCalendarCard(
                             )
                         )
                         Text(
-                            text = stringResource(R.string.dashboard_mgmt_today_overview),
+                            text = tr(R.string.dashboard_mgmt_today_overview),
                             style = TextStyle(
                                 fontFamily = InterFontFamily,
                                 fontWeight = FontWeight.Normal,
@@ -273,7 +279,7 @@ private fun ManagementCalendarCard(
                     }
                     Column(horizontalAlignment = Alignment.End) {
                         Text(
-                            text = stringResource(R.string.dashboard_mgmt_rate),
+                            text = tr(R.string.dashboard_mgmt_rate),
                             style = TextStyle(
                                 fontFamily = InterFontFamily,
                                 fontWeight = FontWeight.Normal,
@@ -322,7 +328,7 @@ private fun ManagementCalendarCard(
                                 )
                             )
                             Text(
-                                text = stringResource(R.string.dashboard_mgmt_total),
+                                text = tr(R.string.dashboard_mgmt_total),
                                 style = TextStyle(
                                     fontFamily = InterFontFamily,
                                     fontWeight = FontWeight.Normal,
@@ -339,8 +345,8 @@ private fun ManagementCalendarCard(
                     ) {
                         AttendanceLegendRow(
                             dotColor = MgmtPresentGreen,
-                            label = stringResource(R.string.dashboard_mgmt_present),
-                            usersText = stringResource(
+                            label = tr(R.string.dashboard_mgmt_present),
+                            usersText = tr(
                                 R.string.dashboard_mgmt_users_format,
                                 data.presentCount
                             ),
@@ -349,8 +355,8 @@ private fun ManagementCalendarCard(
                         )
                         AttendanceLegendRow(
                             dotColor = MgmtAbsentRed,
-                            label = stringResource(R.string.dashboard_mgmt_absent),
-                            usersText = stringResource(
+                            label = tr(R.string.dashboard_mgmt_absent),
+                            usersText = tr(
                                 R.string.dashboard_mgmt_users_format,
                                 data.absentCount
                             ),
@@ -525,7 +531,7 @@ private fun ManagementSecurityCard(
                     }
                     Column {
                         Text(
-                            text = stringResource(R.string.dashboard_mgmt_security_title),
+                            text = tr(R.string.dashboard_mgmt_security_title),
                             style = TextStyle(
                                 fontFamily = InterFontFamily,
                                 fontWeight = FontWeight.Bold,
@@ -535,7 +541,7 @@ private fun ManagementSecurityCard(
                             )
                         )
                         Text(
-                            text = stringResource(R.string.dashboard_mgmt_security_subtitle),
+                            text = tr(R.string.dashboard_mgmt_security_subtitle),
                             style = TextStyle(
                                 fontFamily = InterFontFamily,
                                 fontWeight = FontWeight.Normal,
@@ -548,7 +554,7 @@ private fun ManagementSecurityCard(
                 IconButton(onClick = onChevronClick.singleClick()) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = stringResource(R.string.dashboard_cd_navigate_forward),
+                        contentDescription = tr(R.string.dashboard_cd_navigate_forward),
                         tint = DashboardFigmaMuted,
                         modifier = Modifier.size(20.dp)
                     )
@@ -574,7 +580,7 @@ private fun ManagementSecurityCard(
                             modifier = Modifier.size(14.dp)
                         )
                     },
-                    label = stringResource(R.string.dashboard_mgmt_total_users),
+                    label = tr(R.string.dashboard_mgmt_total_users),
                     valueText = data.totalUsers.toString(),
                     valueBrush = Brush.linearGradient(listOf(DashboardFigmaInk, DashboardFigmaInk))
                 )
@@ -591,7 +597,7 @@ private fun ManagementSecurityCard(
                             modifier = Modifier.size(14.dp)
                         )
                     },
-                    label = stringResource(R.string.dashboard_mgmt_submissions),
+                    label = tr(R.string.dashboard_mgmt_submissions),
                     valueText = data.submissionsCount.toString(),
                     valueBrush = Brush.linearGradient(listOf(DashboardFigmaInk, DashboardFigmaInk))
                 )
@@ -618,7 +624,7 @@ private fun ManagementSecurityCard(
                 ) {
                     Column {
                         Text(
-                            text = stringResource(R.string.dashboard_mgmt_submission_status),
+                            text = tr(R.string.dashboard_mgmt_submission_status),
                             style = TextStyle(
                                 fontFamily = InterFontFamily,
                                 fontWeight = FontWeight.SemiBold,
@@ -627,7 +633,7 @@ private fun ManagementSecurityCard(
                             )
                         )
                         Text(
-                            text = stringResource(R.string.dashboard_mgmt_this_month),
+                            text = tr(R.string.dashboard_mgmt_this_month),
                             style = TextStyle(
                                 fontFamily = InterFontFamily,
                                 fontWeight = FontWeight.Normal,
@@ -638,7 +644,7 @@ private fun ManagementSecurityCard(
                     }
                     Column(horizontalAlignment = Alignment.End) {
                         Text(
-                            text = stringResource(R.string.dashboard_mgmt_total_users_header),
+                            text = tr(R.string.dashboard_mgmt_total_users_header),
                             style = TextStyle(
                                 fontFamily = InterFontFamily,
                                 fontWeight = FontWeight.Normal,
@@ -658,7 +664,7 @@ private fun ManagementSecurityCard(
                                     .background(Color(0xFF00D3F3))
                             )
                             Text(
-                                text = stringResource(
+                                text = tr(
                                     R.string.dashboard_mgmt_total_users_count,
                                     data.totalUsers
                                 ),
@@ -700,7 +706,7 @@ private fun ManagementSecurityCard(
                             )
                         )
                         Text(
-                            text = stringResource(R.string.dashboard_mgmt_users_format),
+                            text = tr(R.string.dashboard_mgmt_users_format),
                             style = TextStyle(
                                 fontFamily = InterFontFamily,
                                 fontWeight = FontWeight.Normal,
@@ -794,7 +800,7 @@ private fun SecurityLegendLine(color: Color, text: String, title: Int) {
         )
         Column {
             Text(
-                text = stringResource(id = title),
+                text = tr(id = title),
                 style = TextStyle(
                     fontFamily = InterFontFamily,
                     fontWeight = FontWeight.Normal,

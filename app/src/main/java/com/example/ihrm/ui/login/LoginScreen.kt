@@ -63,6 +63,7 @@ import com.example.ihrm.ui.theme.Primary300
 import com.example.ihrm.ui.theme.Primary400
 import com.example.ihrm.ui.theme.Primary50
 import com.example.ihrm.ui.theme.Primary500
+import com.example.ihrm.ui.localization.tr
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
@@ -114,7 +115,7 @@ fun LoginScreenContent(
 
                     // bottom brand label
                     Text(
-                        text = stringResource(R.string.login_test_footer),
+                        text = tr(R.string.login_test_footer),
                         color = Primary400,
                         fontSize = 12.sp,
                         textAlign = TextAlign.Center,
@@ -143,7 +144,7 @@ private fun LoginContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = stringResource(R.string.login_test_title),
+            text = tr(R.string.login_test_title),
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
             color = Neutral700,
@@ -154,7 +155,7 @@ private fun LoginContent(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = stringResource(R.string.login_test_subtitle),
+            text = tr(R.string.login_test_subtitle),
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
             color = Neutral500,
@@ -168,7 +169,7 @@ private fun LoginContent(
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = buildAnnotatedString {
-                append(stringResource(R.string.login_test_employee_id_label))
+                append(tr(R.string.login_test_employee_id_label))
 
                 withStyle(
                     style = SpanStyle(
@@ -188,7 +189,7 @@ private fun LoginContent(
         val employeeIdError = uiState.employeeIdError
         if (employeeIdError != null) {
             val msg =
-                if (employeeIdError is LoginFieldError.ServerMsg) employeeIdError.msg else stringResource(
+                if (employeeIdError is LoginFieldError.ServerMsg) employeeIdError.msg else tr(
                     employeeIdError.toEmployeeIdMessageResId()
                 )
             ErrorFieldMsg(msg)
@@ -199,7 +200,7 @@ private fun LoginContent(
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = buildAnnotatedString {
-                append(stringResource(R.string.login_test_password_label))
+                append(tr(R.string.login_test_password_label))
 
                 withStyle(
                     style = SpanStyle(
@@ -219,7 +220,7 @@ private fun LoginContent(
         val passwordError = uiState.passwordError
         if (passwordError != null) {
             val msg =
-                if (passwordError is LoginFieldError.ServerMsg) passwordError.msg else stringResource(
+                if (passwordError is LoginFieldError.ServerMsg) passwordError.msg else tr(
                     passwordError.toPasswordMessageResId()
                 )
             ErrorFieldMsg(msg)
@@ -228,20 +229,20 @@ private fun LoginContent(
         Spacer(modifier = Modifier.height(32.dp))
 
         if (uiState.isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = Primary400
-                )
-            }
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(48.dp),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                CircularProgressIndicator(
+//                    modifier = Modifier.size(24.dp),
+//                    color = Primary400
+//                )
+//            }
         } else {
             CustomButton(
-                text = stringResource(R.string.login_test_login_button),
+                text = tr(R.string.login_test_login_button),
                 onClick = { viewModel.login(onLoginSuccess) },
                 modifier = Modifier.fillMaxWidth(),
                 size = ButtonSize.Large,
@@ -257,7 +258,7 @@ private fun LoginContent(
             horizontalArrangement = Arrangement.Center,
         ) {
             Text(
-                text = stringResource(R.string.login_test_forgot_password),
+                text = tr(R.string.login_test_forgot_password),
                 color = Primary400,
                 fontSize = 14.sp
             )
@@ -287,7 +288,7 @@ private fun IdInput(
         onValueChange = viewModel::updateEmployeeId,
         placeholder = {
             Text(
-                stringResource(R.string.login_test_employee_id_placeholder),
+                tr(R.string.login_test_employee_id_placeholder),
                 color = Neutral400
             )
         },
@@ -322,7 +323,7 @@ private fun PasswordInput(
         onValueChange = viewModel::updatePassword,
         placeholder = {
             Text(
-                stringResource(R.string.login_test_password_placeholder),
+                tr(R.string.login_test_password_placeholder),
                 color = Neutral400
             )
         },
@@ -392,7 +393,7 @@ private fun LogoHeader() {
         Spacer(modifier = Modifier.width(12.dp))
 
         Text(
-            text = stringResource(R.string.login_test_brand),
+            text = tr(R.string.login_test_brand),
             color = Primary500,
             fontWeight = FontWeight.Bold,
             fontSize = 24.sp

@@ -26,17 +26,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -54,9 +50,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -68,6 +62,7 @@ import com.example.ihrm.R
 import com.example.ihrm.ui.common.BaseHRMCompose
 import com.example.ihrm.ui.common.bottomsheet.SecurityChecksFilterBottomSheet
 import com.example.ihrm.ui.common.header.BaseHeader
+import com.example.ihrm.ui.security.SecurityFiltersRow
 import com.example.ihrm.ui.theme.InterFontFamily
 import com.example.ihrm.util.DashboardBrush
 import com.example.ihrm.util.LabelTextStyle13Regular
@@ -76,9 +71,11 @@ import com.example.ihrm.util.LabelTextStyle13RegularWhite
 import com.example.ihrm.util.formatVNPhoneNumber
 import com.example.ihrm.util.singleClick
 import com.example.ihrm.util.txtInterMedium15
+import com.example.ihrm.ui.localization.tr
 
 @Composable
 fun SecurityChecksScreen(
+    onMenuClick: () -> Unit,
     onBackClick: () -> Unit,
     onSeeChartClick: () -> Unit,
     onSecurityCheckClick: (String) -> Unit,
@@ -88,7 +85,7 @@ fun SecurityChecksScreen(
     BaseHRMCompose(
         content = {
             SecurityChecksScreenContent(
-                onBackClick = onBackClick,
+                onMenuClick = onMenuClick,
                 onSeeChartClick = onSeeChartClick,
                 onSecurityCheckClick = onSecurityCheckClick,
                 modifier = modifier,
@@ -109,7 +106,7 @@ enum class SecuritySummaryFilter {
 
 @Composable
 fun SecurityChecksScreenContent(
-    onBackClick: () -> Unit,
+    onMenuClick: () -> Unit,
     onSeeChartClick: () -> Unit,
     onSecurityCheckClick: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -134,11 +131,11 @@ fun SecurityChecksScreenContent(
         securityGroupsState.securityGroups
     }
 
-    val labelApproved = stringResource(R.string.security_checks_approved)
-    val labelSubmitted = stringResource(R.string.security_checks_submitted)
-    val labelRejected = stringResource(R.string.security_checks_status_rejected)
-    val labelNotSubmitted = stringResource(R.string.security_checks_status_not_submitted)
-    val dash = stringResource(R.string.security_checks_dash)
+    val labelApproved = tr(R.string.security_checks_approved)
+    val labelSubmitted = tr(R.string.security_checks_submitted)
+    val labelRejected = tr(R.string.security_checks_status_rejected)
+    val labelNotSubmitted = tr(R.string.security_checks_status_not_submitted)
+    val dash = tr(R.string.security_checks_dash)
 
 //    val filteredSubmissions = remember(
 //        submissionsState.submissions,
@@ -163,7 +160,6 @@ fun SecurityChecksScreenContent(
         labelNotSubmitted,
         dash,
     ) {
-        Log.d("Vinh", "selectedSummaryFilter: $selectedSummaryFilter")
         if (selectedSummaryFilter == SecuritySummaryFilter.NOT_SUBMITTED) {
             submissionsState.notSubmission
                 .toSecurityCheckItemUiList(
@@ -223,9 +219,9 @@ fun SecurityChecksScreenContent(
                 modifier = Modifier
                     .padding(paddingValues)
                     .statusBarsPadding(),
-                title = stringResource(R.string.drawer_item_security_checks),
+                title = tr(R.string.drawer_item_security_checks),
                 showNavigationIcon = true,
-                onNavigationClick = onBackClick.singleClick(),
+                onNavigationClick = onMenuClick.singleClick(),
                 containerColor = Color.Transparent,
                 navigationIcon = {
                     Icon(
@@ -238,10 +234,16 @@ fun SecurityChecksScreenContent(
             )
             Spacer(modifier = Modifier.height(12.dp))
             SecurityFiltersRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 14.dp),
                 searchQuery = searchQuery,
                 onSearchQueryChange = { searchQuery = it },
                 filterActive = filterIndicatorActive,
                 onFilterClick = { showFilterSheet = true },
+                searchPlaceholder = tr(R.string.security_checks_year),
+                filterContentDescription = tr(R.string.security_checks_filter_cd),
             )
             Spacer(modifier = Modifier.height(20.dp))
             Spacer(modifier = Modifier.height(20.dp))
@@ -267,7 +269,7 @@ fun SecurityChecksScreenContent(
                     if (!showInitialLoading && uiItems.isEmpty() && submissionsState.errorMessage == null) {
                         item {
                             Text(
-                                text = stringResource(R.string.security_checks_empty),
+                                text = tr(R.string.security_checks_empty),
                                 style = LabelTextStyle13RegularWhite,
                                 modifier = Modifier.padding(vertical = 24.dp)
                             )
@@ -284,7 +286,7 @@ fun SecurityChecksScreenContent(
                             SecurityCheckCard(
                                 item = check,
                                 onClick = {
-                                    onSecurityCheckClick(check.submissionId.toString())
+                                    onSecurityCheckClick(check.userId)
                                 }.singleClick()
                             )
                         }
@@ -292,109 +294,6 @@ fun SecurityChecksScreenContent(
                     }
                     item { Spacer(modifier = Modifier.height(8.dp)) }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-private fun SecurityFiltersRow(
-    searchQuery: String,
-    onSearchQueryChange: (String) -> Unit,
-    filterActive: Boolean,
-    onFilterClick: () -> Unit,
-) {
-    val textStyle = TextStyle(
-        color = Color.Black,
-        fontSize = 15.sp,
-        fontWeight = FontWeight.Normal,
-        lineHeight = 18.sp,
-        platformStyle = PlatformTextStyle(
-            includeFontPadding = false
-        )
-    )
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .padding(top = 14.dp)
-            .height(44.dp)
-            .clip(RoundedCornerShape(14.dp))
-            .background(Color(0xFFF2F2F7))
-            .padding(horizontal = 14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Icon(
-            imageVector = ImageVector.vectorResource(R.drawable.ic_search),
-            contentDescription = null,
-            tint = Color(0xFF6B7280),
-            modifier = Modifier.size(16.dp)
-        )
-        BasicTextField(
-            value = searchQuery,
-            onValueChange = onSearchQueryChange,
-            modifier = Modifier.weight(1f),
-            singleLine = true,
-            textStyle = textStyle,
-            decorationBox = { innerTextField ->
-                Box(
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    if (searchQuery.isEmpty()) {
-                        Text(
-                            text = stringResource(R.string.security_checks_year),
-                            style = textStyle,
-                            color = Color(0xFF9CA3AF)
-                        )
-                    }
-                    innerTextField()
-                }
-            }
-        )
-        if (searchQuery.isNotEmpty()) {
-            Box(
-                modifier = Modifier
-                    .size(20.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF969BA4))
-                    .clickable { onSearchQueryChange("") },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = null,
-                    tint = White,
-                    modifier = Modifier.size(10.dp)
-                )
-            }
-        }
-        VerticalDivider(
-            modifier = Modifier.height(20.dp),
-            thickness = 1.dp,
-            color = Color(0xFFE5E7EB)
-        )
-        Box(modifier = Modifier.size(28.dp), contentAlignment = Alignment.Center) {
-            IconButton(
-                onClick = onFilterClick.singleClick(),
-                modifier = Modifier.size(28.dp)
-            ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_filter),
-                    contentDescription = stringResource(R.string.security_checks_filter_cd),
-                    tint = Color(0xFF6B7280),
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-            if (filterActive) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(top = 4.dp, end = 2.dp)
-                        .size(6.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF2563EB))
-                )
             }
         }
     }
@@ -420,7 +319,7 @@ private fun SecuritySummaryCards(
             modifier = Modifier
                 .weight(1f),
             value = approved,
-            label = stringResource(R.string.security_checks_approved),
+            label = tr(R.string.security_checks_approved),
             valueColor = Color(0xFF34C759),
             selected = selectedFilter == SecuritySummaryFilter.APPROVED,
             selectedBackgroundColor = Color(0xFFD7F6D6),
@@ -430,7 +329,7 @@ private fun SecuritySummaryCards(
             modifier = Modifier
                 .weight(1f),
             value = submitted,
-            label = stringResource(R.string.security_checks_submitted),
+            label = tr(R.string.security_checks_submitted),
             valueColor = Color(0xFF1970F3),
             selected = selectedFilter == SecuritySummaryFilter.SUBMITTED,
             selectedBackgroundColor = Color(0xFFD2E6FF),
@@ -440,7 +339,7 @@ private fun SecuritySummaryCards(
             modifier = Modifier
                 .weight(1f),
             value = rejected,
-            label = stringResource(R.string.security_checks_rejected),
+            label = tr(R.string.security_checks_rejected),
             valueColor = Color(0xFFFF1515),
             selectedBackgroundColor = Color(0xFFFFD5D5),
             selected = selectedFilter == SecuritySummaryFilter.REJECTED,
@@ -450,7 +349,7 @@ private fun SecuritySummaryCards(
             modifier = Modifier
                 .weight(1f),
             value = total,
-            label = stringResource(R.string.security_checks_not_submitted),
+            label = tr(R.string.security_checks_not_submitted),
             valueColor = Color(0xFFF0B100),
             selected = selectedFilter == SecuritySummaryFilter.NOT_SUBMITTED,
             selectedBackgroundColor = Color(0xFFF0F5D7),
@@ -684,7 +583,7 @@ private fun CardApprovedBy(item: SecurityCheckItemUi) {
         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             if (item.approvedByLabelRes != null) {
                 Text(
-                    text = stringResource(item.approvedByLabelRes),
+                    text = tr(item.approvedByLabelRes),
                     color = SecurityCheckCardMuted,
                     fontFamily = InterFontFamily,
                     fontSize = 13.sp,
@@ -706,12 +605,12 @@ private fun CardApprovedBy(item: SecurityCheckItemUi) {
 private fun CardDates(item: SecurityCheckItemUi) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
         val label = when (item.statusUseApprovedChip) {
-            SecurityCheckStatus.REJECTED -> stringResource(R.string.security_checks_rejected_date)
-            else -> stringResource(R.string.security_checks_approved_date)
+            SecurityCheckStatus.REJECTED -> tr(R.string.security_checks_rejected_date)
+            else -> tr(R.string.security_checks_approved_date)
         }
         DateColumn(
             modifier = Modifier.weight(1f),
-            label = stringResource(R.string.security_checks_submitted_date),
+            label = tr(R.string.security_checks_submitted_date),
             value = item.submittedDate
         )
         DateColumn(

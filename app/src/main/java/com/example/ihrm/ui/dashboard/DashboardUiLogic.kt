@@ -1,5 +1,6 @@
 package com.example.ihrm.ui.dashboard
 
+import com.example.ihrm.R
 import com.example.ihrm.domain.model.AccountType
 
 enum class DashboardRole {
@@ -10,13 +11,21 @@ enum class DashboardRole {
 data class DashboardPersonalRoleUi(
     val profile: DashboardProfileModel,
     val leaveStats: List<LeaveStatModel>,
-    val securityMonthly: SecurityMonthlyModel
+    val securityMonthly: SecurityMonthlyModel,
+    val securityBanner: DashboardSecurityBannerModel = DashboardSecurityBannerModel(
+        titleRes = R.string.dashboard_security_banner_all_good_title,
+        subtitleRes = R.string.dashboard_security_banner_default_subtitle
+    )
 )
 
 data class DashboardExtraRoleUi(
     val profile: DashboardProfileModel,
     val leaveStats: List<LeaveStatModel>,
     val securityMonthly: SecurityMonthlyModel,
+    val securityBanner: DashboardSecurityBannerModel = DashboardSecurityBannerModel(
+        titleRes = R.string.dashboard_security_banner_all_good_title,
+        subtitleRes = R.string.dashboard_security_banner_default_subtitle
+    ),
     val management: DashboardManagementUiModel
 )
 

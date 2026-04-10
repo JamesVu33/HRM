@@ -43,7 +43,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -70,6 +69,7 @@ import com.example.ihrm.util.DashboardBrush.BaseBackgroundItemSelected
 import com.example.ihrm.util.singleClick
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import com.example.ihrm.ui.localization.tr
 
 /** Routes that have a real screen. Others show Coming Soon. */
 private val IMPLEMENTED_ROUTES =
@@ -175,6 +175,7 @@ fun DrawerMenu(
     onItemClick: (String) -> Unit,
     onLogoutClick: () -> Unit = {},
     onShowComingSoon: (String) -> Unit = {},
+    onTranslationKeysClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val userRole = AuthManager.getAccountType().toDashboardRole()
@@ -210,7 +211,7 @@ fun DrawerMenu(
                     visibleSections.forEach { section ->
                         item(key = "header_${section.titleResId}") {
                             Text(
-                                text = stringResource(section.titleResId).uppercase(),
+                                text = tr(section.titleResId).uppercase(),
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = DrawerSectionLabel.copy(alpha = 0.9f),
@@ -225,7 +226,7 @@ fun DrawerMenu(
                             items = section.items,
                             key = { "${section.titleResId}_${it.route}" }
                         ) { item ->
-                            val label = stringResource(item.labelResId)
+                            val label = tr(item.labelResId)
                             val selected = when (item.route) {
                                 "employee_list" -> currentRoute == "employee_list" || currentRoute.startsWith(
                                     "employee_detail"
@@ -238,11 +239,18 @@ fun DrawerMenu(
                                 label = label,
                                 selected = selected,
                                 onClick = {
-                                    if (item.route in IMPLEMENTED_ROUTES) {
-                                        scope.launch { drawerState.close() }
-                                        onItemClick(item.route)
-                                    } else {
-                                        onShowComingSoon(label)
+                                    when (item.route) {
+                                        "translation_keys",
+                                        "translation_keys_personal" -> {
+                                            scope.launch { drawerState.close() }
+                                            onTranslationKeysClick()
+                                        }
+                                        else -> if (item.route in IMPLEMENTED_ROUTES) {
+                                            scope.launch { drawerState.close() }
+                                            onItemClick(item.route)
+                                        } else {
+                                            onShowComingSoon(label)
+                                        }
                                     }
                                 }.singleClick()
                             )
@@ -294,7 +302,7 @@ private fun DrawerHeader(scope: CoroutineScope, drawerState: DrawerState) {
         }
         Spacer(modifier = Modifier.size(12.dp))
         Text(
-            text = stringResource(R.string.drawer_brand),
+            text = tr(R.string.drawer_brand),
             fontSize = 17.sp,
             fontWeight = FontWeight.SemiBold,
             color = Color(0xFF101828)
@@ -309,7 +317,7 @@ private fun DrawerHeader(scope: CoroutineScope, drawerState: DrawerState) {
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = stringResource(R.string.drawer_close),
+                contentDescription = tr(R.string.drawer_close),
                 tint = Neutral600
             )
         }
@@ -322,9 +330,9 @@ private fun DrawerUserCard(
     email: String?
 ) {
     val displayName =
-        fullName?.takeIf { it.isNotBlank() } ?: stringResource(R.string.drawer_user_name)
+        fullName?.takeIf { it.isNotBlank() } ?: tr(R.string.drawer_user_name)
     val displayEmail =
-        email?.takeIf { it.isNotBlank() } ?: stringResource(R.string.drawer_user_email)
+        email?.takeIf { it.isNotBlank() } ?: tr(R.string.drawer_user_email)
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -406,7 +414,7 @@ private fun DrawerLogoutButton(onClick: () -> Unit) {
             )
             Spacer(modifier = Modifier.size(8.dp))
             Text(
-                text = stringResource(R.string.drawer_logout),
+                text = tr(R.string.drawer_logout),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = LogoutRed
@@ -489,7 +497,7 @@ fun ComingSoonDialog(
             }
             Spacer(modifier = Modifier.height(24.dp))
             Text(
-                text = stringResource(R.string.coming_soon_title),
+                text = tr(R.string.coming_soon_title),
                 fontSize = 22.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = androidx.compose.ui.graphics.Color(0xFF0a0a0a),
@@ -497,7 +505,7 @@ fun ComingSoonDialog(
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = stringResource(R.string.coming_soon_message, featureName),
+                text = tr(R.string.coming_soon_message, featureName),
                 fontSize = 15.sp,
                 color = Neutral600,
                 textAlign = TextAlign.Center
@@ -530,7 +538,7 @@ fun ComingSoonDialog(
                         )
                     ) {
                         Text(
-                            text = stringResource(R.string.coming_soon_got_it),
+                            text = tr(R.string.coming_soon_got_it),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -546,7 +554,7 @@ fun ComingSoonDialog(
                         elevation = ButtonDefaults.buttonElevation(0.dp)
                     ) {
                         Text(
-                            text = stringResource(R.string.coming_soon_close),
+                            text = tr(R.string.coming_soon_close),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
                             color = Neutral600
@@ -594,7 +602,7 @@ fun LogoutConfirmDialog(
             }
             Spacer(modifier = Modifier.height(20.dp))
             Text(
-                text = stringResource(R.string.logout_dialog_title),
+                text = tr(R.string.logout_dialog_title),
                 fontSize = 22.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = androidx.compose.ui.graphics.Color(0xFF0a0a0a),
@@ -602,7 +610,7 @@ fun LogoutConfirmDialog(
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = stringResource(R.string.logout_dialog_message),
+                text = tr(R.string.logout_dialog_message),
                 fontSize = 15.sp,
                 color = Neutral600,
                 textAlign = TextAlign.Center
@@ -643,7 +651,7 @@ fun LogoutConfirmDialog(
                         )
                         Spacer(modifier = Modifier.size(8.dp))
                         Text(
-                            text = stringResource(R.string.logout_yes_button),
+                            text = tr(R.string.logout_yes_button),
                             fontSize = 15.sp,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -659,7 +667,7 @@ fun LogoutConfirmDialog(
                         elevation = ButtonDefaults.buttonElevation(0.dp)
                     ) {
                         Text(
-                            text = stringResource(R.string.logout_cancel_button),
+                            text = tr(R.string.logout_cancel_button),
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Medium,
                             color = Neutral600

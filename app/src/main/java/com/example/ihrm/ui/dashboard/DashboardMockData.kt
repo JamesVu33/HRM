@@ -5,6 +5,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import com.example.ihrm.R
 import com.example.ihrm.domain.model.Employee
+import com.example.ihrm.ui.localization.tr
 
 /**
  * Mock dashboard payload aligned with Figma HRM dashboard (Personal + Management).
@@ -13,12 +14,12 @@ object DashboardMockData {
 
     @Composable
     fun rememberHomeModel(): DashboardHomeMockModel {
-        val name = stringResource(R.string.dashboard_mock_profile_name)
-        val id = stringResource(R.string.dashboard_mock_profile_id)
-        val dept = stringResource(R.string.dashboard_mock_department)
-        val email = stringResource(R.string.dashboard_mock_email)
-        val phone = stringResource(R.string.dashboard_mock_phone)
-        val joined = stringResource(R.string.dashboard_mock_joined)
+        val name = tr(R.string.dashboard_mock_profile_name)
+        val id = tr(R.string.dashboard_mock_profile_id)
+        val dept = tr(R.string.dashboard_mock_department)
+        val email = tr(R.string.dashboard_mock_email)
+        val phone = tr(R.string.dashboard_mock_phone)
+        val joined = tr(R.string.dashboard_mock_joined)
         return remember(name, id, dept, email, phone, joined) {
             DashboardHomeMockModel(
                 profile = DashboardProfileModel(
@@ -31,7 +32,8 @@ object DashboardMockData {
                     departmentDetail = dept,
                     avatarUrl = null,
                     avatarInitials = avatarInitialsFromDisplayName(name),
-                    avatarSecurity = null
+                    avatarSecurity = null,
+                    roleName = null
                 ),
                 leaveStats = listOf(
                     LeaveStatModel(
@@ -59,28 +61,15 @@ object DashboardMockData {
                         accent = LeaveStatAccent.Green
                     )
                 ),
-                securityMonthly = SecurityMonthlyModel(
-                    approved = 0,
-                    rechecking = 1,
-                    rejected = 3
-                ),
+                securityMonthly = SecurityMonthlyModel(approved = 0, rechecking = 0, rejected = 0),
                 management = DashboardManagementUiModel(
                     calendar = ManagementCalendarUiModel(
-                        dayOfMonth = "19",
-                        monthLabel = "Mar",
-                        weekdayLabel = "Thu",
                         presentCount = 38,
                         absentCount = 7,
                         totalHeadcount = 45,
                         attendanceRatePercent = 84
                     ),
-                    security = ManagementSecurityUiModel(
-                        totalUsers = 45,
-                        submissionsCount = 20,
-                        submitted = 20,
-                        pending = 5,
-                        notSubmitted = 20
-                    )
+                    security = ManagementSecurityUiModel(0, 0, 0, 0, 0)
                 )
             )
         }

@@ -2,18 +2,24 @@ package com.example.ihrm.data.repository
 
 import com.example.ihrm.data.local.dao.EmployeeDao
 import com.example.ihrm.data.remote.api.EmployeeApiService
+import com.example.ihrm.data.remote.base.PaginatedApiData
 import com.example.ihrm.data.remote.base.safeApiCall
+import com.example.ihrm.data.remote.base.safeApiCallPaginated
 import com.example.ihrm.data.remote.base.safeApiCallRaw
 import com.example.ihrm.data.remote.dto.MeEmployeeResponse
 import com.example.ihrm.data.remote.base.NetworkResult
+import com.example.ihrm.data.remote.dto.EmployeeDto
 import com.example.ihrm.data.remote.dto.UserMetaResponseDto
+import com.example.ihrm.data.remote.employee.EmployeeProfileResponse
 import com.example.ihrm.data.remote.mapper.toEmployee
+import com.example.ihrm.data.remote.mapper.toEmployeeDto
 import com.example.ihrm.data.remote.mapper.toEmployeeEntity
 import com.example.ihrm.data.remote.mapper.toLevel
 import com.example.ihrm.di.NetworkModule
 import com.example.ihrm.domain.model.Employee
 import com.example.ihrm.domain.model.Level
 import com.example.ihrm.domain.repository.EmployeeRepository
+import com.example.ihrm.domain.usecase.employees.EmployeeListDto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import okhttp3.MultipartBody
@@ -37,52 +43,20 @@ class EmployeeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addEmployee(employee: Employee): NetworkResult<Unit> {
-        val dto = com.example.ihrm.data.remote.dto.EmployeeDto(
-            id = employee.id,
-            name = employee.name,
-            email = employee.email,
-            phone = employee.phone,
-            department = employee.department,
-            position = employee.position,
-            hireDate = employee.hireDate,
-            salary = employee.salary,
-            address = employee.address,
-            englishName = employee.englishName,
-            gender = employee.gender,
-            personalId = employee.personalId,
-            idIssueDate = employee.idIssueDate,
-            createdAt = employee.createdAt,
-            updatedAt = employee.updatedAt
-        )
+        val dto = employee.toEmployeeDto()
         val result = safeApiCall(retrofit) { apiService.createEmployee(dto) }
         if (result is NetworkResult.Success) {
-            employeeDao.insertEmployee(employee.toEmployeeEntity())
+            employeeDao.insertEmployee(result.data.toEmployee().toEmployeeEntity())
             return NetworkResult.Success(Unit)
         }
         return result.map { Unit }
     }
 
     override suspend fun updateEmployee(employee: Employee): NetworkResult<Unit> {
-        val dto = com.example.ihrm.data.remote.dto.EmployeeDto(
-            id = employee.id,
-            name = employee.name,
-            email = employee.email,
-            phone = employee.phone,
-            department = employee.department,
-            position = employee.position,
-            hireDate = employee.hireDate,
-            salary = employee.salary,
-            address = employee.address,
-            englishName = employee.englishName,
-            gender = employee.gender,
-            personalId = employee.personalId,
-            idIssueDate = employee.idIssueDate,
-            createdAt = employee.createdAt,
-            updatedAt = employee.updatedAt
-        )
+        val dto = employee.toEmployeeDto()
         val result = safeApiCall(retrofit) { apiService.updateEmployee(employee.id, dto) }
         if (result is NetworkResult.Success) {
-            employeeDao.insertEmployee(employee.toEmployeeEntity())
+            employeeDao.insertEmployee(result.data.toEmployee().toEmployeeEntity())
             return NetworkResult.Success(Unit)
         }
         return result.map { Unit }
@@ -133,17 +107,11 @@ class EmployeeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getLevelByEmployeeId(employeeId: String): NetworkResult<Level?> {
-        val result = safeApiCall(retrofit) { apiService.getEmployeeById(employeeId) }
-        return when (result) {
-            is NetworkResult.Success -> NetworkResult.Success(
-                result.data.level?.toLevel()
-            )
+    override suspend fun getEmployeeDetailById(employeeId: String): NetworkResult<EmployeeDto> =
+        safeApiCall(retrofit) { apiService.getEmployeeById(employeeId) }
 
-            is NetworkResult.Failure -> NetworkResult.Failure(result.error)
-            is NetworkResult.Exception -> NetworkResult.Exception(result.e)
-        }
-    }
+    override suspend fun getEmployeeProfileById(employeeId: String): NetworkResult<EmployeeProfileResponse> =
+        safeApiCall(retrofit) { apiService.getEmployeeProfileById(employeeId) }
 
     override suspend fun getMeEmployeeInfo(): NetworkResult<MeEmployeeResponse> =
         safeApiCall(retrofit) { apiService.getMeEmployeeInfo() }
@@ -154,6 +122,32 @@ class EmployeeRepositoryImpl @Inject constructor(
     override suspend fun changeAvatar(avatar: MultipartBody.Part): NetworkResult<Unit> {
         val result = safeApiCallRaw { apiService.changeAvatar(avatar) }
         return result.map { Unit }
+    }
+
+    override suspend fun getEmployeesList(
+        search: String?,
+        page: Int?,
+        limit: Int?,
+        orderBy: String?,
+        sortBy: String?,
+        type: String?,
+        groupId: String?,
+        isLeader: Boolean?,
+        status: String?,
+        jobTitles: List<String>?
+    ): NetworkResult<PaginatedApiData<List<EmployeeListDto>>> = safeApiCallPaginated(retrofit) {
+        apiService.getEmployeesList(
+            search = search,
+            page = page,
+            limit = limit,
+            orderBy = orderBy,
+            sortBy = sortBy,
+            type = type,
+            groupId = groupId,
+            isLeader = isLeader,
+            status = status,
+            jobTitles = jobTitles
+        )
     }
 
     private fun <T, R> NetworkResult<T>.map(transform: (T) -> R): NetworkResult<R> {

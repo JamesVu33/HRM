@@ -87,24 +87,22 @@ class LoginUseCase @Inject constructor(
      * Validate employeeId
      */
     fun validateEmployeeId(employeeId: String): LoginFieldError? {
-//        if (employeeId.isBlank()) return null
-//        val len = employeeId.trim().length
-//        return when {
-//            len != EMPLOYEE_ID_EXACT_LENGTH -> LoginFieldError.InvalidLength
-//            else -> null
-//        }
-        return null
+        if (employeeId.isBlank()) return null
+        val len = employeeId.trim().length
+        return when {
+            len != EMPLOYEE_ID_EXACT_LENGTH -> LoginFieldError.InvalidLength
+            else -> null
+        }
     }
 
     /**
      * Validate password
      */
     fun validatePassword(password: String): LoginFieldError? {
-//        return when {
-//            password.isEmpty() -> null
-//            password.length < 8 -> LoginFieldError.TooShort
-//            else -> null
-//        }
-        return null
+        return when {
+            password.isEmpty() -> null
+            password.length < 8 -> LoginFieldError.TooShort
+            else -> null
+        }
     }
 }

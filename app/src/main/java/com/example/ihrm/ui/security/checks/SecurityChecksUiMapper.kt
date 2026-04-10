@@ -127,7 +127,7 @@ fun SecurityCheckSubmission.toSecurityCheckItemUi(
 
     val email = email?.takeIf { it.isNotBlank() } ?: dash
     val phone = phoneNumber?.takeIf { it.isNotBlank() } ?: dash
-
+    val userId = id.toString()
     return SecurityCheckItemUi(
         submissionId = id,
         employeeId = employeeId,
@@ -143,7 +143,8 @@ fun SecurityCheckSubmission.toSecurityCheckItemUi(
         approvedDate = secondColumnDate,
         statusUseApprovedChip = uiStatus,
         email = email,
-        phoneNumber = phone
+        phoneNumber = phone,
+        userId = userId
     )
 }
 

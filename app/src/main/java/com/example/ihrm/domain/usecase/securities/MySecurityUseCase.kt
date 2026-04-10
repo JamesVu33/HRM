@@ -3,6 +3,7 @@ package com.example.ihrm.domain.usecase.securities
 import com.example.ihrm.core.usecase.BaseUseCase
 import com.example.ihrm.data.remote.base.NetworkResult
 import com.example.ihrm.data.remote.securities.MySecurityCheckResponse
+import com.example.ihrm.data.remote.securities.SecurityCheckStatusResponse
 import com.example.ihrm.domain.repository.LanguageRepository
 import com.example.ihrm.domain.repository.MySecurityCheckRepository
 import com.example.ihrm.ui.security.mysecurity.MySecurityCheckUiState
@@ -19,6 +20,7 @@ class MySecurityUseCase @Inject constructor(
 
     suspend fun getMySecurityCheck(
         year: Int?,
+        query: String?,
         page: Int?,
         limit: Int?,
         orderBy: String?,
@@ -27,6 +29,7 @@ class MySecurityUseCase @Inject constructor(
     ): NetworkResult<List<MySecurityCheckResponse>> {
         val result = mySecurityCheckRepository.getMySecurityCheck(
             year = year,
+            query = query,
             page = page,
             limit = limit,
             orderBy = orderBy,
@@ -36,11 +39,18 @@ class MySecurityUseCase @Inject constructor(
         return translateResponse(result)
     }
 
+    suspend fun getHasSubmitted(): NetworkResult<SecurityCheckStatusResponse> {
+        val result = mySecurityCheckRepository.getHasSubmitted()
+        return translateResponse(result)
+    }
+
+
     fun mapToUiState(
         detail: MySecurityCheckResponse,
     ): MySecurityCheckUiState {
         val status = legendByKey(detail.status ?: "")
         return MySecurityCheckUiState(
+            id = detail.id.toString(),
             userName = detail.user?.fullName ?: DASH,
             employeeId = detail.user?.employeeId ?: DASH,
             status = status,

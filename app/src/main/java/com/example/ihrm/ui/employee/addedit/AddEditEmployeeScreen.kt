@@ -5,9 +5,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,8 +35,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -52,10 +48,8 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -74,7 +68,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -86,8 +79,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ihrm.R
 import com.example.ihrm.ui.components.ButtonVariant
 import com.example.ihrm.ui.components.CustomButton
-import com.example.ihrm.ui.theme.FABGradientEnd
-import com.example.ihrm.ui.theme.FABGradientStart
 import com.example.ihrm.ui.theme.Neutral200
 import com.example.ihrm.ui.theme.Neutral50
 import com.example.ihrm.ui.theme.Neutral500
@@ -102,6 +93,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import com.example.ihrm.ui.localization.tr
 
 private val FormInputBg = Color(0xFFF9FAFB)
 
@@ -158,7 +150,7 @@ fun AddEditEmployeeScreen(
             englishName = emp.englishName ?: ""
             email = emp.email
             phone = emp.phone
-            emp.hireDate?.let {
+            emp.statusWorking?.let {
                 dateOfBirth = try {
                     dateFormat.parse(it)
                 } catch (_: Exception) {
@@ -253,7 +245,7 @@ fun AddEditEmployeeScreen(
                     }
                     Text(
                         modifier = Modifier.align(Alignment.Center),
-                        text = stringResource(R.string.add_employee_title),
+                        text = tr(R.string.add_employee_title),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.White
@@ -312,7 +304,7 @@ fun AddEditEmployeeScreen(
                 }
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    text = stringResource(R.string.add_employee_upload_photo),
+                    text = tr(R.string.add_employee_upload_photo),
                     fontSize = 14.sp,
                     color = Color.White
                 )
@@ -323,7 +315,7 @@ fun AddEditEmployeeScreen(
         if (showPhotoPicker) {
             AlertDialog(
                 onDismissRequest = { showPhotoPicker = false },
-                title = { Text(stringResource(R.string.add_employee_upload_photo)) },
+                title = { Text(tr(R.string.add_employee_upload_photo)) },
                 text = {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         TextButton(
@@ -332,7 +324,7 @@ fun AddEditEmployeeScreen(
                                 showPhotoPicker = false
                             }.singleClick()
                         ) {
-                            Text(stringResource(R.string.add_employee_take_photo))
+                            Text(tr(R.string.add_employee_take_photo))
                         }
                         TextButton(
                             onClick = {
@@ -340,14 +332,14 @@ fun AddEditEmployeeScreen(
                                 showPhotoPicker = false
                             }.singleClick()
                         ) {
-                            Text(stringResource(R.string.add_employee_choose_from_library))
+                            Text(tr(R.string.add_employee_choose_from_library))
                         }
                     }
                 },
                 confirmButton = {},
                 dismissButton = {
                     TextButton(onClick = { showPhotoPicker = false }.singleClick()) {
-                        Text(stringResource(R.string.add_employee_photo_cancel))
+                        Text(tr(R.string.add_employee_photo_cancel))
                     }
                 }
             )
@@ -368,46 +360,46 @@ fun AddEditEmployeeScreen(
                     .padding(horizontal = 24.dp, vertical = 24.dp)
             ) {
                 // Basic Information - section with vertical blue bar
-                SectionTitleWithBar(stringResource(R.string.add_employee_basic_info))
+                SectionTitleWithBar(tr(R.string.add_employee_basic_info))
                 Text(
-                    text = stringResource(R.string.add_employee_basic_info_subtitle),
+                    text = tr(R.string.add_employee_basic_info_subtitle),
                     style = MaterialTheme.typography.bodySmall,
                     color = Neutral500,
                     modifier = Modifier.padding(top = 4.dp)
                 )
 
                 AddEditDetailEditField(
-                    label = stringResource(R.string.add_employee_full_name),
+                    label = tr(R.string.add_employee_full_name),
                     value = fullName,
                     onValueChange = { fullName = it },
                     icon = Icons.Default.Person,
-                    placeholder = stringResource(R.string.add_employee_full_name_hint)
+                    placeholder = tr(R.string.add_employee_full_name_hint)
                 )
                 AddEditDetailEditField(
-                    label = stringResource(R.string.add_employee_english_name),
+                    label = tr(R.string.add_employee_english_name),
                     value = englishName,
                     onValueChange = { englishName = it },
                     icon = Icons.Default.Person,
-                    placeholder = stringResource(R.string.add_employee_english_name_hint)
+                    placeholder = tr(R.string.add_employee_english_name_hint)
                 )
                 AddEditDetailEditField(
-                    label = stringResource(R.string.add_employee_email),
+                    label = tr(R.string.add_employee_email),
                     value = email,
                     onValueChange = { email = it },
                     icon = Icons.Default.Email,
                     keyboardType = KeyboardType.Email,
-                    placeholder = stringResource(R.string.add_employee_email_hint)
+                    placeholder = tr(R.string.add_employee_email_hint)
                 )
                 AddEditDetailEditField(
-                    label = stringResource(R.string.add_employee_phone),
+                    label = tr(R.string.add_employee_phone),
                     value = phone,
                     onValueChange = { phone = it },
                     icon = Icons.Default.Phone,
                     keyboardType = KeyboardType.Phone,
-                    placeholder = stringResource(R.string.add_employee_phone_hint)
+                    placeholder = tr(R.string.add_employee_phone_hint)
                 )
                 AddEditDateField(
-                    label = stringResource(R.string.add_employee_date_of_birth),
+                    label = tr(R.string.add_employee_date_of_birth),
                     date = dateOfBirth,
                     onPick = { showDobPicker = true },
                     dateFormat = dateFormat
@@ -420,26 +412,26 @@ fun AddEditEmployeeScreen(
                     )
                 }
                 AddEditGenderDropdown(
-                    label = stringResource(R.string.add_employee_gender),
+                    label = tr(R.string.add_employee_gender),
                     value = gender,
                     onValueChange = { gender = it },
                     expanded = genderExpanded,
                     onExpandedChange = { genderExpanded = it },
                     options = listOf(
-                        stringResource(R.string.add_employee_gender_male),
-                        stringResource(R.string.add_employee_gender_female),
-                        stringResource(R.string.add_employee_gender_other)
+                        tr(R.string.add_employee_gender_male),
+                        tr(R.string.add_employee_gender_female),
+                        tr(R.string.add_employee_gender_other)
                     )
                 )
                 AddEditDetailEditField(
-                    label = stringResource(R.string.add_employee_identity_id),
+                    label = tr(R.string.add_employee_identity_id),
                     value = personalId,
                     onValueChange = { personalId = it },
                     icon = Icons.Default.Info,
-                    placeholder = stringResource(R.string.add_employee_identity_id_hint)
+                    placeholder = tr(R.string.add_employee_identity_id_hint)
                 )
                 AddEditDateField(
-                    label = stringResource(R.string.add_employee_id_issue_day),
+                    label = tr(R.string.add_employee_id_issue_day),
                     date = idIssueDate,
                     onPick = { showIdIssueDatePicker = true },
                     dateFormat = dateFormat
@@ -452,123 +444,123 @@ fun AddEditEmployeeScreen(
                     )
                 }
                 AddEditDetailEditField(
-                    label = stringResource(R.string.add_employee_id_issue_place),
+                    label = tr(R.string.add_employee_id_issue_place),
                     value = idIssuePlace,
                     onValueChange = { idIssuePlace = it },
                     icon = Icons.Default.LocationOn,
-                    placeholder = stringResource(R.string.add_employee_id_issue_place_hint)
+                    placeholder = tr(R.string.add_employee_id_issue_place_hint)
                 )
                 AddEditDropdownField(
-                    label = stringResource(R.string.add_employee_nationality),
+                    label = tr(R.string.add_employee_nationality),
                     value = nationality,
                     onValueChange = { nationality = it },
                     options = listOf(
-                        stringResource(R.string.nationality_vietnamese),
-                        stringResource(R.string.nationality_american),
-                        stringResource(R.string.nationality_british),
-                        stringResource(R.string.nationality_chinese),
-                        stringResource(R.string.nationality_japanese),
-                        stringResource(R.string.nationality_korean)
+                        tr(R.string.nationality_vietnamese),
+                        tr(R.string.nationality_american),
+                        tr(R.string.nationality_british),
+                        tr(R.string.nationality_chinese),
+                        tr(R.string.nationality_japanese),
+                        tr(R.string.nationality_korean)
                     ),
                     icon = Icons.Default.LocationOn
                 )
                 AddEditDropdownField(
-                    label = stringResource(R.string.add_employee_marital_status),
+                    label = tr(R.string.add_employee_marital_status),
                     value = maritalStatus,
                     onValueChange = { maritalStatus = it },
                     options = listOf(
-                        stringResource(R.string.marital_single),
-                        stringResource(R.string.marital_married),
-                        stringResource(R.string.marital_divorced),
-                        stringResource(R.string.marital_widowed)
+                        tr(R.string.marital_single),
+                        tr(R.string.marital_married),
+                        tr(R.string.marital_divorced),
+                        tr(R.string.marital_widowed)
                     ),
                     icon = Icons.Default.Person
                 )
                 AddEditDetailEditField(
-                    label = stringResource(R.string.add_employee_address),
+                    label = tr(R.string.add_employee_address),
                     value = address,
                     onValueChange = { address = it },
                     icon = Icons.Default.LocationOn,
                     minLines = 3,
-                    placeholder = stringResource(R.string.add_employee_address_hint)
+                    placeholder = tr(R.string.add_employee_address_hint)
                 )
 
                 Spacer(Modifier.height(24.dp))
-                SectionTitleWithBar(stringResource(R.string.add_employee_employment_info))
+                SectionTitleWithBar(tr(R.string.add_employee_employment_info))
 
                 AddEditDropdownField(
-                    label = stringResource(R.string.add_employee_job_title),
+                    label = tr(R.string.add_employee_job_title),
                     value = jobTitle,
                     onValueChange = { jobTitle = it },
                     options = listOf(
-                        stringResource(R.string.job_title_account),
-                        stringResource(R.string.job_title_ga),
-                        stringResource(R.string.job_title_contract),
-                        stringResource(R.string.job_title_developer)
+                        tr(R.string.job_title_account),
+                        tr(R.string.job_title_ga),
+                        tr(R.string.job_title_contract),
+                        tr(R.string.job_title_developer)
                     ),
                     icon = Icons.Default.Person
                 )
                 AddEditDropdownField(
-                    label = stringResource(R.string.add_employee_role),
+                    label = tr(R.string.add_employee_role),
                     value = role,
                     onValueChange = { role = it },
                     options = listOf(
-                        stringResource(R.string.employee_info_role1),
-                        stringResource(R.string.employee_info_role2)
+                        tr(R.string.employee_info_role1),
+                        tr(R.string.employee_info_role2)
                     ),
                     icon = Icons.Default.Person
                 )
                 AddEditDropdownField(
-                    label = stringResource(R.string.add_employee_department),
+                    label = tr(R.string.add_employee_department),
                     value = department,
                     onValueChange = { department = it },
                     options = listOf(
-                        stringResource(R.string.department_gdc),
-                        stringResource(R.string.department_project_biz),
-                        stringResource(R.string.department_banking),
-                        stringResource(R.string.department_mobile),
-                        stringResource(R.string.department_qa)
+                        tr(R.string.department_gdc),
+                        tr(R.string.department_project_biz),
+                        tr(R.string.department_banking),
+                        tr(R.string.department_mobile),
+                        tr(R.string.department_qa)
                     ),
                     icon = Icons.Default.LocationOn
                 )
                 AddEditDropdownField(
-                    label = stringResource(R.string.add_employee_status),
+                    label = tr(R.string.add_employee_status),
                     value = status,
                     onValueChange = { status = it },
                     options = listOf(
-                        stringResource(R.string.employee_info_status_working),
-                        stringResource(R.string.status_on_leave),
-                        stringResource(R.string.status_probation),
-                        stringResource(R.string.status_notice_period)
+                        tr(R.string.employee_info_status_working),
+                        tr(R.string.status_on_leave),
+                        tr(R.string.status_probation),
+                        tr(R.string.status_notice_period)
                     ),
                     icon = Icons.Default.Person
                 )
                 AddEditDropdownField(
-                    label = stringResource(R.string.add_employee_contract_type),
+                    label = tr(R.string.add_employee_contract_type),
                     value = contractType,
                     onValueChange = { contractType = it },
                     options = listOf(
-                        stringResource(R.string.employee_info_contract_full),
-                        stringResource(R.string.employee_info_contract_part),
-                        stringResource(R.string.employee_info_contract_contract),
-                        stringResource(R.string.employee_info_contract_internship)
+                        tr(R.string.employee_info_contract_full),
+                        tr(R.string.employee_info_contract_part),
+                        tr(R.string.employee_info_contract_contract),
+                        tr(R.string.employee_info_contract_internship)
                     ),
                     icon = Icons.Default.Person
                 )
                 AddEditDropdownField(
-                    label = stringResource(R.string.add_employee_level),
+                    label = tr(R.string.add_employee_level),
                     value = level,
                     onValueChange = { level = it },
                     options = listOf(
-                        stringResource(R.string.employee_info_level_j1),
-                        stringResource(R.string.employee_info_level_j2),
-                        stringResource(R.string.employee_info_level_s1),
-                        stringResource(R.string.employee_info_level_s2),
-                        stringResource(R.string.employee_info_level_m1),
-                        stringResource(R.string.employee_info_level_m2),
-                        stringResource(R.string.employee_info_level_m3),
-                        stringResource(R.string.employee_info_level_d1),
-                        stringResource(R.string.employee_info_level_d2)
+                        tr(R.string.employee_info_level_j1),
+                        tr(R.string.employee_info_level_j2),
+                        tr(R.string.employee_info_level_s1),
+                        tr(R.string.employee_info_level_s2),
+                        tr(R.string.employee_info_level_m1),
+                        tr(R.string.employee_info_level_m2),
+                        tr(R.string.employee_info_level_m3),
+                        tr(R.string.employee_info_level_d1),
+                        tr(R.string.employee_info_level_d2)
                     ),
                     icon = Icons.Default.Person
                 )
@@ -585,7 +577,7 @@ fun AddEditEmployeeScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             CustomButton(
-                text = stringResource(R.string.add_employee_cancel),
+                text = tr(R.string.add_employee_cancel),
                 onClick = onBack.singleClick(),
                 variant = ButtonVariant.Outline,
                 modifier = Modifier.weight(1f)
@@ -593,7 +585,7 @@ fun AddEditEmployeeScreen(
             Spacer(modifier = Modifier.width(16.dp))
             CustomButton(
                 modifier = Modifier.weight(1f),
-                text = stringResource(R.string.add_employee_create_member),
+                text = tr(R.string.add_employee_create_member),
                 onClick = {
                     viewModel.saveEmployee(
                         name = fullName,
@@ -725,7 +717,7 @@ private fun AddEditDateField(
             value = date?.let { dateFormat.format(it) } ?: "",
             onValueChange = {},
             readOnly = true,
-            placeholder = { Text(stringResource(R.string.add_employee_date_format)) },
+            placeholder = { Text(tr(R.string.add_employee_date_format)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { onPick() },
@@ -932,14 +924,14 @@ private fun AddEmployeeDatePickerDialog(
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(onClick = onDismiss.singleClick()) {
-                        Text(stringResource(android.R.string.cancel), color = Neutral500)
+                        Text(tr(android.R.string.cancel), color = Neutral500)
                     }
                     TextButton(onClick = {
                         datePickerState.selectedDateMillis?.let { ms ->
                             onDateSelected(Date(ms))
                         }
                     }) {
-                        Text(stringResource(android.R.string.ok), color = Primary400)
+                        Text(tr(android.R.string.ok), color = Primary400)
                     }
                 }
             }

@@ -4,6 +4,7 @@ import com.example.ihrm.data.remote.api.SecurityCheckApiService
 import com.example.ihrm.data.remote.base.NetworkResult
 import com.example.ihrm.data.remote.base.safeApiCall
 import com.example.ihrm.data.remote.securities.MySecurityCheckResponse
+import com.example.ihrm.data.remote.securities.SecurityCheckStatusResponse
 import com.example.ihrm.di.NetworkModule
 import com.example.ihrm.domain.repository.MySecurityCheckRepository
 import retrofit2.Retrofit
@@ -15,6 +16,7 @@ class MySecurityRepositoryImpl @Inject constructor(
 ) : MySecurityCheckRepository {
     override suspend fun getMySecurityCheck(
         year: Int?,
+        query: String?,
         page: Int?,
         limit: Int?,
         orderBy: String?,
@@ -24,11 +26,17 @@ class MySecurityRepositoryImpl @Inject constructor(
         safeApiCall(retrofit) {
             apiService.getMySecurityCheckSubmissions(
                 year = year,
+                query = query?.takeIf { it.isNotBlank() },
                 page = page,
                 limit = limit,
                 orderBy = orderBy,
                 sortBy = sortBy,
                 status = status
             )
+        }
+
+    override suspend fun getHasSubmitted(): NetworkResult<SecurityCheckStatusResponse> =
+        safeApiCall(retrofit) {
+            apiService.getHasSubmitted()
         }
 }

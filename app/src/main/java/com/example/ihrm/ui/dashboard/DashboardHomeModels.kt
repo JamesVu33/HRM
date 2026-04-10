@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import com.example.ihrm.domain.model.Employee
 
 data class DashboardProfileModel(
+    val roleName: String?,
     val displayName: String,
     val employeeId: String,
     val departmentBadge: String,
@@ -38,6 +39,20 @@ data class SecurityMonthlyModel(
     val rejected: Int
 )
 
+/** Banner copy for security cards (aligned with iOS dashboard security banner). */
+data class DashboardSecurityBannerModel(
+    @StringRes val titleRes: Int,
+    @StringRes val subtitleRes: Int,
+    /** When set (e.g. API error), shown instead of [subtitleRes]. */
+    val subtitleOverride: String? = null
+)
+
+data class DashboardSecurityCardState(
+    val isLoading: Boolean,
+    val monthly: SecurityMonthlyModel,
+    val banner: DashboardSecurityBannerModel
+)
+
 data class DashboardHomeMockModel(
     val profile: DashboardProfileModel,
     val leaveStats: List<LeaveStatModel>,
@@ -53,9 +68,6 @@ data class DashboardManagementUiModel(
 )
 
 data class ManagementCalendarUiModel(
-    val dayOfMonth: String,
-    val monthLabel: String,
-    val weekdayLabel: String,
     val presentCount: Int,
     val absentCount: Int,
     val totalHeadcount: Int,

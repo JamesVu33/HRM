@@ -22,7 +22,7 @@ data class UserResponseDto(
     val levelId: Int? = null,
     @SerializedName("level")
     val level: LevelShortDto? = null,
-    @SerializedName("title")
+    @SerializedName("level")
     val title: TitleShortDto? = null,
     @SerializedName("status")
     val status: String? = null,

@@ -58,6 +58,8 @@ object AuthManager {
             ?.putBoolean(Constants.PREF_IS_LOGGED_IN, true)
             ?.putString(Constants.PREF_USER_FULL_NAME, response.user.fullName)
             ?.putString(Constants.PREF_USER_EMAIL, response.user.email)
+            ?.putString(Constants.PREF_USER_EMPLOYEE_ID, response.user.employeeId)
+            ?.putString(Constants.PREF_USER_PHONE, response.user.phoneNumber.orEmpty())
             ?.putString(Constants.PREF_ACCOUNT_TYPE, session.accountType.toApiValue())
             ?.putString(Constants.PREF_MODIFIABLE_FEATURES, featuresCsv)
             ?.apply()
@@ -71,6 +73,12 @@ object AuthManager {
 
     /** Logged-in user's email, or null if not saved. */
     fun getUserEmail(): String? = prefs?.getString(Constants.PREF_USER_EMAIL, null)
+
+    /** Employee id from last login, or null if not saved. */
+    fun getUserEmployeeId(): String? = prefs?.getString(Constants.PREF_USER_EMPLOYEE_ID, null)
+
+    /** Phone from last login; may be blank. */
+    fun getUserPhone(): String? = prefs?.getString(Constants.PREF_USER_PHONE, null)
 
     /**
      * Account tier from last login ([LoginSessionResolver]); defaults to [AccountType.Basic] if missing.
@@ -100,6 +108,8 @@ object AuthManager {
             ?.remove(Constants.PREF_REFRESH_TOKEN)
             ?.remove(Constants.PREF_USER_FULL_NAME)
             ?.remove(Constants.PREF_USER_EMAIL)
+            ?.remove(Constants.PREF_USER_EMPLOYEE_ID)
+            ?.remove(Constants.PREF_USER_PHONE)
             ?.remove(Constants.PREF_ACCOUNT_TYPE)
             ?.remove(Constants.PREF_MODIFIABLE_FEATURES)
             ?.putBoolean(Constants.PREF_IS_LOGGED_IN, false)

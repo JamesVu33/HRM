@@ -25,6 +25,7 @@ import com.example.ihrm.util.DashboardBrush
 import com.example.ihrm.util.statLabelStyle
 import com.example.ihrm.util.statTitleStyle
 import com.example.ihrm.util.statValueStyle
+import com.example.ihrm.ui.localization.tr
 
 data class SecurityStatItem(
     val label: String,
@@ -45,7 +46,7 @@ fun SecurityCheckThisMonthProgressSection(
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
-            text = stringResource(R.string.dashboard_security_this_month),
+            text = tr(R.string.dashboard_security_this_month),
             style = statTitleStyle
         )
         Spacer(modifier = Modifier.height(8.dp))

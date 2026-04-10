@@ -1,7 +1,8 @@
-package com.example.ihrm.ui.common
+package com.example.ihrm.ui.common.bottomsheet
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,6 +33,7 @@ import com.example.ihrm.R
 import com.example.ihrm.domain.model.MaritalStatus
 import com.example.ihrm.ui.theme.DashboardFigmaInk
 import com.example.ihrm.ui.theme.InterFontFamily
+import com.example.ihrm.ui.localization.tr
 
 @Composable
 fun MaritalStatusBottomSheet(
@@ -50,7 +53,12 @@ fun MaritalStatusBottomSheet(
         ),
     ) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) { onDismiss() },
             contentAlignment = Alignment.BottomCenter,
         ) {
             Column(
@@ -76,7 +84,7 @@ fun MaritalStatusBottomSheet(
                 }
 
                 Text(
-                    text = stringResource(R.string.my_info_marital_status_picker_title),
+                    text = tr(R.string.my_info_marital_status_picker_title),
                     style = TextStyle(
                         fontFamily = InterFontFamily,
                         fontWeight = FontWeight.SemiBold,

@@ -76,6 +76,13 @@ val txtInterBold16 = TextStyle(
     color = DashboardFigmaInk
 )
 
+val txtInterBold20 = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.SemiBold,
+    fontSize = 20.sp,
+    color = DashboardFigmaInk
+)
+
 val txtInterBold22White = TextStyle(
     fontFamily = InterFontFamily,
     fontWeight = FontWeight.SemiBold,
