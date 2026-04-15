@@ -6,6 +6,6 @@ import retrofit2.Response
 import retrofit2.http.GET
 
 interface OrganizationApiService {
-    @GET("groups")
+    @GET("/groups")
     suspend fun getOrganizations(): Response<ApiSuccessResponse<List<OrganizationResponse>>>
 }
