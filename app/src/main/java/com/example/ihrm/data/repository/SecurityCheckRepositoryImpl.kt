@@ -12,9 +12,11 @@ import com.example.ihrm.data.remote.securities.SecurityGroupsResponse
 import com.example.ihrm.data.remote.securities.SecuritySubmissionRequest
 import com.example.ihrm.data.remote.securities.SecuritySubmissionResponse
 import com.example.ihrm.data.remote.securities.SecurityTemplateResponse
+import com.example.ihrm.data.remote.securities.SubmissionStatusResponse
 import com.example.ihrm.di.NetworkModule
 import com.example.ihrm.domain.model.SecurityCheckSubmissionsPage
 import com.example.ihrm.domain.model.SecurityGroups
+import com.example.ihrm.domain.model.securitycheck.SubmissionStat
 import com.example.ihrm.domain.repository.SecurityCheckRepository
 import retrofit2.Retrofit
 import javax.inject.Inject
@@ -124,5 +126,24 @@ class SecurityCheckRepositoryImpl @Inject constructor(
     ): NetworkResult<SecuritySubmissionResponse> =
         safeApiCall(retrofit) {
             apiService.postSubmission(request)
+        }
+
+    override suspend fun getSubmissionStat(
+        fromDate: String?,
+        toDate: String?,
+        query: String?,
+        type: String?,
+        monthCode: String?,
+        groupId: String?
+    ): NetworkResult<List<SubmissionStatusResponse>> =
+        safeApiCall(retrofit) {
+            apiService.getStats(
+                fromDate = fromDate,
+                toDate = toDate,
+                query = query,
+                type = type,
+                monthCode = monthCode,
+                groupId = groupId,
+            )
         }
 }

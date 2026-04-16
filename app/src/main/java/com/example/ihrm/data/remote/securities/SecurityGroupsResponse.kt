@@ -14,6 +14,7 @@ data class SecurityGroupsResponse(
 ) : ResponseToInfoMapper<SecurityGroups> {
     override fun fromResponseToInfo(): SecurityGroups {
         return SecurityGroups(
+            id = id,
             code = code,
             name = name,
         )

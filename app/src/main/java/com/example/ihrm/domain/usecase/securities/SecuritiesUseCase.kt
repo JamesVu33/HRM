@@ -10,6 +10,8 @@ import com.example.ihrm.domain.model.SecurityCheckSubmissionsPage
 import com.example.ihrm.domain.model.SecurityGroups
 import com.example.ihrm.domain.model.securitycheck.SecuritySubmission
 import com.example.ihrm.domain.model.securitycheck.SecurityTemplate
+import com.example.ihrm.domain.model.securitycheck.SubmissionStat
+import com.example.ihrm.domain.model.securitycheck.toDomain
 import com.example.ihrm.domain.repository.LanguageRepository
 import com.example.ihrm.domain.repository.SecurityCheckRepository
 import javax.inject.Inject
@@ -101,6 +103,29 @@ class SecuritiesUseCase @Inject constructor(
         val result = securityCheckRepository.postSubmission(request)
         return translateResponse(result).map {
             it.fromResponseToInfo()
+        }
+    }
+
+    suspend fun getSubmissionStat(
+        fromDate: String?,
+        toDate: String?,
+        query: String?,
+        type: String?,
+        monthCode: String?,
+        groupId: String?,
+    ): NetworkResult<List<SubmissionStat>> {
+        val result = securityCheckRepository.getSubmissionStat(
+            fromDate = fromDate,
+            toDate = toDate,
+            query = query,
+            type = type,
+            monthCode = monthCode,
+            groupId = groupId,
+        )
+        return translateResponse(result).map {
+            it.map { itemStat ->
+                itemStat.toDomain()
+            }
         }
     }
 }

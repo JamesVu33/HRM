@@ -1,8 +1,6 @@
 package com.example.ihrm.ui.security.checks
 
-import android.content.Context
 import android.util.Log
-import com.example.ihrm.R
 import com.example.ihrm.core.errorHandler.CommonErrorException
 import com.example.ihrm.core.viewmodel.BaseViewmodel
 import com.example.ihrm.core.viewmodel.CallbackWrapper
@@ -13,14 +11,14 @@ import com.example.ihrm.domain.model.SecurityGroups
 import com.example.ihrm.domain.model.SubmissionPaginationMeta
 import com.example.ihrm.domain.model.securitycheck.SecuritySubmission
 import com.example.ihrm.domain.model.securitycheck.SecurityTemplate
+import com.example.ihrm.domain.model.securitycheck.SubmissionStat
+import com.example.ihrm.domain.model.securitycheck.SubmissionStatus
 import com.example.ihrm.domain.usecase.securities.SecuritiesUseCase
-import com.example.ihrm.ui.common.toast.ToastPosition
 import com.example.ihrm.ui.common.toast.ToastState
 import com.example.ihrm.ui.common.toast.ToastType
 import com.example.ihrm.util.Constants.DEFAULT_LIMIT
 import com.example.ihrm.util.Constants.DEFAULT_PAGE
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -52,7 +50,6 @@ data class SecurityTemplateUiState(
 @HiltViewModel
 class SecurityChecksViewModel @Inject constructor(
     private val securitiesUseCase: SecuritiesUseCase,
-    @ApplicationContext private val appContext: Context,
 ) : BaseViewmodel() {
 
     private val _uiState = MutableStateFlow(SecurityChecksUiState())
@@ -68,43 +65,89 @@ class SecurityChecksViewModel @Inject constructor(
     val isPostSubmissionSuccess: StateFlow<Boolean> = _isPostSubmissionSuccess.asStateFlow()
 
     init {
-        loadSubmissions()
         getGroups()
     }
 
-    fun loadSubmissions(
+    /**
+     * Đồng bộ: GET stats + danh sách (submissions hoặc missing) theo [summaryTab],
+     * cùng bộ [filters] + [searchQuery] (đã debounce ở UI nếu cần).
+     */
+    fun loadSecurityChecksData(
+        searchQuery: String,
+        filters: SecurityChecksActiveFilters,
+        summaryTab: SecuritySummaryFilter,
+    ) {
+        val api = filters.toApiQuery(searchQuery)
+        loadSubmissionStats(api)
+        when (summaryTab) {
+            SecuritySummaryFilter.NOT_SUBMITTED -> loadNotSubmissionsInternal(api)
+            SecuritySummaryFilter.APPROVED -> loadSubmissionsInternal(api, status = "APPROVED")
+            SecuritySummaryFilter.SUBMITTED -> loadSubmissionsInternal(api, status = "SUBMITTED")
+            SecuritySummaryFilter.REJECTED -> loadSubmissionsInternal(api, status = "REJECTED")
+        }
+    }
+
+    private fun loadSubmissionStats(api: SecurityChecksApiQuery) {
+        fetchData(
+            onLoading = {},
+            fetching = {
+                securitiesUseCase.getSubmissionStat(
+                    fromDate = api.fromDate,
+                    toDate = api.toDate,
+                    query = api.query,
+                    type = api.type,
+                    monthCode = api.monthCode,
+                    groupId = api.groupId,
+                )
+            },
+            callbackWrapper = object : CallbackWrapper<List<SubmissionStat>> {
+                override fun onSuccess(data: List<SubmissionStat>) {
+                    _uiState.update { state ->
+                        state.copy(
+                            approvedCount = data.countFor(SubmissionStatus.APPROVED),
+                            submittedCount = data.countFor(SubmissionStatus.SUBMITTED),
+                            rejectedCount = data.countFor(SubmissionStatus.REJECTED),
+                            notSubmittedCount = data.countFor(SubmissionStatus.NOT_SUBMITTED),
+                        )
+                    }
+                }
+
+                override fun onFail(e: CommonErrorException) {
+                    Log.d("apiFlows", "getSubmissionStat onFail: $e")
+                }
+            },
+        )
+    }
+
+    private fun loadSubmissionsInternal(
+        api: SecurityChecksApiQuery,
+        status: String,
         page: Int = DEFAULT_PAGE,
         limit: Int = DEFAULT_LIMIT,
-        fromDate: String? = null,
-        toDate: String? = null,
-        query: String? = null,
-        orderBy: String? = null,
-        sortBy: String? = null,
-        status: String? = null,
-        type: String? = null,
-        monthCode: String? = null,
-        groupId: String? = null,
     ) {
-        _uiState.value = _uiState.value.copy(
-            submissions = emptyList(),
-            pagination = null,
-            isLoading = true,
-            errorMessage = null,
-        )
+        _uiState.update {
+            it.copy(
+                submissions = emptyList(),
+                pagination = null,
+                isLoading = true,
+                errorMessage = null,
+            )
+        }
         fetchData(
+            onLoading = {},
             fetching = {
                 securitiesUseCase.getSubmissions(
-                    fromDate = fromDate,
-                    toDate = toDate,
-                    query = query,
+                    fromDate = api.fromDate,
+                    toDate = api.toDate,
+                    query = api.query,
                     page = page,
                     limit = limit,
-                    orderBy = orderBy,
-                    sortBy = sortBy,
+                    orderBy = null,
+                    sortBy = null,
                     status = status,
-                    type = type,
-                    monthCode = monthCode,
-                    groupId = groupId,
+                    type = api.type,
+                    monthCode = api.monthCode,
+                    groupId = api.groupId,
                 )
             },
             callbackWrapper = object : CallbackWrapper<SecurityCheckSubmissionsPage> {
@@ -114,7 +157,7 @@ class SecurityChecksViewModel @Inject constructor(
                             submissions = data.items,
                             pagination = data.meta,
                             isLoading = false,
-                            errorMessage = null
+                            errorMessage = null,
                         )
                     }
                 }
@@ -131,34 +174,33 @@ class SecurityChecksViewModel @Inject constructor(
         )
     }
 
-    fun loadNotSubmissions(
+    private fun loadNotSubmissionsInternal(
+        api: SecurityChecksApiQuery,
         page: Int = DEFAULT_PAGE,
         limit: Int = DEFAULT_LIMIT,
-        fromDate: String? = null,
-        toDate: String? = null,
-        query: String? = null,
-        orderBy: String? = null,
-        sortBy: String? = null,
-        status: String? = null,
-        type: String? = null,
-        monthCode: String? = null,
-        groupId: String? = null,
     ) {
-        _uiState.update { it.copy(isLoading = true) }
+        _uiState.update {
+            it.copy(
+                notSubmission = emptyList(),
+                isLoading = true,
+                errorMessage = null,
+            )
+        }
         fetchData(
+            onLoading = {},
             fetching = {
                 securitiesUseCase.getNotSubmissions(
-                    fromDate = fromDate,
-                    toDate = toDate,
-                    query = query,
+                    fromDate = api.fromDate,
+                    toDate = api.toDate,
+                    query = api.query,
                     page = page,
                     limit = limit,
-                    orderBy = orderBy,
-                    sortBy = sortBy,
-                    status = status,
-                    type = type,
-                    monthCode = monthCode,
-                    groupId = groupId,
+                    orderBy = null,
+                    sortBy = null,
+                    status = null,
+                    type = api.type,
+                    monthCode = api.monthCode,
+                    groupId = api.groupId,
                 )
             },
             callbackWrapper = object : CallbackWrapper<SecurityCheckSubmissionsPage> {
@@ -168,7 +210,7 @@ class SecurityChecksViewModel @Inject constructor(
                             notSubmission = data.items,
                             pagination = data.meta,
                             isLoading = false,
-                            notSubmittedCount = data.meta?.total ?: 0
+                            errorMessage = null,
                         )
                     }
                 }
@@ -187,6 +229,7 @@ class SecurityChecksViewModel @Inject constructor(
 
     fun getGroups() {
         fetchData(
+            onLoading = {},
             fetching = { securitiesUseCase.getGroups() },
             callbackWrapper = object : CallbackWrapper<List<SecurityGroups>> {
                 override fun onSuccess(data: List<SecurityGroups>) {
@@ -200,18 +243,10 @@ class SecurityChecksViewModel @Inject constructor(
         )
     }
 
-    fun loadSecurityCheck(selectedSummaryFilter: SecuritySummaryFilter) {
-        when (selectedSummaryFilter) {
-            SecuritySummaryFilter.NOT_SUBMITTED -> loadNotSubmissions()
-            SecuritySummaryFilter.APPROVED -> loadSubmissions(status = SecuritySummaryFilter.APPROVED.name)
-            SecuritySummaryFilter.SUBMITTED -> loadSubmissions(status = SecuritySummaryFilter.SUBMITTED.name)
-            SecuritySummaryFilter.REJECTED -> loadSubmissions(status = SecuritySummaryFilter.REJECTED.name)
-        }
-    }
-
     fun getCurrentSecurityTemplate() {
         _templateUiState.update { it.copy(isLoading = true, errorMessage = null) }
         fetchData(
+            onLoading = {},
             fetching = { securitiesUseCase.getCurrentSecurityTemplate() },
             callbackWrapper = object : CallbackWrapper<SecurityTemplate> {
                 override fun onSuccess(data: SecurityTemplate) {
@@ -232,6 +267,7 @@ class SecurityChecksViewModel @Inject constructor(
 
     fun postSubmission(request: SecuritySubmissionRequest) {
         fetchData(
+            onLoading = {},
             fetching = { securitiesUseCase.postSubmission(request) },
             callbackWrapper = object : CallbackWrapper<SecuritySubmission> {
                 override fun onSuccess(data: SecuritySubmission) {
@@ -256,3 +292,6 @@ class SecurityChecksViewModel @Inject constructor(
         _isPostSubmissionSuccess.value = false
     }
 }
+
+private fun List<SubmissionStat>.countFor(status: SubmissionStatus): Int =
+    firstOrNull { it.status == status }?.count ?: 0

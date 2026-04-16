@@ -53,7 +53,7 @@ data class EmployeeDepartmentResponse(
     @SerializedName("phoneNumber")
     val phoneNumber: String? = null,
 
-    @SerializedName("level")
+    @SerializedName("title")
     val title: Title? = null,
 
     @SerializedName("level")

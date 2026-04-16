@@ -16,13 +16,20 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.JavaNetCookieJar
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.net.CookieManager
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
 import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
 import javax.inject.Singleton
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -54,14 +61,18 @@ object NetworkModule {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
-        return OkHttpClient.Builder()
-            .addInterceptor(authInterceptor)
-            .addInterceptor(loggingInterceptor)
-            .authenticator(tokenAuthenticator)
-            .connectTimeout(30L, TimeUnit.SECONDS)
-            .readTimeout(30L, TimeUnit.SECONDS)
-            .writeTimeout(30L, TimeUnit.SECONDS)
-            .build()
+        return OkHttpClient.Builder().apply {
+            cookieJar(JavaNetCookieJar(CookieManager()))
+            if (BuildConfig.DEBUG) {
+                ignoreAllSSLErrors() // emulator / proxy — không dùng cho release
+            }
+            addInterceptor(authInterceptor)
+            addInterceptor(loggingInterceptor)
+            authenticator(tokenAuthenticator)
+            connectTimeout(30L, TimeUnit.SECONDS)
+            readTimeout(30L, TimeUnit.SECONDS)
+            writeTimeout(30L, TimeUnit.SECONDS)
+        }.build()
     }
 
     @Provides
@@ -127,4 +138,18 @@ object NetworkModule {
     fun provideOrganizationApiService(@InternalApi retrofit: Retrofit): OrganizationApiService {
         return retrofit.create(OrganizationApiService::class.java)
     }
+}
+
+private fun OkHttpClient.Builder.ignoreAllSSLErrors(): OkHttpClient.Builder {
+    val naiveTrustManager = object : X509TrustManager {
+        override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
+        override fun checkClientTrusted(certs: Array<X509Certificate>, authType: String) = Unit
+        override fun checkServerTrusted(certs: Array<X509Certificate>, authType: String) = Unit
+    }
+    val insecureSocketFactory = SSLContext.getInstance("TLS").apply {
+        init(null, arrayOf<TrustManager>(naiveTrustManager), SecureRandom())
+    }.socketFactory
+    sslSocketFactory(insecureSocketFactory, naiveTrustManager)
+    hostnameVerifier { _, _ -> true }
+    return this
 }

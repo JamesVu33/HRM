@@ -113,7 +113,7 @@ fun SecurityChecksFilterBottomSheet(
 
     val selectedGroupLabel = draft.groupId?.let { key ->
         groupOptions.firstOrNull { option ->
-            option.code == key || option.name == key
+            option.id == key || option.code == key || option.name == key
         }?.let { option ->
             option.name?.takeIf { it.isNotBlank() } ?: option.code.orEmpty()
         }
@@ -289,9 +289,15 @@ fun SecurityChecksFilterBottomSheet(
                             )
 
                             groupOptions.forEach { option ->
-                                val rowLabel = option.name?.takeIf { it.isNotBlank() } ?: option.code ?: ""
+                                val rowLabel = option.name?.takeIf { it.isNotBlank() }
+                                    ?: option.code?.takeIf { it.isNotBlank() }
+                                    ?: option.id?.takeIf { it.isNotBlank() }
+                                    ?: ""
                                 if (rowLabel.isNotBlank()) {
-                                    val isSelected = draft.groupId == (option.code ?: option.name)
+                                    val optionKey = option.id?.takeIf { it.isNotBlank() }
+                                        ?: option.code?.takeIf { it.isNotBlank() }
+                                        ?: option.name
+                                    val isSelected = draft.groupId == optionKey
 
                                     DropdownMenuItem(
                                         text = {
@@ -306,8 +312,7 @@ fun SecurityChecksFilterBottomSheet(
                                             )
                                         },
                                         onClick = {
-                                            val key = option.code?.takeIf { it.isNotBlank() } ?: option.name
-                                            onDraftChange(draft.copy(groupId = key))
+                                            onDraftChange(draft.copy(groupId = optionKey))
                                             groupMenuExpanded = false
                                         },
                                         modifier = Modifier.background(
@@ -361,7 +366,7 @@ fun SecurityChecksFilterBottomSheet(
 
     if (showFromPicker) {
         SecurityChecksDatePickerDialog(
-            initialMillis = draft.dateFromMillis,
+            initialMillis = draft.dateFromMillis ?: draft.dateToMillis,
             onDateSelected = { ms ->
                 onDraftChange(draft.copy(dateFromMillis = ms))
                 showFromPicker = false
@@ -371,7 +376,7 @@ fun SecurityChecksFilterBottomSheet(
     }
     if (showToPicker) {
         SecurityChecksDatePickerDialog(
-            initialMillis = draft.dateToMillis,
+            initialMillis = draft.dateToMillis ?: draft.dateFromMillis,
             onDateSelected = { ms ->
                 onDraftChange(draft.copy(dateToMillis = ms))
                 showToPicker = false

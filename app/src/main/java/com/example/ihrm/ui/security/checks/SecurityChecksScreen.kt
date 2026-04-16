@@ -1,6 +1,5 @@
 package com.example.ihrm.ui.security.checks
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -38,6 +37,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -72,6 +72,7 @@ import com.example.ihrm.util.formatVNPhoneNumber
 import com.example.ihrm.util.singleClick
 import com.example.ihrm.util.txtInterMedium15
 import com.example.ihrm.ui.localization.tr
+import kotlinx.coroutines.delay
 
 @Composable
 fun SecurityChecksScreen(
@@ -115,11 +116,29 @@ fun SecurityChecksScreenContent(
     val submissionsState by viewModel.uiState.collectAsState()
     val securityGroupsState by viewModel.uiStateSecurityGroups.collectAsState()
 
+    val filterBaseline = remember { SecurityChecksActiveFilters.defaultCurrentMonth() }
     var searchQuery by remember { mutableStateOf("") }
     var showFilterSheet by remember { mutableStateOf(false) }
-    var appliedFilters by remember { mutableStateOf(SecurityChecksActiveFilters.Default) }
-    var draftFilters by remember { mutableStateOf(SecurityChecksActiveFilters.Default) }
+    var appliedFilters by remember { mutableStateOf(filterBaseline) }
+    var draftFilters by remember { mutableStateOf(filterBaseline) }
     var selectedSummaryFilter by remember { mutableStateOf(SecuritySummaryFilter.NOT_SUBMITTED) }
+
+    val debouncedSearch by produceState(initialValue = "", searchQuery) {
+        if (searchQuery.isBlank()) {
+            value = ""
+        } else {
+            delay(350)
+            value = searchQuery.trim()
+        }
+    }
+
+    LaunchedEffect(debouncedSearch, appliedFilters, selectedSummaryFilter) {
+        viewModel.loadSecurityChecksData(
+            searchQuery = debouncedSearch,
+            filters = appliedFilters,
+            summaryTab = selectedSummaryFilter,
+        )
+    }
 
     LaunchedEffect(showFilterSheet) {
         if (showFilterSheet) {
@@ -136,21 +155,6 @@ fun SecurityChecksScreenContent(
     val labelRejected = tr(R.string.security_checks_status_rejected)
     val labelNotSubmitted = tr(R.string.security_checks_status_not_submitted)
     val dash = tr(R.string.security_checks_dash)
-
-//    val filteredSubmissions = remember(
-//        submissionsState.submissions,
-//        searchQuery,
-//        appliedFilters,
-//    ) {
-//        submissionsState.submissions
-//            .filterByDateRange(appliedFilters.dateFromMillis, appliedFilters.dateToMillis)
-//            .filterByGroup(appliedFilters.groupId)
-//            .filteredBySearchQuery(searchQuery, appliedFilters.searchBy)
-//    }
-
-    LaunchedEffect(selectedSummaryFilter) {
-        viewModel.loadSecurityCheck(selectedSummaryFilter)
-    }
 
     val uiItems = remember(
         submissionsState,
@@ -183,12 +187,17 @@ fun SecurityChecksScreenContent(
 
 
 
-    val notSubmittedCount = submissionsState.notSubmission.size
+    val notSubmittedCount = submissionsState.notSubmittedCount
     val approvedCount = submissionsState.approvedCount
     val submittedCount = submissionsState.submittedCount
     val rejectedCount = submissionsState.rejectedCount
-    val showInitialLoading = submissionsState.isLoading && submissionsState.submissions.isEmpty()
-    val filterIndicatorActive = appliedFilters.hasActiveFilters()
+    val listEmptyForTab = if (selectedSummaryFilter == SecuritySummaryFilter.NOT_SUBMITTED) {
+        submissionsState.notSubmission.isEmpty()
+    } else {
+        submissionsState.submissions.isEmpty()
+    }
+    val showInitialLoading = submissionsState.isLoading && listEmptyForTab
+    val filterIndicatorActive = appliedFilters.hasActiveFiltersComparedTo(filterBaseline)
 
     SecurityChecksFilterBottomSheet(
         visible = showFilterSheet,
@@ -196,7 +205,7 @@ fun SecurityChecksScreenContent(
         onDraftChange = { draftFilters = it },
         groupOptions = groupOptions,
         onDismiss = { showFilterSheet = false },
-        onClearAll = { draftFilters = SecurityChecksActiveFilters.Default },
+        onClearAll = { draftFilters = SecurityChecksActiveFilters.defaultCurrentMonth() },
         onApply = {
             appliedFilters = draftFilters
             showFilterSheet = false

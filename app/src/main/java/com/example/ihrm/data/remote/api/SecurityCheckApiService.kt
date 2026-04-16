@@ -11,6 +11,7 @@ import com.example.ihrm.data.remote.securities.SecurityGroupsResponse
 import com.example.ihrm.data.remote.securities.SecuritySubmissionRequest
 import com.example.ihrm.data.remote.securities.SecuritySubmissionResponse
 import com.example.ihrm.data.remote.securities.SecurityTemplateResponse
+import com.example.ihrm.data.remote.securities.SubmissionStatusResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -88,4 +89,14 @@ interface SecurityCheckApiService {
 
     @GET("/security-check/submissions/has-submitted")
     suspend fun getHasSubmitted(): Response<ApiSuccessResponse<SecurityCheckStatusResponse>>
+
+    @GET("/security-check/submissions/stats")
+    suspend fun getStats(
+        @Query("fromDate") fromDate: String? = null,
+        @Query("toDate") toDate: String? = null,
+        @Query("query") query: String? = null,
+        @Query("type") type: String? = null,
+        @Query("monthCode") monthCode: String? = null,
+        @Query("groupId") groupId: String? = null,
+    ): Response<ApiSuccessResponse<List<SubmissionStatusResponse>>>
 }

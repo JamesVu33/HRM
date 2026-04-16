@@ -5,8 +5,10 @@ import com.example.ihrm.data.remote.securities.SecurityCheckDashboardResponse
 import com.example.ihrm.data.remote.securities.SecuritySubmissionRequest
 import com.example.ihrm.data.remote.securities.SecuritySubmissionResponse
 import com.example.ihrm.data.remote.securities.SecurityTemplateResponse
+import com.example.ihrm.data.remote.securities.SubmissionStatusResponse
 import com.example.ihrm.domain.model.SecurityCheckSubmissionsPage
 import com.example.ihrm.domain.model.SecurityGroups
+import com.example.ihrm.domain.model.securitycheck.SubmissionStat
 
 interface SecurityCheckRepository {
     suspend fun getSubmissions(
@@ -41,4 +43,12 @@ interface SecurityCheckRepository {
     suspend fun postSubmission(
         request: SecuritySubmissionRequest
     ): NetworkResult<SecuritySubmissionResponse>
+    suspend fun getSubmissionStat(
+        fromDate: String?,
+        toDate: String?,
+        query: String?,
+        type: String?,
+        monthCode: String?,
+        groupId: String?,
+    ): NetworkResult<List<SubmissionStatusResponse>>
 }
